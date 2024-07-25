@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 const transactionSchema = mongoose.Schema({
+  userId: String,
   transactionId: {
     type: String,
     required: true,
@@ -11,12 +12,9 @@ const transactionSchema = mongoose.Schema({
   date: Date,
   name: String,
   merchantName: String,
+  logo_url: String,
   category: [String],
-  description: String,
-  institutionId: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Institution"
-  }]
+  description: String,  
 });
 
 export default mongoose.model("Transaction", transactionSchema);

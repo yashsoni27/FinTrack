@@ -1,5 +1,5 @@
 import express from "express";
-import { getDbBalance } from "../controllers/db";
+import { getBalanceDb, getTransactionsDb } from "../controllers/db.js";
 
 const router = express.Router();
 
@@ -9,7 +9,7 @@ router.get("/db", (req, res) => {
   });
 });
 
-router.post("/balance/get", getDbBalance);
-router.post("/transactions/get", getTransactions);
+router.post("/balance/get", getBalanceDb);
+router.post("/transactions/get", getTransactionsDb);
 
 export default router;

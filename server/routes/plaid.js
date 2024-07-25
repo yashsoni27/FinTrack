@@ -5,12 +5,13 @@ import {
     exchangePublicToken,
     getBalance,
     getTransactions,
+    institutionLogo,
     syncTransactions,
 } from "../controllers/plaid.js";
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
+router.get("/api", (req, res) => {
   return res.json({
     data: "Hello from Plaid API",
   });
@@ -23,5 +24,7 @@ router.post("/auth", auth);
 router.post("/balance/get", getBalance);
 router.post("/transactions/sync", syncTransactions);
 router.post("/transactions/get", getTransactions);
+
+router.post("/institution/logo", institutionLogo);
 
 export default router;

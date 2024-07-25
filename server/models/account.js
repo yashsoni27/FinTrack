@@ -20,6 +20,7 @@ const accountSchema = mongoose.Schema({
   type: String,
   subType: String,
   persistent_account_id: String,
+  userId: String,
 });
 
 export default mongoose.model("Account", accountSchema);

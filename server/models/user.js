@@ -11,6 +11,7 @@ const InstitutionSchema = mongoose.Schema({
     required: true,
   },
   accessToken: String,  
+  plaidCursor: String, 
 });
 
 const userSchema = mongoose.Schema({
@@ -38,7 +39,7 @@ const userSchema = mongoose.Schema({
   institutions: [InstitutionSchema],
   resetCode: String,      
   // accessToken: String,   
-  plaidCursor: String, 
+  // plaidCursor: String, 
 });
 
 export default mongoose.model("Users", userSchema);
