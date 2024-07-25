@@ -13,11 +13,14 @@ export const getDbBalance = async (request, response) => {
       throw new error("User not found or access token not set");
     }
 
-    const accessToken = user.accessToken;
-    const res = await plaidClient.accountsBalanceGet({
-      access_token: accessToken,
-    });
-    console.log("******  ", res.data.accounts);
+    // const accessToken = user.accessToken;
+    // const res = await plaidClient.accountsBalanceGet({
+    //   access_token: accessToken,
+    // });
+    // console.log("******  ", res.data.accounts);
+    const account = await Account.findOne({
+      
+    })
 
     for (const accountData of res.data.accounts) {
       try {

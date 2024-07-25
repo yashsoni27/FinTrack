@@ -23,8 +23,7 @@ const plaidClient = new PlaidApi(configuration);
 // Plaid API starts
 // Creating a temporary link token for bank connect
 export const createLinkToken = async (request, response) => {
-  
-  const { userId } = request.body;  
+  const { userId } = request.body;
   const user = await User.findOne({ userId });
   const plaidRequest = {
     user: {
@@ -52,19 +51,35 @@ export const createLinkToken = async (request, response) => {
 
 // For exchanging public token   --- NEED TO BE REFACTORED A BIT
 export const exchangePublicToken = async (request, response) => {
-  const { userId, public_token } = request.body;
-  console.log(userId, public_token);
+  const { userId, public_token, metadata } = request.body;
+  // console.log(metadata);
   const user = await User.findOne({ userId });
+  console.log(user);
   var accessToken;
   try {
     // Only exchange token if the user doesn't have access token
-    if (user.accessToken == "" || user.accessToken == null) {
+    if (!user.institutions || user.institutions.length == 0) {
       const plaidResponse = await plaidClient.itemPublicTokenExchange({
         public_token: public_token,
       });
 
-      user.accessToken = plaidResponse.data.access_token;
+      // user.institutions[0].accessToken = plaidResponse.data.access_token;
+      accessToken = plaidResponse.data.access_token;
+
       const itemID = plaidResponse.data.item_id;
+      console.log("itemId: ", itemID);
+
+      const institution = {
+        institutionId: metadata.institution.id,
+        name: metadata.institution.name,
+        accessToken: plaidResponse.data.access_token,
+      };
+
+      // Initialize institutions if undefined
+      if (!user.institutions) {
+        user.institutions = [];
+      }
+      user.institutions.push(institution);
 
       // const user = await User.findOneAndUpdate({userId}, {accessToken}, {new: true})
       // console.log(plaidResponse.data);
@@ -72,49 +87,60 @@ export const exchangePublicToken = async (request, response) => {
       user.save();
       console.log("user data saved");
     } else {
-      accessToken = user.accessToken;
+      accessToken = user.institutions[0].accessToken;
     }
 
-    const balanceResponse = await plaidClient.accountsBalanceGet({
+    // getting balance after initial connect
+    // const balanceResponse = await plaidClient.accountsBalanceGet({
+    //   access_token: accessToken,
+    // });
+
+    // for (const accountData in balanceResponse.data.accounts) {
+    //   try {
+    //     const existingAccount = await Account.findOne({
+    //       account_id: accountData.account_id,
+    //     });
+
+    //     if (!existingAccount) {
+    //       const newAccount = new Account({
+    //         account_id: accountData.account_id,
+    //         balances: {
+    //           available: accountData.balances.available,
+    //           current: accountData.balances.current,
+    //           iso_currency_code: accountData.balances.iso_currency_code,
+    //           limit: accountData.balances.limit,
+    //           unofficial_currency_code:
+    //             accountData.balances.unofficial_currency_code,
+    //         },
+    //         mask: accountData.mask,
+    //         name: accountData.name,
+    //         type: accountData.type,
+    //         subType: accountData.subType,
+    //         persistent_account_id: accountData.persistent_account_id,
+    //         userId: user.userId,
+    //       });
+    //       await newAccount.save();
+    //       console.log("Bank account saved: ", accountData.account_id);
+    //     } else {
+    //       console.log("Bank account already exists: ", accountData.account_id);
+    //     }
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // }
+
+    // getting authData from plaid
+    // const authData = await auth({userId});
+    // console.log("authData", authData);
+
+    const authData = await plaidClient.accountsGet({
       access_token: accessToken,
     });
-    // console.log(balanceResponse.data);
-
-    for (const accountData in balanceResponse.data.accounts) {
-      try {
-        const existingAccount = await Account.findOne({
-          account_id: accountData.account_id,
-        });
-
-        if (!existingAccount) {
-          const newAccount = new Account({
-            account_id: accountData.account_id,
-            balances: {
-              available: accountData.balances.available,
-              current: accountData.balances.current,
-              iso_currency_code: accountData.balances.iso_currency_code,
-              limit: accountData.balances.limit,
-              unofficial_currency_code:
-                accountData.balances.unofficial_currency_code,
-            },
-            mask: accountData.mask,
-            name: accountData.name,
-            type: accountData.type,
-            subType: accountData.subType,
-            persistent_account_id: accountData.persistent_account_id,
-          });
-          await newAccount.save();
-          console.log("Bank account saved: ", accountData.account_id);
-        } else {
-          console.log("Bank account already exists: ", accountData.account_id);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
+    // console.log("authResponse: ", authData.data);
 
     response.json({
-      balance: balanceResponse.data,
+      // balance: balanceResponse.data,
+      auth: authData.data,
     });
   } catch (error) {
     // handle error
@@ -128,21 +154,20 @@ export const getBalance = async (request, response) => {
   try {
     const { userId } = request.body;
     const user = await User.findOne({ userId });
-    if (!user || !user.accessToken) {
+    if (!user || !user.institutions || user.institutions.length == 0) {
       throw new error("User not found or access token not set");
     }
 
-    const accessToken = user.accessToken;
+    // const accessToken = user.institutions[0].accessToken;
     const res = await plaidClient.accountsBalanceGet({
-      access_token: accessToken,
+      access_token: user.institutions[0].accessToken,
     });
-    console.log("******  ", res.data.accounts);
 
     for (const accountData of res.data.accounts) {
       try {
         const existingAccount = await Account.findOne({
           account_id: accountData.account_id,
-        });        
+        });
 
         if (!existingAccount) {
           const newAccount = new Account({
@@ -182,13 +207,13 @@ export const getTransactions = async (request, response) => {
   try {
     const { userId } = request.body;
     const user = await User.findOne({ userId });
-    if (!user || !user.accessToken) {
+    if (!user || !user.institutions || user.institutions.length == 0) {
       throw new error("User not found or access token not set");
     }
 
-    const accessToken = user.accessToken;
+    // const accessToken = user.institutions[0].accessToken;
     const plaidRequest = {
-      access_token: accessToken,
+      access_token: user.institutions[0].accessToken,
       start_date: "2024-04-19",
       end_date: "2024-07-19",
     };
@@ -203,11 +228,11 @@ export const getTransactions = async (request, response) => {
 export const syncTransactions = async (request, response) => {
   const { userId } = request.body;
   const user = await User.findOne({ userId });
-  if (!user || !user.accessToken) {
+  if (!user || !user.institutions || user.institutions.length == 0) {
     throw new error("User not found or access token not set");
   }
 
-  let accessToken = user.accessToken;
+  let accessToken = user.institutions[0].accessToken;
   let cursor = user.plaidCursor;
   let hasMore = true;
   let addedTransactions = [];
@@ -223,8 +248,12 @@ export const syncTransactions = async (request, response) => {
       });
 
       addedTransactions = addedTransactions.concat(syncResponse.data.added);
-      modifiedTransactions = modifiedTransactions.concat(syncResponse.data.modified);
-      removedTransactions = removedTransactions.concat(syncResponse.data.removed);
+      modifiedTransactions = modifiedTransactions.concat(
+        syncResponse.data.modified
+      );
+      removedTransactions = removedTransactions.concat(
+        syncResponse.data.removed
+      );
 
       cursor = syncResponse.data.next_cursor;
       hasMore = syncResponse.data.has_more;
@@ -232,9 +261,8 @@ export const syncTransactions = async (request, response) => {
       // Update user's cursor
       user.plaidCursor = cursor;
       await user.save();
-
     } catch (e) {
-      console.error('Error syncing transactions:', error);
+      console.error("Error syncing transactions:", error);
       throw error;
     }
   }
@@ -249,7 +277,7 @@ export const syncTransactions = async (request, response) => {
       date: new Date(transaction.date),
       name: transaction.name,
       merchantName: transaction.merchant_name,
-      category: transaction.category[0],      
+      category: transaction.category[0],
     });
   }
 
@@ -261,7 +289,7 @@ export const syncTransactions = async (request, response) => {
         date: new Date(transaction.date),
         name: transaction.name,
         merchantName: transaction.merchant_name,
-        category: transaction.category[0],        
+        category: transaction.category[0],
       }
     );
   }
@@ -275,7 +303,6 @@ export const syncTransactions = async (request, response) => {
     modified: modifiedTransactions.length,
     removed: removedTransactions.length,
   });
-
 };
 
 // Getting proper auth info from plaid with access_token
@@ -283,15 +310,17 @@ export const auth = async (request, response) => {
   try {
     const { userId } = request.body;
     const user = await User.findOne({ userId });
-    const accessToken = user.accessToken;
-    // const access_token = request.body.access_token; // NEED TO CHANGE THIS - grab accessToken from DB instead from clients
+    if (!user || !user.institutions || user.institutions.length == 0) {
+      throw new error("User not found or access token not set");
+    }
+    // const accessToken = user.institutions[0].accessToken;
     const plaidRequest = {
-      access_token: accessToken,
+      access_token: user.institutions[0].accessToken,
     };
     const plaidResponse = await plaidClient.authGet(plaidRequest);
-    // console.log("plaidResponse: ", plaidResponse.data);
+    console.log("plaidResponse: ", plaidResponse.data);
     response.json(plaidResponse.data);
   } catch (e) {
-    response.status(500).send("failed");
+    response.status(500).send(e);
   }
 };

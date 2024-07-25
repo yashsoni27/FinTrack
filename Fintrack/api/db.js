@@ -2,7 +2,7 @@ import axios from "axios";
 
 const BASE_URL = process.env.EXPO_PUBLIC_SERVER_URL;
 
-export const getCurrentBalance = async (userId) => {
+export const getBalance = async (userId) => {
   try {
     const response = await axios.post(`${BASE_URL}/api/balance/get`, { userId });
     return response.data;

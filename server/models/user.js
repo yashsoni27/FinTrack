@@ -1,6 +1,18 @@
 import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 
+const InstitutionSchema = mongoose.Schema({
+  institutionId: {
+    type: String,
+    required: true,    
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+  accessToken: String,  
+});
+
 const userSchema = mongoose.Schema({
   userId: {
     type: String,
@@ -23,12 +35,9 @@ const userSchema = mongoose.Schema({
     max: 32,
   },
   mobile: String,  // Not used uptil now
-  institutions: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Institution"
-  }],
+  institutions: [InstitutionSchema],
   resetCode: String,      
-  accessToken: String,   
+  // accessToken: String,   
   plaidCursor: String, 
 });
 

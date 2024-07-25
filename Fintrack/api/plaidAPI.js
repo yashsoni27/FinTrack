@@ -14,9 +14,9 @@ export const createLinkToken = async (userId) => {
     }
 }
 
-export const exchangePublicToken = async (userId, public_token) => {
+export const exchangePublicToken = async (userId, public_token, metadata) => {
     try {
-        const response = await axios.post(`${BASE_URL}/api/exchange_public_token`, { userId, public_token });
+        const response = await axios.post(`${BASE_URL}/api/exchange_public_token`, { userId, public_token, metadata });
         return response.data
     }
     catch (error) {

@@ -1,5 +1,11 @@
 import React, { useContext, useState, useEffect, useCallback } from "react";
-import { Text, SafeAreaView, TouchableOpacity, View, FlatList } from "react-native";
+import {
+  Text,
+  SafeAreaView,
+  TouchableOpacity,
+  View,
+  FlatList,
+} from "react-native";
 import FooterList from "../components/footer/footerList";
 import { AuthContext } from "../context/auth";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
@@ -19,47 +25,48 @@ const Home = () => {
   // console.log("home.js auth console");
   const userId = state.user.userId;
 
+  const generateLinkToken = async () => {
+    try {
+      setLoading(true);
+      const response = await createLinkToken(userId);
+      console.log("create_link_token response", response);
+      setLinkToken(response.link_token);
+    } catch (error) {
+      console.log("Error generating link token: ", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchBalance = async () => {
+    try {
+      const response = await getBalance(userId);
+      console.log("Balance fetched from Plaid: ", response.accounts);
+      setBalance(response.accounts[0].balances.current);
+    } catch (error) {
+      console.log("Error fetching balance: ", error);
+      setBalance(null);
+    }
+  };
+
+  const fetchTransactions = async () => {
+    try {
+      setLoading(true);
+      const response = await getTransactions(userId);
+      // console.log("Transactions fetched from Plaid: ", response);
+      setTransactions(response.transactions);
+      // console.log(transactions);
+      setLoading(false);
+    } catch (error) {
+      console.log("Error in fetching transactions: ", error);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const generateLinkToken = async () => {
-      try {
-        setLoading(true);        
-        const response = await createLinkToken(userId);
-        console.log("create_link_token response", response);
-        setLinkToken(response.link_token);
-      } catch (error) {
-        console.log("Error generating link token: ", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     generateLinkToken();
-
-    const fetchBalance = async () => {
-      try {
-        const response = await getCurrentBalance(userId);
-        console.log("Balance fetched from Plaid: ", response.accounts);
-        setBalance(response.accounts[0].balances.current);
-      } catch (error) {
-        console.log("Error fetching balance: ", error);
-        setBalance(null);
-      }
-    };
-    fetchBalance();
-
-    const fetchTransactions = async () => {
-      try {
-        setLoading(true);
-        const response = await getTransactions(userId);
-        // console.log("Transactions fetched from Plaid: ", response);
-        setTransactions(response.transactions);
-        // console.log(transactions);
-        setLoading(false);
-      } catch (error) {
-        console.log("Error in fetching transactions: ", error);
-        setLoading(false);
-      }
-    };
-    fetchTransactions();
+    // fetchBalance();
+    // fetchTransactions();
   }, [state.user.userId]);
 
   const renderTransactions = ({ item }) => (
@@ -83,12 +90,15 @@ const Home = () => {
     try {
       const response = await exchangePublicToken(
         state.user.userId,
-        success.publicToken
+        success.publicToken,
+        success.metadata
       );
       console.log("Bank account added successfully");
       console.log(response);
       // Handle success (e.g., navigate to another screen or update UI)
       // setBalance(response.balances.current)
+      // fetchBalance();
+      // fetchTransactions();
     } catch (error) {
       console.error("Error exchanging public token:", error);
     }
@@ -171,7 +181,9 @@ const Home = () => {
             <FlatList
               data={transactions.slice(0, 20)}
               renderItem={renderTransactions}
-              keyExtractor={(item, index) => item.id?.toString() || index.toString()}
+              keyExtractor={(item, index) =>
+                item.id?.toString() || index.toString()
+              }
             />
             {/* {transactions ? (
               transactions.slice(0, 10).map((transaction, idx) => {

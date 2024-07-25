@@ -1,4 +1,5 @@
 import express from "express";
+import { getDbBalance } from "../controllers/db";
 
 const router = express.Router();
 
@@ -8,7 +9,7 @@ router.get("/db", (req, res) => {
   });
 });
 
-router.post("/balance/get", getBalance);
+router.post("/balance/get", getDbBalance);
 router.post("/transactions/get", getTransactions);
 
 export default router;
