@@ -11,8 +11,14 @@ import { AuthContext } from "../context/auth";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { ActivityIndicator } from "react-native";
 import PlaidLink from "react-native-plaid-link-sdk";
-import { createLinkToken, exchangePublicToken } from "../../api/plaidAPI";
-import { getCurrentBalance, getTransactions } from "../../api/db";
+import {
+  createLinkToken,
+  exchangePublicToken,
+  getBalance,
+  getTransactions,
+  syncTransactions,
+} from "../../api/plaidAPI";
+import { getBalanceDb, getTransactionsDb } from "../../api/db";
 
 const Home = () => {
   const [state, setState] = useContext(AuthContext);
@@ -23,6 +29,17 @@ const Home = () => {
   const [transactions, setTransactions] = useState([]);
   // console.log("home.js auth console: ", state);
   // console.log("home.js auth console");
+  const options = {
+    // weekday: "long",
+    year: "numeric",
+    // month: "long",
+    month: "numeric",
+    day: "numeric",
+    // hour: "numeric",
+    // minute: "numeric",
+    // second: "numeric",
+    // timeZoneName: "short",
+  };
   const userId = state.user.userId;
 
   const generateLinkToken = async () => {
@@ -41,8 +58,27 @@ const Home = () => {
   const fetchBalance = async () => {
     try {
       const response = await getBalance(userId);
-      console.log("Balance fetched from Plaid: ", response.accounts);
-      setBalance(response.accounts[0].balances.current);
+      console.log("Balance fetched from Plaid: ", response);
+      const netBalance = response.netBalance.reduce(
+        (sum, account) => sum + (account.balances.current || 0),
+        0
+      );
+      setBalance(netBalance);
+    } catch (error) {
+      console.log("Error fetching balance: ", error);
+      setBalance(null);
+    }
+  };
+
+  const fetchBalanceDB = async () => {
+    try {
+      const response = await getBalanceDb(userId);
+      console.log("Balance fetched from DB: ", response.netBalance);
+      const netBalance = response.netBalance.reduce(
+        (sum, account) => sum + (account.balances.current || 0),
+        0
+      );
+      setBalance(netBalance);
     } catch (error) {
       console.log("Error fetching balance: ", error);
       setBalance(null);
@@ -52,10 +88,22 @@ const Home = () => {
   const fetchTransactions = async () => {
     try {
       setLoading(true);
-      const response = await getTransactions(userId);
-      // console.log("Transactions fetched from Plaid: ", response);
+      const response = await syncTransactions(userId);
+      console.log("Transactions synced from Plaid: ", response);
+      // setTransactions(response.transactions);
+      setLoading(false);
+    } catch (error) {
+      console.log("Error in fetching transactions: ", error);
+      setLoading(false);
+    }
+  };
+
+  const fetchTransactionsDB = async () => {
+    try {
+      setLoading(true);
+      const response = await getTransactionsDb(userId, (count = 10));
+      console.log("Transactions fetched from DB: ", response);
       setTransactions(response.transactions);
-      // console.log(transactions);
       setLoading(false);
     } catch (error) {
       console.log("Error in fetching transactions: ", error);
@@ -66,7 +114,9 @@ const Home = () => {
   useEffect(() => {
     generateLinkToken();
     // fetchBalance();
+    fetchBalanceDB();
     // fetchTransactions();
+    fetchTransactionsDB();
   }, [state.user.userId]);
 
   const renderTransactions = ({ item }) => (
@@ -79,7 +129,7 @@ const Home = () => {
         borderBottomColor: "#ccc",
       }}
     >
-      <Text>{item.date}</Text>
+      <Text>{new Intl.DateTimeFormat('en-US', options).format(new Date(item.date))}</Text>
       <Text>{item.name}</Text>
       <Text>£{item.amount.toFixed(2)}</Text>
     </View>
@@ -179,21 +229,13 @@ const Home = () => {
               Transactions...
             </Text>
             <FlatList
-              data={transactions.slice(0, 20)}
+              // data={transactions.slice(0, 5)}
+              data={transactions}
               renderItem={renderTransactions}
               keyExtractor={(item, index) =>
                 item.id?.toString() || index.toString()
               }
             />
-            {/* {transactions ? (
-              transactions.slice(0, 10).map((transaction, idx) => {
-                <Text style={{ color: "black" }} key={idx}>
-                  {transaction.amount}
-                </Text>;
-              })
-            ) : (
-              <></>
-            )} */}
           </View>
         </View>
         <FooterList />

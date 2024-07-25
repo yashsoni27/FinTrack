@@ -13,7 +13,7 @@ const Stack = createNativeStackNavigator();
 // const image = { uri: "https://picsum.photos/1600/900" };
 
 export default function Page() {
-  const scheme = useColorScheme();
+  // const scheme = useColorScheme();
   return (
     <>
       <StatusBar barStyle="dark-content" />
