@@ -40,19 +40,6 @@ export const getBalance = async (userId) => {
   }
 };
 
-// deprecated
-// export const getTransactions = async (userId) => {
-//   try {
-//     const response = await axios.post(`${BASE_URL}/api/transactions/get`, {
-//       userId,
-//     });
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error fetching transactions: ", error);
-//     throw error;
-//   }
-// };
-
 export const syncTransactions = async (userId) => {
   try {
     const response = await axios.post(`${BASE_URL}/api/transactions/sync`, {

@@ -73,7 +73,8 @@ const Home = () => {
   const fetchBalanceDB = async () => {
     try {
       const response = await getBalanceDb(userId);
-      console.log("Balance fetched from DB: ", response.netBalance);
+      // console.log("Balance fetched from DB: ", response.netBalance);
+      console.log("Balance fetched from DB");
       const netBalance = response.netBalance.reduce(
         (sum, account) => sum + (account.balances.current || 0),
         0
@@ -102,7 +103,8 @@ const Home = () => {
     try {
       setLoading(true);
       const response = await getTransactionsDb(userId, (count = 10));
-      console.log("Transactions fetched from DB: ", response);
+      // console.log("Transactions fetched from DB: ", response);
+      console.log("Transactions fetched from DB");
       setTransactions(response.transactions);
       setLoading(false);
     } catch (error) {
