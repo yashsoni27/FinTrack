@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 import RNFS from "react-native-fs";
-import TextRecognition from "@react-native-ml-kit/text-recognition";
 import FooterList from "../components/footer/footerList";
 import { ScrollView } from "react-native";
 import { scanReceipt } from "../../api/ocr";
@@ -78,7 +77,7 @@ const Add = () => {
 
       setRecognizedText(JSON.stringify(response.receiptData, null, 2));
       console.log("Upload successful:", response.receiptData);
-      
+
     } catch (error) {
       console.error("Error uploading image:", error);
     }
