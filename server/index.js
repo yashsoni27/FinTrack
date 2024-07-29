@@ -5,10 +5,12 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import morgan from "morgan";
+import bodyParser from "body-parser";
 
 import authRoutes from "./routes/auth.js";
 import plaidRoutes from "./routes/plaid.js";
 import dbRoutes from "./routes/db.js";
+import ocrRoutes from "./routes/ocr.js";
 
 
 const app = express();
@@ -29,8 +31,8 @@ mongoose
 // middlewares
 app.use(cors());
 // app.use(bodyParser.json());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(morgan("dev"));
 
 
@@ -38,3 +40,4 @@ app.use(morgan("dev"));
 app.use("/api", authRoutes);
 app.use("/api", plaidRoutes);
 app.use("/db", dbRoutes);
+app.use("/ocr", ocrRoutes);

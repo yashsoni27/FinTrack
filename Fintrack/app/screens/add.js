@@ -10,14 +10,15 @@ import {
   StyleSheet,
 } from "react-native";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
+import RNFS from "react-native-fs";
 import TextRecognition from "@react-native-ml-kit/text-recognition";
 import FooterList from "../components/footer/footerList";
 import { ScrollView } from "react-native";
+import { scanReceipt } from "../../api/ocr";
 
 const Add = () => {
   const [imageUri, setImageUri] = useState(null);
-  const [recognizedText, setRecognizedText] = useState("");
-  const [extractedInfo, setExtractedInfo] = useState(null);
+  const [recognizedText, setRecognizedText] = useState("");  
 
   const handleChoosePhoto = () => {
     Alert.alert(
@@ -44,6 +45,7 @@ const Add = () => {
   const handleImagePicker = (type) => {
     const options = {
       mediaType: "photo",
+      includeBase64: true,
     };
 
     if (type === "camera") {
@@ -65,67 +67,24 @@ const Add = () => {
     } else if (response.assets && response.assets.length > 0) {
       const uri = response.assets[0].uri;
       setImageUri(uri);
-      performOCR(uri);
+      extractInfo(uri);      
     }
   };
 
-  const performOCR = async (uri) => {
+  const extractInfo = async (uri) => {
     try {
-      const result = await TextRecognition.recognize(uri);
-      // const result = "";
-      let structuredText = [];
+      const imageData = await RNFS.readFile(uri, "base64");
+      const response = await scanReceipt(imageData);
 
-      result.blocks.forEach((block, blockIndex) => {
-        block.lines.forEach((line, lineIndex) => {
-          structuredText.push({
-            text: line.text,
-            blockIndex,
-            lineIndex,
-            frame: line.frame,
-          });
-        });
-      });
-      console.log("Structured Text: ", structuredText);
-      const extractedInfo = extractInfo(structuredText);
-      console.log("Extracted Info: ", extractedInfo);
-      setExtractedInfo(extractedInfo);
-      setRecognizedText(JSON.stringify(extractedInfo, null, 2));
+      setRecognizedText(JSON.stringify(response.receiptData, null, 2));
+      console.log("Upload successful:", response.receiptData);
+      
     } catch (error) {
-      console.error(error);
+      console.error("Error uploading image:", error);
     }
   };
 
-  const extractInfo = (structuredText) => {
-    const findLine = (regex) =>
-      structuredText.find((line) => regex.test(line.text))?.text;
 
-    const totalRegex = /\b(total|total to pay)[ :]*?([£]?[\d,]+\.?\d*)/i;
-    let total = "Not found";
-    const totalLine = findLine(totalRegex);
-    if (totalLine) {
-      const match = totalLine.match(totalRegex);
-      if (match && match[2]) {
-        total = match[2].replace(",", ".").replace(/[$€£]/, "");
-      }
-    }
-
-    const dateRegex = /\d{2}\/\d{2}\/\d{2}/;
-    const date = findLine(dateRegex)?.match(dateRegex)[0] || "Not found";
-
-    let merchantName = "Not found";
-    // Look for the first all-caps line that's not "TOTAL" or a date
-    const merchantLine = structuredText.find(
-      (line) =>
-        line.text === line.text.toUpperCase() &&
-        line.text.length > 3 &&
-        !/TOTAL|RECEIPT|\d{1,2}[-/]\d{1,2}[-/]\d{2,4}/.test(line.text)
-    );
-    if (merchantLine) {
-      merchantName = merchantLine.text;
-    }
-
-    return { total, date, merchantName };
-  };
 
   return (
     <SafeAreaView
