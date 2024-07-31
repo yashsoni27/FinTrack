@@ -51,3 +51,15 @@ export const syncTransactions = async (userId) => {
     throw error;
   }
 };
+
+export const getRecurringTransactions = async (userId) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/api/transactions/recurring/get`, {
+      userId,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching recurring transactions: ", error);
+    throw error;
+  }
+}

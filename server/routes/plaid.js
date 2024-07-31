@@ -4,8 +4,10 @@ import {
     createLinkToken,
     exchangePublicToken,
     getBalance,
+    getCategories,
     getTransactions,
     institutionLogo,
+    recurringTransactions,
     syncTransactions,
 } from "../controllers/plaid.js";
 
@@ -24,7 +26,9 @@ router.post("/auth", auth);
 router.post("/balance/get", getBalance);
 router.post("/transactions/sync", syncTransactions);
 router.post("/transactions/get", getTransactions);
+router.post("/transactions/recurring/get", recurringTransactions); 
 
 router.post("/institution/logo", institutionLogo);
+router.get("/categories", getCategories);
 
 export default router;

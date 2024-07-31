@@ -10,6 +10,7 @@ import Analysis from "../screens/analysis";
 import Landing from "../screens/static/landing";
 import ForgotPassword from "../screens/auth/forgotPassword";
 import Add from "../screens/add";
+import Transactions from "../screens/transactions";
 
 const Stack = createNativeStackNavigator();
 
@@ -33,6 +34,7 @@ const NavigationScreen = () => {
           <Stack.Screen name="Account" component={Account} />
           <Stack.Screen name="Analysis" component={Analysis} />
           <Stack.Screen name="Add" component={Add} />
+          <Stack.Screen name="Transactions" component={Transactions} />
         </>
       ) : (
         <>

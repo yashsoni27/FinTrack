@@ -320,6 +320,42 @@ export const syncTransactions = async (request, response) => {
   }
 };
 
+export const recurringTransactions = async (request, response) => {
+  try {
+    const { userId } = request.body;
+    const user = await User.findOne({ userId });
+    if (!user || !user.institutions || user.institutions.length == 0) {
+      throw new error("User not found or access token not set");
+    }
+    const accessToken = user.institutions[0].accessToken;
+
+    const accountIds = await Account.find(
+      { userId: userId },
+      { account_id: 1 }
+    );
+    const accountIdArray = accountIds.map((account) => account.account_id);
+    console.log("accountIds: ", accountIdArray);
+
+    const plaidRequest = {
+      access_token: accessToken,
+      account_ids: accountIdArray,
+    };
+    const plaidResponse = await plaidClient.transactionsRecurringGet(plaidRequest);
+    let inflowStreams = plaidResponse.data.inflow_streams;
+    let outflowStreams = plaidResponse.data.outflow_streams;
+    // console.log("response ", plaidResponse);
+
+    response.json({
+      inflowStreams: inflowStreams,
+      outflowStreams: outflowStreams,
+    });
+
+  } catch (e) {
+    console.log("recurringTransactions error: ", e);
+    response.status(500).send(e);
+  }
+};
+
 // Getting proper auth info from plaid with access_token -- PROBABLY NO USE AS OF NOW
 export const auth = async (request, response) => {
   try {
@@ -350,7 +386,10 @@ export const institutionLogo = async (request, response) => {
       throw new error("User not found or access token not set");
     }
 
-    const insId = { institution_id: user.institutions[0].institutionId, country_codes: ["GB"] };
+    const insId = {
+      institution_id: user.institutions[0].institutionId,
+      country_codes: ["GB"],
+    };
     const options = {
       include_optional_metadata: true,
       include_status: true,
@@ -363,5 +402,15 @@ export const institutionLogo = async (request, response) => {
   } catch (error) {
     console.log("institutionLogo error: ", error);
     response.status(500).send(error);
+  }
+};
+
+// Getting the categories
+export const getCategories = async (request, response) => {
+  try {
+    const res = await plaidClient.categoriesGet({});
+    response.json(res.data.categories);
+  } catch (e) {
+    response.status(500).send(e);
   }
 };

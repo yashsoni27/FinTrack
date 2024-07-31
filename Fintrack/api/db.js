@@ -21,3 +21,13 @@ export const getTransactionsDb = async (userId, count) => {
     throw error;
   }
 };
+
+export const getRecurringTransactionsDb = async (userId) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/db/transactions/recurring/get`, { userId });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching recurring transactions: ", error);
+    throw error;
+  }
+}
