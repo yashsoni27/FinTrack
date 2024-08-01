@@ -222,7 +222,7 @@ const Home = () => {
             // </TouchableOpacity>
           )}
           <View style={{ margin: 10 }}>
-            <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+            <Text style={{ fontSize: 20 }}>
               Total Balance: £ {balance}
             </Text>
           </View>
