@@ -13,7 +13,7 @@ import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 import RNFS from "react-native-fs";
 import FooterList from "../components/footer/footerList";
 import { ScrollView } from "react-native";
-import { scanReceipt } from "../../api/ocr";
+import { scanInvoice, scanReceipt } from "../../api/ocr";
 
 const Add = () => {
   const [imageUri, setImageUri] = useState(null);
@@ -44,7 +44,7 @@ const Add = () => {
   const handleImagePicker = (type) => {
     const options = {
       mediaType: "photo",
-      includeBase64: true,
+      includeBase64: true, // change to true for basic 
     };
 
     if (type === "camera") {
@@ -64,19 +64,29 @@ const Add = () => {
     } else if (response.error) {
       console.log("ImagePicker Error: ", response.error);
     } else if (response.assets && response.assets.length > 0) {
-      const uri = response.assets[0].uri;
+      const uri = response.assets[0].uri;      
       setImageUri(uri);
       extractInfo(uri);      
     }
   };
 
   const extractInfo = async (uri) => {
+    const formData = new FormData();
+    formData.append('file', {
+      uri,
+      type: 'image/jpeg', // Adjust MIME type if necessary
+      name: 'photo.jpg',
+    });
     try {
       const imageData = await RNFS.readFile(uri, "base64");
-      const response = await scanReceipt(imageData);
+      // const response = await scanReceipt(imageData);
 
-      setRecognizedText(JSON.stringify(response.receiptData, null, 2));
-      console.log("Upload successful:", response.receiptData);
+      // setRecognizedText(JSON.stringify(response.receiptData, null, 2));
+      // console.log("Upload successful:", response.receiptData);
+
+      const response = await scanInvoice(formData);
+      console.log("tesseract upload successful:", response);
+      console.log("tesseract upload successful:", response.text);
 
     } catch (error) {
       console.error("Error uploading image:", error);

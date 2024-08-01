@@ -376,7 +376,7 @@ export const auth = async (request, response) => {
   }
 };
 
-// Getting the institution logo
+// Getting the institution logo -- PROBABLY NO USE AS OF NOW
 export const institutionLogo = async (request, response) => {
   try {
     const { userId } = request.body;
@@ -405,7 +405,7 @@ export const institutionLogo = async (request, response) => {
   }
 };
 
-// Getting the categories
+// Getting the categories -- PRBABLY NO USE AS OF NOW
 export const getCategories = async (request, response) => {
   try {
     const res = await plaidClient.categoriesGet({});

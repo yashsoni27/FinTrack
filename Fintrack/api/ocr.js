@@ -21,3 +21,21 @@ export const scanReceipt = async (imageData) => {
     throw error;
   }
 };
+
+export const scanInvoice = async (formData) => {
+  try {    
+    const response = await axios.post(
+      `${BASE_URL}/ocr/scan-invoice`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching receiptData: ", error);
+    throw error;
+  }
+}
