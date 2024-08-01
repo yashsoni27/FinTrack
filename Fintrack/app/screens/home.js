@@ -19,6 +19,7 @@ import {
   syncTransactions,
 } from "../../api/plaidAPI";
 import { getBalanceDb, getTransactionsDb } from "../../api/db";
+import DefaultText from "../components/defaultText";
 
 const Home = () => {
   const [state, setState] = useContext(AuthContext);
@@ -131,9 +132,10 @@ const Home = () => {
         borderBottomColor: "#ccc",
       }}
     >
-      <Text>{new Intl.DateTimeFormat('en-US', options).format(new Date(item.date))}</Text>
-      <Text>{item.name}</Text>
-      <Text>£{item.amount.toFixed(2)}</Text>
+      <DefaultText>{new Intl.DateTimeFormat('en-US', options).format(new Date(item.date))}</DefaultText>
+      <DefaultText>{item.name}</DefaultText>
+      <DefaultText>£{item.amount.toFixed(2)}</DefaultText>
+      
     </View>
   );
 
@@ -167,9 +169,9 @@ const Home = () => {
         }}
       >
         <ActivityIndicator size="large" color="#4285F4" />
-        <Text style={{ marginTop: 10, fontSize: 16, color: "#333" }}>
+        <DefaultText style={{ marginTop: 10, fontSize: 16, color: "#333" }}>
           Loading...
-        </Text>
+        </DefaultText>
       </View>
     );
   }
@@ -184,9 +186,9 @@ const Home = () => {
         }}
       >
         <View>
-          <Text style={{ fontSize: 30, textAlign: "center" }}>
+          <DefaultText style={{ fontSize: 30, textAlign: "center" }}>
             Hi {state.user.name}
-          </Text>
+          </DefaultText>
           {linkToken && (
             // <TouchableOpacity style={{ backgroundColor:"lightgray", borderRadius:50, padding:20}}>
             <PlaidLink
@@ -212,24 +214,24 @@ const Home = () => {
                   size={30}
                   color="black"
                 />
-                <Text
-                  style={{ color: "white", fontSize: 16, fontWeight: "bold" }}
+                <DefaultText
+                  style={{ color: "white", fontSize: 16}}
                 >
                   Add Account
-                </Text>
+                </DefaultText>
               </View>
             </PlaidLink>
             // </TouchableOpacity>
           )}
           <View style={{ margin: 10 }}>
-            <Text style={{ fontSize: 20 }}>
+            <DefaultText style={{ fontSize: 20 }}>
               Total Balance: £ {balance}
-            </Text>
+            </DefaultText>
           </View>
           <View style={{ margin: 10, height: "50%" }}>
-            <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-              Transactions...
-            </Text>
+            <DefaultText style={{ fontSize: 20 }}>
+              Total Transactions...
+            </DefaultText>
             <FlatList
               // data={transactions.slice(0, 5)}
               data={transactions}
