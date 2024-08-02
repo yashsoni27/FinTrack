@@ -7,6 +7,8 @@ import User from "../models/user.js";
 import Account from "../models/account.js";
 import Transaction from "../models/transaction.js";
 import Recurring from "../models/recurring.js";
+import { getBalanceDb, getRecurringDb } from "./db.js";
+import { callController } from "../helpers/callController.js";
 
 
 // Plaid common configuration
@@ -200,11 +202,10 @@ export const getBalance = async (request, response) => {
       }
     }
 
-    // fetching balances from all connected accounts from DB for single user
-    const netBalance = await Account.find({ userId: userId });
-    console.log(netBalance);
-
-    response.json({ netBalance: netBalance });
+    const balanceResponse = await callController(getBalanceDb, {userId});
+    
+    response.json(balanceResponse);
+    // response.json({ netBalance: netBalance });
   } catch (e) {
     response.status(500).send(e);
   }
@@ -382,12 +383,16 @@ export const recurringTransactions = async (request, response) => {
     await saveOrUpdateStream(outflowStreams, "Outflow");
 
     // Fetch all recurring transactions from DB
-    const recurringTransactions = await Recurring.find({ userId });
+    const recurringResponse = await callController(getRecurringDb, { userId });
+    console.log("recurringResponse: ", recurringResponse);
+    
+    response.json(recurringResponse);
+    // const recurringTransactions = await Recurring.find({ userId });
 
-    response.json({
-      inflowStreams: recurringTransactions.filter(stream => stream.stream === "Inflow"),
-      outflowStreams: recurringTransactions.filter(stream => stream.stream === "Outflow"),
-    });
+    // response.json({
+    //   inflowStreams: recurringTransactions.filter(stream => stream.stream === "Inflow"),
+    //   outflowStreams: recurringTransactions.filter(stream => stream.stream === "Outflow"),
+    // });
 
   } catch (e) {
     console.log("recurringTransactions error: ", e);

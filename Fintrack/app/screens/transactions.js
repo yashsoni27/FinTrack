@@ -13,7 +13,7 @@ const Transactions = () => {
   const getRecurring = async () => {
     try {
       const response = await getRecurringTransactions(userId);
-      console.log("recurring: ", response);
+      // console.log("recurring: ", response);
       const subscriptions = response.outflowStreams.filter(
         (stream) =>
           stream.category[0] === "Service" 
