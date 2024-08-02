@@ -6,6 +6,8 @@ dotenv.config();
 import User from "../models/user.js";
 import Account from "../models/account.js";
 import Transaction from "../models/transaction.js";
+import Recurring from "../models/recurring.js";
+
 
 // Plaid common configuration
 const configuration = new Configuration({
@@ -191,6 +193,7 @@ export const getBalance = async (request, response) => {
           existingAccount.balances.available = accountData.balances.available;
           existingAccount.balances.current = accountData.balances.current;
           existingAccount.balances.limit = accountData.balances.limit;
+          existingAccount.save();
         }
       } catch (error) {
         console.log(error);
@@ -207,7 +210,7 @@ export const getBalance = async (request, response) => {
   }
 };
 
-// Getting transactions data
+// Getting transactions data -- Could be removed as sync transactions is used
 export const getTransactions = async (request, response) => {
   try {
     const { userId } = request.body;
@@ -320,6 +323,7 @@ export const syncTransactions = async (request, response) => {
   }
 };
 
+// Fetching the recurring transactions
 export const recurringTransactions = async (request, response) => {
   try {
     const { userId } = request.body;
@@ -334,20 +338,55 @@ export const recurringTransactions = async (request, response) => {
       { account_id: 1 }
     );
     const accountIdArray = accountIds.map((account) => account.account_id);
-    console.log("accountIds: ", accountIdArray);
 
     const plaidRequest = {
       access_token: accessToken,
       account_ids: accountIdArray,
     };
-    const plaidResponse = await plaidClient.transactionsRecurringGet(plaidRequest);
+    const plaidResponse = await plaidClient.transactionsRecurringGet(
+      plaidRequest
+    );
     let inflowStreams = plaidResponse.data.inflow_streams;
     let outflowStreams = plaidResponse.data.outflow_streams;
-    // console.log("response ", plaidResponse);
+
+    const saveOrUpdateStream = async (stream, streamType) => {
+      for (const streamItem of stream) {
+        const updateData = {
+          userId: userId,
+          stream: streamType,
+          name: streamItem.name,
+          accountId: streamItem.account_id,
+          averageAmount: streamItem.average_amount,
+          category: streamItem.category,
+          description: streamItem.description,
+          firstDate: streamItem.first_date,
+          frequency: streamItem.frequency,
+          isActive: streamItem.is_active,
+          isUserModified: streamItem.is_user_modified,
+          lastAmount: streamItem.last_amount,
+          lastDate: streamItem.last_date,
+          merchantName: streamItem.merchant_name,
+          status: streamItem.status,
+          transactionIds: streamItem.transaction_ids,
+        };
+
+        await Recurring.updateOne(
+          { userId, streamId: streamItem.stream_id },
+          { $set: updateData },
+          { upsert: true }
+        );
+      }
+    };
+
+    await saveOrUpdateStream(inflowStreams, "Inflow");
+    await saveOrUpdateStream(outflowStreams, "Outflow");
+
+    // Fetch all recurring transactions from DB
+    const recurringTransactions = await Recurring.find({ userId });
 
     response.json({
-      inflowStreams: inflowStreams,
-      outflowStreams: outflowStreams,
+      inflowStreams: recurringTransactions.filter(stream => stream.stream === "Inflow"),
+      outflowStreams: recurringTransactions.filter(stream => stream.stream === "Outflow"),
     });
 
   } catch (e) {

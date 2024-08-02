@@ -13,13 +13,13 @@ const Transactions = () => {
   const getRecurring = async () => {
     try {
       const response = await getRecurringTransactions(userId);
-      // console.log("recurring: ", response);
+      console.log("recurring: ", response);
       const subscriptions = response.outflowStreams.filter(
         (stream) =>
           stream.category[0] === "Service" 
           // && stream.category[1] === "Subscription"
       );
-      console.log("Subscriptions: ", subscriptions);
+      // console.log("Subscriptions: ", subscriptions);
     } catch (error) {
       console.log("Error in fetching recurring: ", error);
     }

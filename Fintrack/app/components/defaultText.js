@@ -1,7 +1,11 @@
 import React from "react";
 import { StyleSheet, Text } from "react-native";
+import { useTheme } from "../context/themeContext";
 
 const DefaultText = (props) => {
+  const { theme } = useTheme();
+
+  const styles = createStyles(theme);
   return (
     <Text {...props} style={[styles.defaultText, props.style]}>
       {props.children}
@@ -9,10 +13,14 @@ const DefaultText = (props) => {
   );
 };
 
-const styles = StyleSheet.create({
-  defaultText: {
-    fontFamily: "Urbanist",    
-  },
-});
+const createStyles = (theme) => {
+  return StyleSheet.create({
+    defaultText: {
+      fontFamily: "Urbanist",
+      // color: globalStyles.dark.primary,
+      color: theme.text,
+    },
+  });
+};
 
 export default DefaultText;

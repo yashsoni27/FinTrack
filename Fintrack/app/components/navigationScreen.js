@@ -18,10 +18,10 @@ const NavigationScreen = () => {
   const [state, setState] = useContext(AuthContext);
 //   console.log("state", state);
   const authenticated = state && state.token !== "" && state.user !== null;
-
+  // contentStyle:{backgroundColor: globalStyles.dark.background}
   return (
     <Stack.Navigator
-      screenOptions={{ headerShown: false }}
+      screenOptions={{ headerShown: false,  }}
       initialRouteName="Home"
     >
       {authenticated ? (
