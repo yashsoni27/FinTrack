@@ -14,6 +14,7 @@ import RNFS from "react-native-fs";
 import FooterList from "../components/footer/footerList";
 import { ScrollView } from "react-native";
 import { scanInvoice, scanReceipt } from "../../api/ocr";
+import DefaultText from "../components/defaultText";
 
 const Add = () => {
   const [imageUri, setImageUri] = useState(null);
@@ -99,16 +100,16 @@ const Add = () => {
     <SafeAreaView
       style={{ flex: 1, justifyContent: "space-between", alignItems: "center" }}
     >
-      <Text style={{ fontSize: 30, textAlign: "center" }}>
+      <DefaultText style={{ fontSize: 30, textAlign: "center" }}>
         Add your spending Screen
-      </Text>
+      </DefaultText>
       <View>
         <Button title="Choose Photo" onPress={handleChoosePhoto} />
         {imageUri && (
           <>
             <Image source={{ uri: imageUri }} style={styles.image} />
             <ScrollView style={styles.textContainer}>
-              <Text>{recognizedText}</Text>
+              <DefaultText>{recognizedText}</DefaultText>
             </ScrollView>
           </>
         )}

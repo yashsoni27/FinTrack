@@ -4,6 +4,7 @@ import FooterList from "../components/footer/footerList";
 import { AuthContext } from "../context/auth";
 import { getRecurringTransactions } from "../../api/plaidAPI";
 import { getRecurringTransactionsDb } from "../../api/db";
+import DefaultText from "../components/defaultText";
 
 const Transactions = () => {
   const [state, setState] = useContext(AuthContext);
@@ -15,9 +16,8 @@ const Transactions = () => {
       const response = await getRecurringTransactions(userId);
       // console.log("recurring: ", response);
       const subscriptions = response.outflowStreams.filter(
-        (stream) =>
-          stream.category[0] === "Service" 
-          // && stream.category[1] === "Subscription"
+        (stream) => stream.category[0] === "Service"
+        // && stream.category[1] === "Subscription"
       );
       // console.log("Subscriptions: ", subscriptions);
     } catch (error) {
@@ -35,20 +35,20 @@ const Transactions = () => {
   };
 
   useEffect(() => {
-    getRecurring();
-    // getRecurringDb();
+    // getRecurring();
+    getRecurringDb();
   }, []);
 
   return (
     <SafeAreaView
       style={{ flex: 1, justifyContent: "space-between", alignItems: "center" }}
     >
-      <Text style={{ fontSize: 30, textAlign: "center" }}>
+      <DefaultText style={{ fontSize: 30, textAlign: "center" }}>
         Transactions Screen
-      </Text>
+      </DefaultText>
       <View>
         <View>
-          <Text>Recurring Transactions</Text>
+          <DefaultText>Recurring Transactions</DefaultText>
         </View>
         <View></View>
       </View>
