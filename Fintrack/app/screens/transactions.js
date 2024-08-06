@@ -28,7 +28,8 @@ const Transactions = () => {
   const getRecurringDb = async () => {
     try {
       const response = await getRecurringTransactionsDb(userId);
-      console.log("recurring DB: ", response);
+      // console.log("recurring DB: ", response);
+      console.log("recurring DB success");
     } catch (error) {
       console.log("Error in fetching recurring DB: ", error);
     }
@@ -41,11 +42,13 @@ const Transactions = () => {
 
   return (
     <SafeAreaView
-      style={{ flex: 1, justifyContent: "space-between", alignItems: "center" }}
+      style={{ flex: 1, alignItems: "center" }}
     >
-      <DefaultText style={{ fontSize: 30, textAlign: "center" }}>
-        Transactions Screen
-      </DefaultText>
+      <View>
+        <DefaultText style={{ fontSize: 30, textAlign: "center" }}>
+          Transactions Screen
+        </DefaultText>
+      </View>
       <View>
         <View>
           <DefaultText>Recurring Transactions</DefaultText>

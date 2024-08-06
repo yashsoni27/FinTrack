@@ -20,16 +20,20 @@ import {
 } from "../../api/plaidAPI";
 import { getBalanceDb, getTransactionsDb } from "../../api/db";
 import DefaultText from "../components/defaultText";
+import { useTheme } from "../context/themeContext";
 
 const Home = () => {
   const [state, setState] = useContext(AuthContext);
+  const {theme, toggleTheme} = useTheme();
+  
   const [linkToken, setLinkToken] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const [balance, setBalance] = useState(null);
   const [transactions, setTransactions] = useState([]);
   // console.log("home.js auth console: ", state);
-  // console.log("home.js auth console");
+
+
   const options = {
     // weekday: "long",
     year: "numeric",
@@ -132,10 +136,11 @@ const Home = () => {
         borderBottomColor: "#ccc",
       }}
     >
-      <DefaultText>{new Intl.DateTimeFormat('en-US', options).format(new Date(item.date))}</DefaultText>
+      <DefaultText>
+        {new Intl.DateTimeFormat("en-US", options).format(new Date(item.date))}
+      </DefaultText>
       <DefaultText>{item.name}</DefaultText>
       <DefaultText>£{item.amount.toFixed(2)}</DefaultText>
-      
     </View>
   );
 
@@ -158,6 +163,7 @@ const Home = () => {
     }
   };
 
+  // Loading sign
   if (loading) {
     return (
       <View
@@ -178,17 +184,28 @@ const Home = () => {
 
   return (
     <>
-      <SafeAreaView
-        style={{
-          flex: 1,
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
+      <View
+        style={
+          {
+            // flex: 1,
+            // justifyContent: "space-between",
+            // alignItems: "center",
+            padding: 10,
+            backgroundColor: theme.background,
+          }
+        }
       >
-        <View>
-          <DefaultText style={{ fontSize: 30, textAlign: "center" }}>
-            Hi {state.user.name}
-          </DefaultText>
+        {/* <View> */}
+          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", backgroundColor: "lightgrey"}}>
+            <View style={{backgroundColor: "grey"}}>
+              <DefaultText style={{ fontSize: 30, color: theme.text }}>
+                Hi {state.user.name}
+              </DefaultText>
+            </View>
+            <View >
+              <DefaultText>Check</DefaultText>
+            </View>
+          </View>
           {linkToken && (
             // <TouchableOpacity style={{ backgroundColor:"lightgray", borderRadius:50, padding:20}}>
             <PlaidLink
@@ -214,9 +231,7 @@ const Home = () => {
                   size={30}
                   color="black"
                 />
-                <DefaultText
-                  style={{ color: "white", fontSize: 16}}
-                >
+                <DefaultText style={{ color: "white", fontSize: 16 }}>
                   Add Account
                 </DefaultText>
               </View>
@@ -241,9 +256,9 @@ const Home = () => {
               }
             />
           </View>
-        </View>
-        <FooterList />
-      </SafeAreaView>
+        {/* </View> */}
+      </View>
+      <FooterList />
     </>
   );
 };

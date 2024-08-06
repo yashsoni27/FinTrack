@@ -1,14 +1,25 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import { useTheme } from "../../context/themeContext";
 
 const FooterItem = ({ name, text, handlePress, screenName, routeName }) => {
-  const activeScreenColor = screenName === routeName && "darkmagenta";
+  const { theme } = useTheme();
+  // console.log("Theme: ",theme.primary);
+
+  const activeScreenColor = screenName === routeName && theme.primary;
+  // console.log(activeScreenColor);
 
   return (
-    <TouchableOpacity onPress={handlePress}>
-      <FontAwesome5 name={name} size={25} style={styles.fontStyle} color={activeScreenColor} />
-      <Text style={styles.textStyle}>{text}</Text>
+    <TouchableOpacity onPress={handlePress} style={styles.footerItem}>
+      <FontAwesome5
+        name={name}
+        size={25}
+        style={styles.fontStyle}
+        color={activeScreenColor}
+      />
+      {/* {activeScreenColor ? <Text style={[styles.textStyle, { color: theme.text }]}>{text}</Text> : null} */}
+      <Text style={[styles.textStyle, { color: theme.text }]}>{text}</Text>
     </TouchableOpacity>
   );
 };
@@ -21,7 +32,12 @@ const styles = StyleSheet.create({
   textStyle: {
     fontSize: 12,
     textAlign: "center",
-    textTransform: "uppercase",
+    textTransform: "uppercase",    
+  },
+  footerItem: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",    
   },
 });
 

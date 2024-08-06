@@ -18,7 +18,7 @@ import DefaultText from "../components/defaultText";
 
 const Add = () => {
   const [imageUri, setImageUri] = useState(null);
-  const [recognizedText, setRecognizedText] = useState("");  
+  const [recognizedText, setRecognizedText] = useState("");
 
   const handleChoosePhoto = () => {
     Alert.alert(
@@ -45,7 +45,7 @@ const Add = () => {
   const handleImagePicker = (type) => {
     const options = {
       mediaType: "photo",
-      includeBase64: true, // change to true for basic 
+      includeBase64: true, // change to true for basic
     };
 
     if (type === "camera") {
@@ -65,18 +65,18 @@ const Add = () => {
     } else if (response.error) {
       console.log("ImagePicker Error: ", response.error);
     } else if (response.assets && response.assets.length > 0) {
-      const uri = response.assets[0].uri;      
+      const uri = response.assets[0].uri;
       setImageUri(uri);
-      extractInfo(uri);      
+      extractInfo(uri);
     }
   };
 
   const extractInfo = async (uri) => {
     const formData = new FormData();
-    formData.append('file', {
+    formData.append("file", {
       uri,
-      type: 'image/jpeg', // Adjust MIME type if necessary
-      name: 'photo.jpg',
+      type: "image/jpeg", // Adjust MIME type if necessary
+      name: "photo.jpg",
     });
     try {
       const imageData = await RNFS.readFile(uri, "base64");
@@ -88,21 +88,18 @@ const Add = () => {
       const response = await scanInvoice(formData);
       console.log("tesseract upload successful:", response);
       console.log("tesseract upload successful:", response.text);
-
     } catch (error) {
       console.error("Error uploading image:", error);
     }
   };
 
-
-
   return (
-    <SafeAreaView
-      style={{ flex: 1, justifyContent: "space-between", alignItems: "center" }}
-    >
-      <DefaultText style={{ fontSize: 30, textAlign: "center" }}>
-        Add your spending Screen
-      </DefaultText>
+    <SafeAreaView style={{ flex: 1, alignItems: "center" }}>
+      <View>
+        <DefaultText style={{ fontSize: 30, textAlign: "center" }}>
+          Add your spending Screen
+        </DefaultText>
+      </View>
       <View>
         <Button title="Choose Photo" onPress={handleChoosePhoto} />
         {imageUri && (

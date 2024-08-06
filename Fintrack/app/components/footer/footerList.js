@@ -23,11 +23,26 @@ const FooterList = () => {
 
 const styles = StyleSheet.create({
   container: {
+    position: "absolute",
+    bottom: 15,
+    width: "90%",
     flexDirection: "row",
-    width: "80%",
-    margin: 10,
-    marginHorizontal: 30,
     justifyContent: "space-between",
+    alignItems: "center",
+    alignSelf: "center",    
+    backgroundColor:"#fff",
+    marginHorizontal: 10,
+    paddingVertical: 10,
+    borderRadius: 35,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 2,
+    backgroundColor: "lightgrey"
   },
 });
 

@@ -5,9 +5,10 @@ const ThemeContext = createContext();
 
 export const themes = {
   light: {
-    background: "#ffffff",
+    background: "#ACACAC",
     text: "#000000",
-    primary: "#3498db",
+    // primary: "#D1FF32",
+    primary: "#7FB143",
     statusBarStyle: "dark-content",
   },
   dark: {
@@ -21,13 +22,13 @@ export const themes = {
 
 export const ThemeProvider = ({ children }) => {
   const initialColorScheme = Appearance.getColorScheme();
-  const [theme, setTheme] = useState(initialColorScheme == 'dark' ? "dark" : 'light');
-//   Appearance.setColorScheme("light");
+  const [theme, setTheme] = useState(initialColorScheme == 'light' ? "dark" : 'light');
 
   useEffect(() => {
+    console.log(initialColorScheme);
     const handleAppearanceChange = (pref) => {
         const newScheme = pref.colorScheme;
-        setTheme(newScheme == 'dark' ? "dark" : 'light');
+        setTheme(newScheme == 'light' ? "dark" : 'light');        
     };
     
     const listener = Appearance.addChangeListener(handleAppearanceChange);

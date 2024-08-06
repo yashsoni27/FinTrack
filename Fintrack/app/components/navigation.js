@@ -2,18 +2,13 @@ import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/
 import * as SplashScreen from "expo-splash-screen"
 import { AuthProvider } from '../context/auth'
 import NavigationScreen from './navigationScreen'
-import { useColorScheme } from 'react-native'
 
-const Navigation = () => {
-  
-  const scheme = useColorScheme();
-
+const Navigation = () => {    
   // SplashScreen.preventAutoHideAsync();
   // setTimeout(SplashScreen.hideAsync, 2000);
 
   return (
-    <NavigationContainer independent={true} >      
-    {/* <NavigationContainer independent={true} theme={scheme === "dark" ? DarkTheme : DefaultTheme} >       */}
+    <NavigationContainer independent={true} >          
       <AuthProvider>
         <NavigationScreen />
       </AuthProvider>

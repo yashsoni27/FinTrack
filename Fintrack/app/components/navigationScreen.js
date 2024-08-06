@@ -22,7 +22,7 @@ const NavigationScreen = () => {
   const authenticated = state && state.token !== "" && state.user !== null;
 
   const { theme } = useTheme();
-  // contentStyle:{backgroundColor: globalStyles.dark.background}
+    
   return (
     <Stack.Navigator
       screenOptions={{
