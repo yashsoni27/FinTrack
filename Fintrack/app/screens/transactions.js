@@ -5,9 +5,12 @@ import { AuthContext } from "../context/auth";
 import { getRecurringTransactions } from "../../api/plaidAPI";
 import { getRecurringTransactionsDb } from "../../api/db";
 import DefaultText from "../components/defaultText";
+import { useTheme } from "../context/themeContext";
+import Recurring from "../components/recurring";
 
 const Transactions = () => {
   const [state, setState] = useContext(AuthContext);
+  const { theme } = useTheme();
 
   const userId = state.user.userId;
 
@@ -28,8 +31,8 @@ const Transactions = () => {
   const getRecurringDb = async () => {
     try {
       const response = await getRecurringTransactionsDb(userId);
-      // console.log("recurring DB: ", response);
-      console.log("recurring DB success");
+      console.log("recurring DB: ", response);
+      // console.log("recurring DB success");
     } catch (error) {
       console.log("Error in fetching recurring DB: ", error);
     }
@@ -41,22 +44,34 @@ const Transactions = () => {
   }, []);
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, alignItems: "center" }}
-    >
-      <View>
-        <DefaultText style={{ fontSize: 30, textAlign: "center" }}>
-          Transactions Screen
-        </DefaultText>
-      </View>
-      <View>
+    <>
+      <View
+        style={{
+          padding: 10,
+          backgroundColor: theme.background,
+          borderColor: "#000",
+          borderWidth: 1,
+        }}
+      >
         <View>
-          <DefaultText>Recurring Transactions</DefaultText>
+          <DefaultText style={{ fontSize: 30, textAlign: "center" }}>
+            Transactions
+          </DefaultText>
         </View>
-        <View></View>
+
+        {/* <View>
+          <View>
+            <DefaultText>Recurring Transactions</DefaultText>
+          </View>
+          <View></View>
+        </View> */}
+
+        <View style={{ marginTop: 20, padding:5, borderColor: "#000", borderWidth: 1 }}>
+          {/* <Recurring /> */}
+        </View>
       </View>
       <FooterList />
-    </SafeAreaView>
+    </>
   );
 };
 

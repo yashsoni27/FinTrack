@@ -69,7 +69,7 @@ export const getRecurringDb = async (request, response) => {
       throw new error("User not found or access token not set");
     }
     
-    const recurringTransactions = await Recurring.find({ userId });
+    const recurringTransactions = await Recurring.find({ userId: userId, isActive: true });
 
     response.json({
       inflowStreams: recurringTransactions.filter(stream => stream.stream === "Inflow"),

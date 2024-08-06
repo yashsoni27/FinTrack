@@ -2,6 +2,7 @@ import React from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { useTheme } from "../../context/themeContext";
+import DefaultText from "../defaultText";
 
 const FooterItem = ({ name, text, handlePress, screenName, routeName }) => {
   const { theme } = useTheme();
@@ -19,7 +20,7 @@ const FooterItem = ({ name, text, handlePress, screenName, routeName }) => {
         color={activeScreenColor}
       />
       {/* {activeScreenColor ? <Text style={[styles.textStyle, { color: theme.text }]}>{text}</Text> : null} */}
-      <Text style={[styles.textStyle, { color: theme.text }]}>{text}</Text>
+      <DefaultText style={[styles.textStyle, { color: theme.text }]}>{text}</DefaultText>
     </TouchableOpacity>
   );
 };
@@ -32,7 +33,7 @@ const styles = StyleSheet.create({
   textStyle: {
     fontSize: 12,
     textAlign: "center",
-    textTransform: "uppercase",    
+    // textTransform: "uppercase",    
   },
   footerItem: {
     flex: 1,

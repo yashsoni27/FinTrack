@@ -1,9 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
-import {
-  SafeAreaView,
-  View,
-  FlatList,
-} from "react-native";
+import { SafeAreaView, View, FlatList } from "react-native";
 import FooterList from "../components/footer/footerList";
 import { AuthContext } from "../context/auth";
 import { ActivityIndicator } from "react-native";
@@ -18,6 +14,7 @@ import { getBalanceDb, getTransactionsDb } from "../../api/db";
 import DefaultText from "../components/defaultText";
 import { useTheme } from "../context/themeContext";
 import AccountSlider from "../components/accountSlider";
+import Recurring from "../components/recurring";
 
 const Home = () => {
   const [state, setState] = useContext(AuthContext);
@@ -98,7 +95,7 @@ const Home = () => {
   const fetchTransactionsDB = async () => {
     try {
       setLoading(true);
-      const response = await getTransactionsDb(userId, (count = 10));
+      const response = await getTransactionsDb(userId, (count = 3));
       // console.log("Transactions fetched from DB: ", response);
       console.log("Transactions fetched from DB");
       setTransactions(response.transactions);
@@ -164,7 +161,6 @@ const Home = () => {
           backgroundColor: theme.background,
         }}
       >
-        {/* <View> */}
         <View
           style={{
             flexDirection: "row",
@@ -182,6 +178,7 @@ const Home = () => {
             <DefaultText>Check</DefaultText>
           </View>
         </View>
+
         <View style={{ marginVertical: 10 }}>
           <DefaultText style={{ fontSize: 20 }}>
             My Total Balance: £ {balance}
@@ -189,11 +186,14 @@ const Home = () => {
         </View>
 
         <View>
-          {/* <View style={{ flexDirection: "row", justifyContent: "space-between" }}> */}          
-          <AccountSlider accounts={accounts} onAddAccountSuccess={fetchBalanceDB} />
+          {/* <View style={{ flexDirection: "row", justifyContent: "space-between" }}> */}
+          <AccountSlider
+            accounts={accounts}
+            onAddAccountSuccess={fetchBalanceDB}
+          />
         </View>
 
-        <View style={{ margin: 10, height: "50%" }}>
+        <View style={{ margin: 10 }}>
           <DefaultText style={{ fontSize: 20 }}>
             Total Transactions...
           </DefaultText>
@@ -206,7 +206,11 @@ const Home = () => {
             }
           />
         </View>
-        {/* </View> */}
+
+        <View style={{ margin: 10 }}>
+          <Recurring />
+        </View>
+        
       </View>
       <FooterList />
     </>

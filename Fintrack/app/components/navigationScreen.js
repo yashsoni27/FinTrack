@@ -13,6 +13,7 @@ import Add from "../screens/add";
 import Transactions from "../screens/transactions";
 import { Appearance } from "react-native";
 import { useTheme } from "../context/themeContext";
+import RecurringScreen from "../screens/recurringScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -42,6 +43,7 @@ const NavigationScreen = () => {
           <Stack.Screen name="Analysis" component={Analysis} />
           <Stack.Screen name="Add" component={Add} />
           <Stack.Screen name="Transactions" component={Transactions} />
+          <Stack.Screen name="Recurring" component={RecurringScreen} />
         </>
       ) : (
         <>
