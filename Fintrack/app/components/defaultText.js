@@ -16,7 +16,7 @@ const DefaultText = (props) => {
 const createStyles = (theme) => {
   return StyleSheet.create({
     defaultText: {
-      fontFamily: "Urbanist",
+      fontFamily: "Inter",
       // color: globalStyles.dark.primary,
       color: theme.text,
     },

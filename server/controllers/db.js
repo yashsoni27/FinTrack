@@ -7,12 +7,28 @@ import Transaction from "../models/transaction.js";
 import Recurring from "../models/recurring.js";
 
 
+export const getAccountsDb = async (request, response) => {
+  try {
+    const { userId } = request.body;
+    const user = await User.findOne({ userId });
+    if (!user || !user.institutions || user.institutions.length == 0) {
+      throw new error("User not found");
+    }
+
+    const accounts = await Account.find({ userId: userId });    
+
+    response.json({ accounts: accounts });
+  } catch (e) {
+    response.status(500).send(e);
+  }
+}
+
 export const getBalanceDb = async (request, response) => {
   try {
     const { userId } = request.body;
     const user = await User.findOne({ userId });
     if (!user || !user.institutions || user.institutions.length == 0) {
-      throw new error("User not found or access token not set");
+      throw new error("User not found");
     }
 
     const netBalance = await Account.find({ userId: userId });    
