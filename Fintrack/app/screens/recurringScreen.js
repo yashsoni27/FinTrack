@@ -102,13 +102,14 @@ const RecurringScreen = () => {
         // padding: 10,
         backgroundColor: theme.background,
       }}
+      showsVerticalScrollIndicator={false}
     >
       <View>
         <DefaultText style={{ fontSize: 30, textAlign: "center" }}>
           Recurring Screen
         </DefaultText>
       </View>
-      
+
       <View style={{}}>
         <View
           style={{

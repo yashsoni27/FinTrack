@@ -97,10 +97,10 @@ const Add = () => {
     <SafeAreaView style={{ flex: 1, alignItems: "center" }}>
       <View>
         <DefaultText style={{ fontSize: 30, textAlign: "center" }}>
-          Add your spending Screen
+          Add Transaction
         </DefaultText>
       </View>
-      <View>
+      <View style={{marginTop: 20}}>
         <Button title="Choose Photo" onPress={handleChoosePhoto} />
         {imageUri && (
           <>
@@ -111,7 +111,7 @@ const Add = () => {
           </>
         )}
       </View>
-      <FooterList />
+      {/* <FooterList /> */}
     </SafeAreaView>
   );
 };

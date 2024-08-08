@@ -23,7 +23,7 @@ const FooterList = () => {
 const styles = StyleSheet.create({
   container: {
     position: "absolute",
-    bottom: 15,
+    bottom: 10,
     width: "90%",
     flexDirection: "row",
     justifyContent: "space-between",
