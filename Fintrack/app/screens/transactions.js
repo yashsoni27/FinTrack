@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
+  PanResponder,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import FooterList from "../components/footer/footerList";
@@ -13,101 +14,149 @@ import { getTransactionsDb } from "../../api/db";
 import DefaultText from "../components/defaultText";
 import { useTheme } from "../context/themeContext";
 import { useNavigation } from "@react-navigation/native";
+import { LineChart } from "react-native-gifted-charts";
+import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 
 const Transactions = () => {
   const [state, setState] = useContext(AuthContext);
   const navigation = useNavigation();
   const { theme } = useTheme();
   const [transactions, setTransactions] = useState([]);
-  const [groupedTransactions, setGroupedTransactions] = useState({});
-  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+  const [currMonth, setCurrMonth] = useState(new Date().getMonth() + 1);
+  const [date, setDate] = useState(new Date())
 
   const screenWidth = Dimensions.get("window").width;
+  // let date = new Date();
 
   const userId = state.user.userId;
 
-  const fetchTransactionsDB = async () => {
+  const fetchTransactionsDB = async (selectedMonth) => {
     try {
-      // const response = await getTransactionsDb(userId, (count = 3));
-      const response = await getTransactionsDb(userId);
+      const response = await getTransactionsDb(userId, 0, selectedMonth);
       // console.log("Transactions fetched from DB: ", response);
       console.log("Transactions fetched from DB");
       setTransactions(response.transactions);
-      
     } catch (error) {
-      console.log("Error in fetching transactions: ", error);
+      console.log("Error in fetching transactions:  ", error);
     }
   };
 
-  const groupTransactionsByDate = (transactions) => {
-    return transactions.reduce((acc, transaction) => {
-      const date = new Date(transaction.date).toISOString().split("T")[0];
-
-      if (!acc[date]) {
-        acc[date] = [];
+  const generateGraphData = (monthTransactions) => {
+    const aggregatedData = monthTransactions.reduce((acc, { date, amount }) => {
+      const day = new Date(date).getDate();
+      if (amount > 0) {
+        acc[day] = (acc[day] || 0) + amount;
       }
-
-      acc[date].push(transaction);
-
       return acc;
     }, {});
+
+    const currentYear = new Date().getFullYear();
+    const daysInMonth = new Date(currentYear, currMonth, 0).getDate();
+
+    return Array.from({ length: daysInMonth }, (_, i) => ({
+      value: aggregatedData[i + 1] || 0,
+    }));
   };
 
   useEffect(() => {
-    fetchTransactionsDB();
-  }, []);
+    // fetchTransactionsDB();
+    fetchTransactionsDB(currMonth);
+    const newDate = new Date(date);
+    newDate.setMonth(currMonth - 1);
+    setDate(newDate);
+  }, [currMonth]);
 
-  useEffect(() => {
-    const grouped = groupTransactionsByDate(transactions);
-    setGroupedTransactions(grouped);
-  }, [transactions]);
-
+  const graphData = generateGraphData(transactions);
+  // console.log("graphData: ", graphData);
 
   return (
     <>
-      <ScrollView
-        style={{
-          // padding: 10,
-          backgroundColor: theme.background,
-        }}
-        showsVerticalScrollIndicator={false}
-      >
-        <View>
-          <DefaultText style={{ fontSize: 30, textAlign: "center" }}>
-            Transactions
-          </DefaultText>
-        </View>
-
-        <View
+      <View style={{ height: "92%", backgroundColor: "grey", padding: 5 }}>
+        <ScrollView
           style={{
-            marginTop: 20,
-            margin: 10,
-            padding: 10,
-            borderColor: "#000",
-            borderWidth: 1,
+            // padding: 10,
+            backgroundColor: theme.background,
           }}
+          showsVerticalScrollIndicator={false}
         >
-          <View style={{ marginVertical: 10 }}>
-            <DefaultText style={{fontSize: 20}}>History</DefaultText>
-          </View>          
-
           <View>
-            {Object.keys(groupedTransactions).map((date) => (
-              <View key={date} style={{ marginVertical: 10 }}>
-                <DefaultText style={{fontSize: 15, fontWeight: "bold"}}>{date}</DefaultText>
-                {groupedTransactions[date].map((transaction) => (
-                  <View key={transaction._id} style={{ marginVertical: 3 }}>
-                    <DefaultText>{transaction.name}</DefaultText>
-                    <DefaultText>{transaction.amount}</DefaultText>
-                  </View>
-                ))}
-              </View>
-            ))}
+            <DefaultText style={{ fontSize: 30, textAlign: "center" }}>
+              Transactions
+            </DefaultText>
           </View>
-        </View>
 
-        <View style={{ height: 100, backgroundColor: "grey" }}></View>
-      </ScrollView>
+          <LineChart
+            data={graphData}
+            width={screenWidth - 40}
+            height={150}
+            // initialSpacing={0}
+            spacing={10}
+            hideRules
+            color1="green"
+            thickness={2}
+            areaChart
+            startFillColor="rgba(34,193,195,0.2)" // Start of gradient color
+            endFillColor="rgba(34,193,195,0)" // End of gradient color
+            startOpacity={0.5} // Starting opacity for gradient fill
+            endOpacity={0}
+            hideDataPoints
+            // hideYAxisText
+            // pointerConfig={{}}
+            // hideAxesAndRules
+            curved
+            curvature={0.02}
+            // showVerticalLines
+            verticalLinesColor="#e0e0e0" // Color of grid lines
+            yAxisTextStyle={{ color: "gray" }}
+            // yAxisOffset={20}
+
+            // focusEnabled={true}
+            // showDataPointOnFocus={true}
+          />
+
+          <View
+            style={{
+              marginTop: 20,
+              margin: 10,
+              padding: 10,
+              // borderColor: "#000",
+              // borderWidth: 1,
+            }}
+          >
+            <View style={{ marginVertical: 10, flexDirection: "row", justifyContent: "space-between" }}>
+              <FontAwesome5Icon
+                style={{}}
+                name="angle-left"
+                size={20}
+                color=""
+                onPress={() => setCurrMonth(currMonth - 1)}
+              />
+              <DefaultText style={{ fontSize: 20, textAlign: "center" }}>
+                History for {date.toLocaleString("default", { month: "short" })}
+              </DefaultText>
+              <FontAwesome5Icon
+                style={{}}
+                name="angle-right"
+                size={20}
+                color=""
+                onPress={() => setCurrMonth(currMonth + 1)}
+              />
+            </View>
+
+            {/* Beautify this View  */}
+            <View>
+              {transactions.map((transaction) => (
+                <View key={transaction._id} style={{ marginVertical: 3 }}>
+                  <DefaultText>{transaction.name}</DefaultText>
+                  <DefaultText>£ {transaction.amount}</DefaultText>
+                </View>
+              ))}
+            </View>
+          </View>
+
+          {/* <View style={{ height: 100, backgroundColor: "grey" }}></View> */}
+        </ScrollView>
+      </View>
 
       <View style={{ position: "absolute", bottom: 90, right: 20 }}>
         <TouchableOpacity

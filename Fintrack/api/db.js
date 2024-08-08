@@ -22,9 +22,9 @@ export const getBalanceDb = async (userId) => {
   }
 };
 
-export const getTransactionsDb = async (userId, count) => {
+export const getTransactionsDb = async (userId, count, month) => {
   try {
-    const response = await axios.post(`${BASE_URL}/db/transactions/get`, { userId, count });
+    const response = await axios.post(`${BASE_URL}/db/transactions/get`, { userId, count, month });
     return response.data;
   } catch (error) {
     console.error("Error fetching transactions: ", error);
