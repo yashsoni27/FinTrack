@@ -77,11 +77,10 @@ const RecurringScreen = () => {
         }
       }, 0);
       console.log("paidTotal: ", paidTotal);
-      const unpaidTotal = totalToPay - paidTotal;  
+      const unpaidTotal = totalToPay - paidTotal;
 
       setAmount({ paid: paidTotal, unpaid: unpaidTotal });
       setSubscription(subscriptions);
-
     } catch (error) {
       console.log("Error in fetching recurring DB: ", error);
     }
@@ -104,9 +103,12 @@ const RecurringScreen = () => {
         backgroundColor: theme.background,
       }}
     >
-      <DefaultText style={{ fontSize: 30, textAlign: "center" }}>
-        Recurring Screen
-      </DefaultText>
+      <View>
+        <DefaultText style={{ fontSize: 30, textAlign: "center" }}>
+          Recurring Screen
+        </DefaultText>
+      </View>
+      
       <View style={{}}>
         <View
           style={{
@@ -119,9 +121,7 @@ const RecurringScreen = () => {
             justifyContent: "space-between",
           }}
         >
-          <View
-            style={{ flexDirection: "column", justifyContent: "space-between" }}
-          >
+          <View style={[styles.amountContainer, { alignItems: "flex-start" }]}>
             <DefaultText style={{ fontSize: 20 }}>
               £ {amount.unpaid}
             </DefaultText>
@@ -157,9 +157,7 @@ const RecurringScreen = () => {
               // }}
             />
           </View>
-          <View
-            style={{ flexDirection: "column", justifyContent: "space-between" }}
-          >
+          <View style={styles.amountContainer}>
             <DefaultText style={{ fontSize: 20 }}>£ {amount.paid}</DefaultText>
             <DefaultText>paid so far</DefaultText>
           </View>
@@ -218,6 +216,12 @@ const RecurringScreen = () => {
 export default RecurringScreen;
 
 const styles = StyleSheet.create({
+  amountContainer: {
+    flexDirection: "column",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+    width: "25%",
+  },
   subscriptionContainer: {
     flexDirection: "row",
     flexWrap: "wrap",

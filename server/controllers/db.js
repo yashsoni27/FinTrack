@@ -48,13 +48,24 @@ export const getTransactionsDb = async (request, response) => {
       throw new error("User not found or access token not set");
     }
 
-    const transactions = await Transaction.find({ userId: userId })
-      .sort({ date: -1 })
-      .limit(count);
+    let query = Transaction.find({ userId: userId }).sort({ date: -1 });
+
+    if (count) {
+      query = query.limit(count);
+    } else {
+      query = query.limit(10);
+    }
+
+    const transactions = await query.exec();
+
+
+    // const transactions = await Transaction.find({ userId: userId })
+    //   .sort({ date: -1 })
+    //   .limit(count);
 
     // console.log("transactions: ", transactions);
     response.json({transactions: transactions});
-    // response.json("testing");
+    
   } catch (error) {
     console.error("Error fetching transactions: ", error);
     response.status(500).send(error);
