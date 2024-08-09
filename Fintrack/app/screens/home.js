@@ -210,7 +210,7 @@ const Home = () => {
         <View style={{ margin: 10 }}>
           <Recurring />
         </View>
-        
+
       </View>
       <FooterList />
     </>

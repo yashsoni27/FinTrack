@@ -71,7 +71,7 @@ const Transactions = () => {
 
   return (
     <>
-      <View style={{ height: "92%", backgroundColor: "grey", padding: 5 }}>
+      <View style={{ height: "90%" }}>
         <ScrollView
           style={{
             // padding: 10,
@@ -154,7 +154,6 @@ const Transactions = () => {
             </View>
           </View>
 
-          {/* <View style={{ height: 100, backgroundColor: "grey" }}></View> */}
         </ScrollView>
       </View>
 
