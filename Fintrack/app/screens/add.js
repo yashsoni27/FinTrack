@@ -1,29 +1,35 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
-  Text,
   SafeAreaView,
   Image,
   Button,
-  ActivityIndicator,
   Alert,
   StyleSheet,
   TextInput,
+  TouchableOpacity,
 } from "react-native";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 import RNFS from "react-native-fs";
-import FooterList from "../components/footer/footerList";
-import { ScrollView } from "react-native";
 import { scanInvoice, scanReceipt } from "../../api/ocr";
 import DefaultText from "../components/defaultText";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { useNavigation } from "@react-navigation/native";
+import { saveTransactionDb } from "../../api/db";
+import { AuthContext } from "../context/auth";
 
 const Add = () => {
+  const [state, setState] = useContext(AuthContext);
   const [imageUri, setImageUri] = useState(null);
-  const [recognizedText, setRecognizedText] = useState("");
+  const navigation = useNavigation();
+
+  const userId = state.user.userId;
+
   const [date, setDate] = useState("");
   const [merchantName, setMerchantName] = useState("");
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState();
+  const [desc, setDesc] = useState("");
 
   const handleChoosePhoto = () => {
     Alert.alert(
@@ -88,45 +94,60 @@ const Add = () => {
       const response = await scanReceipt(imageData);
       console.log("OCR Upload successful:", response);
 
-      setRecognizedText(JSON.stringify(response.receiptData, null, 2));
-
       // const response = await scanInvoice(formData);
       // console.log("tesseract upload successful:", response);
       // console.log("tesseract upload successful:", response.text);
 
-      // const parsedDate = "2023-08-09"; // Replace with extracted date
-      // const parsedMerchant = "Merchant XYZ"; // Replace with extracted merchant name
-      // const parsedAmount = "123.45";
-
       setDate(response.receiptData.date);
       setAmount(response.receiptData.amount);
       setMerchantName(response.receiptData.merchantName);
+      console.log("data: ", date, amount, merchantName);
     } catch (error) {
       console.error("Error uploading image:", error);
     }
   };
 
+  const saveTransaction = async () => {
+    try {
+      const transactionData = {
+        userId,
+        date,
+        amount,
+        merchantName,
+        desc,
+      };
+      const response = await saveTransactionDb(transactionData);
+      console.log("Transaction saved from DB", response);
+    } catch (error) {
+      console.log("Error in saving transactions:  ", error);
+    }
+  };
+
   return (
-    <SafeAreaView style={{ padding: 15 }}>
+    <SafeAreaView style={{ flex: 1, padding: 15 }}>
       <FontAwesome5Icon
         style={{ alignSelf: "flex-end", padding: 10 }}
         name="times"
         size={15}
+        onPress={() => navigation.goBack()}
       />
       <DefaultText
-        style={{ fontSize: 30, textAlign: "center", marginBottom: 20 }}
+        style={{ fontSize: 30, textAlign: "center", marginBottom: 10 }}
       >
         Add Transaction
       </DefaultText>
 
-      <ScrollView style={{ marginTop: 20 }}>
+      <KeyboardAwareScrollView
+        style={{ marginTop: 10 }}
+        showsVerticalScrollIndicator={false}
+      >
         <Button title="Choose Photo" onPress={handleChoosePhoto} />
         {imageUri && (
           <>
             <Image source={{ uri: imageUri }} style={styles.image} />
-            <View style={styles.textContainer}>
+            {/* <View style={styles.textContainer}>
               <DefaultText>{recognizedText}</DefaultText>
-            </View>
+            </View> */}
           </>
         )}
 
@@ -135,8 +156,9 @@ const Add = () => {
           <TextInput
             style={styles.input}
             placeholder="YYYY-MM-DD"
+            type="date"
             value={date}
-            onChangeText={setDate}
+            onChangeText={(e) => setDate(e)}
           />
 
           <DefaultText style={styles.label}>Merchant Name</DefaultText>
@@ -144,7 +166,7 @@ const Add = () => {
             style={styles.input}
             placeholder="Merchant Name"
             value={merchantName}
-            onChangeText={setMerchantName}
+            onChangeText={(e) => setMerchantName(e)}
           />
 
           <DefaultText style={styles.label}>Amount</DefaultText>
@@ -153,12 +175,35 @@ const Add = () => {
             placeholder="Amount"
             keyboardType="numeric"
             value={amount}
-            onChangeText={setAmount}
+            onChangeText={(e) => setAmount(e)}
           />
 
-          <Button title="Save Transaction" />
+          <DefaultText style={styles.label}>Description</DefaultText>
+          <TextInput
+            style={styles.input}
+            placeholder="Short info"
+            value={desc}
+            onChangeText={(e) => setDesc(e)}
+          />
+
+          {/* <Button title="Save Transaction" onPress={saveTransaction} /> */}
+          <TouchableOpacity
+            style={{ backgroundColor: "#2196F3" }}
+            onPress={saveTransaction}
+          >
+            <DefaultText
+              style={{
+                color: "white",
+                fontSize: 15,
+                textAlign: "center",
+                padding: 10,
+              }}
+            >
+              Save Transaction
+            </DefaultText>
+          </TouchableOpacity>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
       {/* <FooterList /> */}
     </SafeAreaView>
   );
@@ -179,6 +224,22 @@ const styles = StyleSheet.create({
   textContainer: {
     flex: 1,
     marginTop: 16,
+  },
+  inputContainer: {
+    marginTop: 20,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
+  input: {
+    height: 40,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 16,
   },
 });
 

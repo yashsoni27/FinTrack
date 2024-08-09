@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -5,6 +6,7 @@ import User from "../models/user.js";
 import Account from "../models/account.js";
 import Transaction from "../models/transaction.js";
 import Recurring from "../models/recurring.js";
+
 
 export const getAccountsDb = async (request, response) => {
   try {
@@ -104,6 +106,33 @@ export const getRecurringDb = async (request, response) => {
     });
   } catch (e) {
     console.log("recurringTransactions error: ", e);
+    response.status(500).send(e);
+  }
+};
+
+export const saveTransactionDb = async (request, response) => {
+  try {
+    const { data } = request.body;
+    console.log("data: ", data);
+
+    await Transaction.create({
+      userId: data.userId,
+      transactionId: uuidv4().replace(/-/g, ''),
+      accountId: "offline",
+      amount: data.amount,
+      date: new Date(data.date),
+      name: data.merchantName,
+      merchantName: data.merchantName,
+      // logoUrl: transaction.logo_url,
+      // category: data.category,
+      description: data.description, 
+    });
+
+    response.json({
+      message: "Transaction saved successfully",
+    });
+  } catch (e) {
+    console.log("saveTransaction error: ", e);
     response.status(500).send(e);
   }
 };

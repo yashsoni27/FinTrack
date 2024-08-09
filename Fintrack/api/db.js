@@ -41,3 +41,13 @@ export const getRecurringTransactionsDb = async (userId) => {
     throw error;
   }
 }
+
+export const saveTransactionDb = async (data) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/db/transactions/save`, {data});
+    return response.data;
+  } catch (error) {
+    console.error("Error saving transaction: ", error);
+    throw error;
+  }
+}
