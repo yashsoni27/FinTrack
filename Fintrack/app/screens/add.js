@@ -103,7 +103,7 @@ const Add = () => {
       setMerchantName(response.receiptData.merchantName);
       console.log("data: ", date, amount, merchantName);
     } catch (error) {
-      console.error("Error uploading image:", error);
+      console.error("Error uploading image: ", error);
     }
   };
 
