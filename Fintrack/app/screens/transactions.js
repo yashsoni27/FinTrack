@@ -23,7 +23,7 @@ const Transactions = () => {
   const { theme } = useTheme();
   const [transactions, setTransactions] = useState([]);
   const [currMonth, setCurrMonth] = useState(new Date().getMonth() + 1);
-  const [date, setDate] = useState(new Date())
+  const [date, setDate] = useState(new Date());
 
   const screenWidth = Dimensions.get("window").width;
   // let date = new Date();
@@ -64,6 +64,8 @@ const Transactions = () => {
     const newDate = new Date(date);
     newDate.setMonth(currMonth - 1);
     setDate(newDate);
+    // console.log("testing: ", date.toISOString(), new Date().toISOString());
+    // console.log("condition: ", date.toISOString() > new Date().toISOString());
   }, [currMonth]);
 
   const graphData = generateGraphData(transactions);
@@ -123,9 +125,15 @@ const Transactions = () => {
               // borderWidth: 1,
             }}
           >
-            <View style={{ marginVertical: 10, flexDirection: "row", justifyContent: "space-between" }}>
+            <View
+              style={{
+                marginVertical: 10,
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}
+            >
               <FontAwesome5Icon
-                style={{}}
+                style={styles.monthButton}
                 name="angle-left"
                 size={20}
                 color=""
@@ -135,10 +143,11 @@ const Transactions = () => {
                 History for {date.toLocaleString("default", { month: "short" })}
               </DefaultText>
               <FontAwesome5Icon
-                style={{}}
+                style={styles.monthButton}
                 name="angle-right"
                 size={20}
                 color=""
+                disabled={date.toISOString() >= new Date().toISOString()}
                 onPress={() => setCurrMonth(currMonth + 1)}
               />
             </View>
@@ -153,7 +162,6 @@ const Transactions = () => {
               ))}
             </View>
           </View>
-
         </ScrollView>
       </View>
 
@@ -186,6 +194,11 @@ const styles = StyleSheet.create({
     // position: "absolute",
     // bottom: 0,
     // right: 0,
+  },
+  monthButton: {
+    backgroundColor: "lightblue",
+    padding: 5,
+    borderRadius: 20,
   },
 });
 
