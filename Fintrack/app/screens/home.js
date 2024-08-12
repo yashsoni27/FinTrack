@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
-import { SafeAreaView, View, FlatList } from "react-native";
+import { SafeAreaView, View, FlatList, ScrollView } from "react-native";
 import FooterList from "../components/footer/footerList";
 import { AuthContext } from "../context/auth";
 import { ActivityIndicator } from "react-native";
@@ -95,7 +95,7 @@ const Home = () => {
   const fetchTransactionsDB = async () => {
     try {
       setLoading(true);
-      const response = await getTransactionsDb(userId, (count = 3));
+      const response = await getTransactionsDb(userId, 5, null);
       // console.log("Transactions fetched from DB: ", response);
       console.log("Transactions fetched from DB");
       setTransactions(response.transactions);
@@ -159,58 +159,60 @@ const Home = () => {
           // alignItems: "center",
           padding: 10,
           backgroundColor: theme.background,
+          height: "92%",
         }}
       >
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            backgroundColor: "lightgrey",
-          }}
-        >
-          <View style={{ backgroundColor: "grey" }}>
-            <DefaultText style={{ fontSize: 30, color: theme.text }}>
-              Hi {state.user.name}
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              backgroundColor: "lightgrey",
+            }}
+          >
+            <View style={{ backgroundColor: "grey" }}>
+              <DefaultText style={{ fontSize: 30, color: theme.text }}>
+                Hi {state.user.name}
+              </DefaultText>
+            </View>
+            <View>
+              <DefaultText>Check</DefaultText>
+            </View>
+          </View>
+
+          <View style={{ marginVertical: 10 }}>
+            <DefaultText style={{ fontSize: 20 }}>
+              My Total Balance: £ {balance}
             </DefaultText>
           </View>
+
           <View>
-            <DefaultText>Check</DefaultText>
+            {/* <View style={{ flexDirection: "row", justifyContent: "space-between" }}> */}
+            <AccountSlider
+              accounts={accounts}
+              onAddAccountSuccess={fetchBalanceDB}
+            />
           </View>
-        </View>
 
-        <View style={{ marginVertical: 10 }}>
-          <DefaultText style={{ fontSize: 20 }}>
-            My Total Balance: £ {balance}
-          </DefaultText>
-        </View>
+          <View style={{ margin: 10 }}>
+            <DefaultText style={{ fontSize: 20 }}>
+              Total Transactions...
+            </DefaultText>
+            <FlatList
+              // data={transactions.slice(0, 5)}
+              data={transactions}
+              renderItem={renderTransactions}
+              keyExtractor={(item, index) =>
+                item.id?.toString() || index.toString()
+              }
+            />
+          </View>
 
-        <View>
-          {/* <View style={{ flexDirection: "row", justifyContent: "space-between" }}> */}
-          <AccountSlider
-            accounts={accounts}
-            onAddAccountSuccess={fetchBalanceDB}
-          />
-        </View>
-
-        <View style={{ margin: 10 }}>
-          <DefaultText style={{ fontSize: 20 }}>
-            Total Transactions...
-          </DefaultText>
-          <FlatList
-            // data={transactions.slice(0, 5)}
-            data={transactions}
-            renderItem={renderTransactions}
-            keyExtractor={(item, index) =>
-              item.id?.toString() || index.toString()
-            }
-          />
-        </View>
-
-        <View style={{ margin: 10 }}>
-          <Recurring />
-        </View>
-
+          <View style={{ margin: 10 }}>
+            <Recurring />
+          </View>
+        </ScrollView>
       </View>
       <FooterList />
     </>

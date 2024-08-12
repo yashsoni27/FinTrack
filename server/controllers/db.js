@@ -44,6 +44,8 @@ export const getTransactionsDb = async (request, response) => {
   try {
     const { userId, count, month } = request.body;
     console.log("userId: ", userId);
+    // console.log(count);
+    // console.log(month);
 
     const user = await User.findOne({ userId });
     if (!user || !user.institutions || user.institutions.length == 0) {

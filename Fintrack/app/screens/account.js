@@ -1,17 +1,27 @@
 import { View, Text, SafeAreaView } from "react-native";
-import React from "react";
+import React, { useContext } from "react";
 import FooterList from "../components/footer/footerList";
 import HeaderTabs from "../components/header/headerTabs";
+import DefaultText from "../components/defaultText";
+import { AuthContext } from "../context/auth";
+import { useTheme } from "../context/themeContext";
 
 const Account = () => {
+  const [state, setState] = useContext(AuthContext);
+  const { theme } = useTheme();
+
+  const userId = state.user.id
+
   return (
-    <SafeAreaView
-      style={{ flex: 1, justifyContent: "space-between", alignItems: "center" }}
-    >
-      <HeaderTabs />
-      <Text style={{ fontSize: 30, textAlign: "center" }}>Account Screen</Text>
+    <>
+      <View style={{}}>
+        <DefaultText style={{ fontSize: 30, textAlign: "center", color: theme.text }}>
+          Account Screen
+        </DefaultText>
+        <HeaderTabs />
+      </View>
       <FooterList />
-    </SafeAreaView>
+    </>
   );
 };
 

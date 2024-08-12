@@ -22,7 +22,7 @@ export const getBalanceDb = async (userId) => {
   }
 };
 
-export const getTransactionsDb = async (userId, count, month) => {
+export const getTransactionsDb = async (userId, count = 0, month = null) => {
   try {
     const response = await axios.post(`${BASE_URL}/db/transactions/get`, { userId, count, month });
     return response.data;
