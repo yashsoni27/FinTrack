@@ -387,12 +387,7 @@ export const recurringTransactions = async (request, response) => {
     console.log("recurringResponse: ", recurringResponse);
     
     response.json(recurringResponse);
-    // const recurringTransactions = await Recurring.find({ userId });
 
-    // response.json({
-    //   inflowStreams: recurringTransactions.filter(stream => stream.stream === "Inflow"),
-    //   outflowStreams: recurringTransactions.filter(stream => stream.stream === "Outflow"),
-    // });
 
   } catch (e) {
     console.log("recurringTransactions error: ", e);

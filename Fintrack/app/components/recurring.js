@@ -1,5 +1,5 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React, { useContext, useEffect } from "react";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
 import DefaultText from "./defaultText";
 import { AuthContext } from "../context/auth";
 import { useTheme } from "../context/themeContext";
@@ -12,10 +12,9 @@ const Recurring = () => {
   const navigation = useNavigation();
   const [state, setState] = useContext(AuthContext);
   const { theme } = useTheme();
+  const [recurringTransactions, setRecurringTransactions] = useState([]);
 
   const userId = state.user.userId;
-  // const currentMonth = new Date().getMonth();
-  // console.log("currentMonth: ", currentMonth);
 
   const getRecurring = async () => {
     try {
@@ -34,8 +33,6 @@ const Recurring = () => {
   const getRecurringDb = async () => {
     try {
       const response = await getRecurringTransactionsDb(userId);
-      // console.log("recurring DB: ", response);
-      // console.log("recurring DB success");
       const subscriptions = response.outflowStreams.filter(
         (stream) => stream.category[0] === "Service"
         // && stream.category[1] === "Subscription"
@@ -44,21 +41,29 @@ const Recurring = () => {
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      // console.log("today: ", today.toISOString());
-      // console.log("oldDate: ", subscriptions[0].lastDate);
-      // const newDate = new Date(subscriptions[0].lastDate);
-      // newDate.setMonth(newDate.getMonth() + 1)
-      // console.log("newDate: ", newDate.toISOString());
 
-      const upcomingTransactions = subscriptions.filter((transaction) => {
-        const nextTransactionDate = new Date(transaction.lastDate);
-        nextTransactionDate.setMonth(nextTransactionDate.getMonth() + 1);
-        return (
-          nextTransactionDate.getMonth() === today.getMonth() &&
-          nextTransactionDate.toISOString() >= today.toISOString()
-        );
-      });
-      console.log("upcomingTransactions: ", upcomingTransactions.length);
+      const recurring = subscriptions
+        .filter((transaction) => {
+          const nextTransactionDate = new Date(transaction.lastDate);
+          nextTransactionDate.setMonth(nextTransactionDate.getMonth() + 1);
+          return (
+            nextTransactionDate.getMonth() === today.getMonth() &&
+            nextTransactionDate.toISOString() >= today.toISOString()
+          );
+        })
+        .sort((a, b) => {
+          const dateA = new Date(a.lastDate);
+          const dateB = new Date(b.lastDate);
+
+          // Move to the next month
+          dateA.setMonth(dateA.getMonth() + 1);
+          dateB.setMonth(dateB.getMonth() + 1);
+
+          return dateA - dateB; // Sort by the next transaction date
+        });
+
+      console.log("recurring: ", recurring);
+      setRecurringTransactions(recurring);
     } catch (error) {
       console.log("Error in fetching recurring DB: ", error);
     }
@@ -78,7 +83,7 @@ const Recurring = () => {
         </View>
       </TouchableOpacity>
       <View>
-        <Text>Testing card stack</Text>
+        <DefaultText>Testing card stack</DefaultText>
       </View>
     </View>
   );

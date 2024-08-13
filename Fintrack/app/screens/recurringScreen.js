@@ -15,6 +15,20 @@ const RecurringScreen = () => {
 
   const userId = state.user.userId;
 
+  const getRecurring = async () => {
+    try {
+      const response = await getRecurringTransactions(userId);
+      // console.log("recurring: ", response);
+      const subscriptions = response.outflowStreams.filter(
+        (stream) => stream.category[0] === "Service"
+        // && stream.category[1] === "Subscription"
+      );
+      // console.log("Subscriptions: ", subscriptions);
+    } catch (error) {
+      console.log("Error in fetching recurring: ", error);
+    }
+  };
+
   const getRecurringDb = async () => {
     try {
       const response = await getRecurringTransactionsDb(userId);
@@ -66,9 +80,6 @@ const RecurringScreen = () => {
         .toFixed(2);
       console.log("totalToPay: ", totalToPay);
 
-      // const paidTotal = paidTransactions.reduce((acc, transaction) => {
-      //   return acc + Number(transaction.averageAmount.amount);
-      // }, 0);
       const paidTotal = subscriptions.reduce((acc, transaction) => {
         if (transaction.paidThisMonth) {
           return acc + Number(transaction.averageAmount.amount);
@@ -79,7 +90,10 @@ const RecurringScreen = () => {
       console.log("paidTotal: ", paidTotal);
       const unpaidTotal = totalToPay - paidTotal;
 
-      setAmount({ paid: paidTotal, unpaid: unpaidTotal });
+      setAmount({
+        paid: Math.round(paidTotal * 100) / 100,
+        unpaid: Math.round(unpaidTotal * 100) / 100,
+      });
       setSubscription(subscriptions);
     } catch (error) {
       console.log("Error in fetching recurring DB: ", error);
