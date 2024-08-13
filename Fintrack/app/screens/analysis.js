@@ -5,25 +5,14 @@ import DefaultText from "../components/defaultText";
 import { AuthContext } from "../context/auth";
 import { useTheme } from "../context/themeContext";
 import { LineChart } from "react-native-gifted-charts";
-import { getTransactionsDb } from "../../api/db";
+import { getChartData, getTransactionsDb } from "../../api/db";
 
 const Analysis = () => {
   const [state, setState] = useContext(AuthContext);
   const { theme } = useTheme();
-  // const [data, setData] = useState([]);
   const [incomeData, setIncomeData] = useState([]);
   const [expenseData, setExpenseData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  const chartData = [
-    { value: 10, dataPointText: "10" },
-    { value: 20, dataPointText: "20" },
-    { value: 30, dataPointText: "30" },
-    { value: 40, dataPointText: "40" },
-    { value: 50, dataPointText: "50" },
-    { value: 60, dataPointText: "60" },
-    { value: 70, dataPointText: "70" },
-  ];
 
   const userId = state.user.userId;
 
@@ -49,7 +38,9 @@ const Analysis = () => {
 
       const filteredTransactions = transactions.filter((transaction) => {
         const date = new Date(transaction.date);
-        return date.getMonth() + 1 === selectedMonth && date.getDate() <= lastDay;
+        return (
+          date.getMonth() + 1 === selectedMonth && date.getDate() <= lastDay
+        );
       });
       // console.log("filtered:  ", filteredTransactions);
 
@@ -79,20 +70,62 @@ const Analysis = () => {
         if (expense[i].value === 0) expense[i].value = expense[i - 1].value;
       }
 
-      console.log("income data: ", income);
-      console.log("expense data: ", expense);
+      // console.log("income data: ", income);
+      // console.log("expense data: ", expense);
 
       setIncomeData(income);
       setExpenseData(expense);
     } catch (error) {
-      console.log("Error in fetching transactions:  ", error);
+      console.log("Error in fetching transactions: ", error);
     } finally {
       setIsLoading(false);
     }
   };
 
+  const fetchChartData = async (selectedMonth = 8) => {
+    try {
+      setIsLoading(true);
+      const response = await getChartData(userId, 0, selectedMonth);
+      const currMonthData = response.currMonthData;
+      const prevMonthData = response.prevMonthData;
+      // console.log("currMonth: ", currMonthData);
+      // console.log("prevMonth: ", prevMonthData);
+
+      setIncomeData(currMonthData.income);
+      setExpenseData(currMonthData.expense);
+
+      let currMonthIncom = currMonthData.income;
+      let currMonthExpense = currMonthData.expense;
+      console.log("currMonthIncome: ", currMonthIncom.slice(-1)[0].value);
+      console.log("currMonthExpense: ", currMonthExpense.slice(-1)[0].value);
+
+      let prevMonthIncome = prevMonthData.income;
+      let prevMonthExpense = prevMonthData.expense;
+      console.log("prevMonthIncome: ", prevMonthIncome.slice(-1)[0].value);
+      console.log("prevMonthExpense: ", prevMonthExpense.slice(-1)[0].value);
+
+      const currMonthIncomeValue = currMonthIncom.slice(-1)[0].value;
+      const currMonthExpenseValue = currMonthExpense.slice(-1)[0].value;
+      const prevMonthIncomeValue = prevMonthIncome.slice(-1)[0].value;
+      const prevMonthExpenseValue = prevMonthExpense.slice(-1)[0].value;
+
+      const incomeChange = ((currMonthIncomeValue - prevMonthIncomeValue) / prevMonthIncomeValue) * 100;
+      const expenseChange = ((currMonthExpenseValue - prevMonthExpenseValue) / prevMonthExpenseValue) * 100;
+
+      console.log("Income percentage change:", incomeChange.toFixed(2) + "%");
+      console.log("Expense percentage change:", expenseChange.toFixed(2) + "%");
+
+
+    } catch (error) {
+      console.log("Error in fetching chart data: ", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   useEffect(() => {
-    fetchTransactionsDB();
+    // fetchTransactionsDB();
+    fetchChartData();
   }, []);
 
   const renderChart = () => {
@@ -105,40 +138,61 @@ const Analysis = () => {
     }
 
     return (
-      <View>
-        <LineChart
-          areaChart
-          curved
-          curvature={0.1}
-          data={expenseData}
-          data2={incomeData}
-          color1="red"
-          color2="green"
-          startFillColor1="red"
-          startFillColor2="green"
-          startOpacity={0.5}
-          endOpacity={0}
-          width={Dimensions.get("window").width - 35}
-          height={150}
-          thickness={2}
-          // noOfSections={5}
-          spacing={12}
-          initialSpacing={10}
-          endSpacing={0}
-          hideDataPoints
-          hideRules
-          hideYAxisText
-          yAxisOffset={1}
-          pointerConfig={{
-            pointer1Color: "red",
-            pointer2Color: "green",
-            height: 0,
-            width: 0,
-            radius: 2,
+      <>
+        <View>
+          <LineChart
+            areaChart
+            curved
+            curvature={0.1}
+            data={expenseData}
+            data2={incomeData}
+            color1="red"
+            color2="green"
+            startFillColor1="red"
+            startFillColor2="green"
+            startOpacity={0.5}
+            endOpacity={0}
+            width={Dimensions.get("window").width - 35}
+            height={150}
+            thickness={2}
+            // noOfSections={5}
+            spacing={12}
+            initialSpacing={10}
+            endSpacing={0}
+            hideDataPoints
+            hideRules
+            hideYAxisText
+            yAxisOffset={1}
+            // pointerConfig={{
+            //   pointer1Color: "red",
+            //   pointer2Color: "green",
+            //   height: 0,
+            //   width: 0,
+            //   radius: 2,
+            // }}
+            hideAxesAndRules
+          />
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-around",
+            flex: 1,
+            margin: 10,
+            borderWidth: 1,
+            borderColor: "black",
           }}
-          hideAxesAndRules
-        />
-      </View>
+        >
+          <View style={{ padding:10, margin: 10, borderWidth: 1, borderColor: "black" }}>
+            <DefaultText>Income</DefaultText>
+            <DefaultText>£ {incomeData.slice(-1)[0].value}</DefaultText>
+          </View>
+          <View style={{ padding:10, margin: 10, borderWidth: 1, borderColor: "black" }}>
+            <DefaultText>Expense</DefaultText>
+            <DefaultText>£ {expenseData.slice(-1)[0].value}</DefaultText>
+          </View>
+        </View>
+      </>
     );
   };
 
@@ -146,9 +200,6 @@ const Analysis = () => {
     <>
       <View
         style={{
-          // flex: 1,
-          // justifyContent: "space-between",
-          // alignItems: "center",
           height: "92%",
         }}
       >
@@ -165,35 +216,8 @@ const Analysis = () => {
             >
               Expense vs Income
             </DefaultText>
-            <View style={{ padding: 10, borderWidth: 1, borderColor: "black" }}>
-              {renderChart()}
-              {/* {incomeData.length > 0 || expenseData.length > 0 ? (
-                <View style={{ }}>
-                  <LineChart
-                    areaChart
-                    data={chartData}
-                    // data={expenseData}
-                    // data2={incomeData}
-                    color1="red"
-                    color2="green"
-                    startFillColor1="red"
-                    startFillColor2="green"
-                    startOpacity={0.2}
-                    endOpacity={0}
-                    width={Dimensions.get("window").width - 80}
-                    height={250}
-                    initialSpacing={0}
-                    thickness={2}
-                    noOfSections={5}
-                    hideDataPoints
-                    // curved
-                    // hideAxesAndRules
-                    // isAnimated
-                  />
-                </View>
-              ) : (
-                <DefaultText>No data for this month</DefaultText>
-              )} */}
+            <View style={{ padding: 10 }}>
+              {renderChart()}              
             </View>
           </View>
         </ScrollView>

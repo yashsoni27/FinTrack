@@ -73,8 +73,6 @@ const AccountSlider = ({ accounts, onAddAccountSuccess }) => {
     );
   }
 
-  {/* <View style={{ flexDirection: "row", justifyContent: "space-between" }}> */}
-
   return (
     <ScrollView
       horizontal={true}
@@ -96,7 +94,7 @@ const AccountSlider = ({ accounts, onAddAccountSuccess }) => {
               borderColor: "#000",
             }}
           >
-            <DefaultText>£{account.balances}</DefaultText>
+            <DefaultText>£ {account.balances}</DefaultText>
             <DefaultText>{account.name}</DefaultText>
           </View>
         );
@@ -133,7 +131,6 @@ const AccountSlider = ({ accounts, onAddAccountSuccess }) => {
           </PlaidLink>
         </TouchableOpacity>
       )}
-      {/* </View> */}
     </ScrollView>
   );
 };

@@ -51,3 +51,13 @@ export const saveTransactionDb = async (data) => {
     throw error;
   }
 }
+
+export const getChartData = async (userId, count = 0, month = null) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/db/chartData/get`, { userId, count, month });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching chartData: ", error);
+    throw error;
+  }
+}

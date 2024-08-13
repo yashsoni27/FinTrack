@@ -108,8 +108,8 @@ const Home = () => {
 
   useEffect(() => {
     // fetchBalance();
-    fetchBalanceDB();
     // fetchTransactions();
+    fetchBalanceDB();
     fetchTransactionsDB();
   }, [state.user.userId]);
 
@@ -127,7 +127,7 @@ const Home = () => {
         {new Intl.DateTimeFormat("en-US", options).format(new Date(item.date))}
       </DefaultText>
       <DefaultText>{item.name}</DefaultText>
-      <DefaultText>£{item.amount.toFixed(2)}</DefaultText>
+      <DefaultText>£ {item.amount.toFixed(2)}</DefaultText>
     </View>
   );
 
@@ -203,6 +203,7 @@ const Home = () => {
               // data={transactions.slice(0, 5)}
               data={transactions}
               renderItem={renderTransactions}
+              scrollEnabled={false}
               keyExtractor={(item, index) =>
                 item.id?.toString() || index.toString()
               }
