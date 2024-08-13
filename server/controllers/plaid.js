@@ -256,7 +256,7 @@ export const syncTransactions = async (request, response) => {
         const syncResponse = await plaidClient.transactionsSync({
           access_token: accessToken,
           cursor: cursor,
-          count: 10,
+          // count: 10,
         });
 
         addedTransactions = addedTransactions.concat(syncResponse.data.added);
@@ -289,6 +289,7 @@ export const syncTransactions = async (request, response) => {
         name: transaction.name,
         merchantName: transaction.merchant_name,
         logoUrl: transaction.logo_url,
+        personalFinanceCategoryIconUrl: transaction.personal_finance_category_icon_url,
         category: transaction.category,
         // description: transaction.description, -- Not for plaid response
       });

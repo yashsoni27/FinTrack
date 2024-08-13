@@ -12,7 +12,8 @@ const transactionSchema = mongoose.Schema({
   date: Date,
   name: String,
   merchantName: String,
-  logo_url: String,
+  logoUrl: String,
+  personalFinanceCategoryIconUrl: String,
   category: [String],
   description: String,  
 });
