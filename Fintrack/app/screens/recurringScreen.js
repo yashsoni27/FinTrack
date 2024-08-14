@@ -1,22 +1,25 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import { RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { useTheme } from "../context/themeContext";
 import DefaultText from "../components/defaultText";
 import { getRecurringTransactionsDb } from "../../api/db";
 import { AuthContext } from "../context/auth";
 import { PieChart } from "react-native-gifted-charts";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
+import { getRecurringTransactions } from "../../api/plaidAPI";
 
 const RecurringScreen = () => {
   const [state, setState] = useContext(AuthContext);
   const { theme } = useTheme();
   const [amount, setAmount] = useState({ paid: 0, unpaid: 0 });
   const [subscription, setSubscription] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
 
   const userId = state.user.userId;
 
   const getRecurring = async () => {
     try {
+      setRefreshing(true);
       const response = await getRecurringTransactions(userId);
       // console.log("recurring: ", response);
       const subscriptions = response.outflowStreams.filter(
@@ -24,8 +27,12 @@ const RecurringScreen = () => {
         // && stream.category[1] === "Subscription"
       );
       // console.log("Subscriptions: ", subscriptions);
+      console.log("subscriptions Plaid");
+      getRecurringDb();
     } catch (error) {
       console.log("Error in fetching recurring: ", error);
+    } finally {
+      setRefreshing(false);
     }
   };
 
@@ -78,7 +85,7 @@ const RecurringScreen = () => {
           return acc + Number(transaction.averageAmount.amount);
         }, 0)
         .toFixed(2);
-      console.log("totalToPay: ", totalToPay);
+      // console.log("totalToPay: ", totalToPay);
 
       const paidTotal = subscriptions.reduce((acc, transaction) => {
         if (transaction.paidThisMonth) {
@@ -87,7 +94,7 @@ const RecurringScreen = () => {
           return acc;
         }
       }, 0);
-      console.log("paidTotal: ", paidTotal);
+      // console.log("paidTotal: ", paidTotal);
       const unpaidTotal = totalToPay - paidTotal;
 
       setAmount({
@@ -95,6 +102,7 @@ const RecurringScreen = () => {
         unpaid: Math.round(unpaidTotal * 100) / 100,
       });
       setSubscription(subscriptions);
+      console.log("recurring DB");
     } catch (error) {
       console.log("Error in fetching recurring DB: ", error);
     }
@@ -105,10 +113,13 @@ const RecurringScreen = () => {
     { value: amount.unpaid, color: "#79D2DE" },
   ];
 
-  useEffect(() => {
-    // getRecurring();
-    getRecurringDb();
+  const onRefresh = useCallback(() => {    
+    getRecurring();
   }, []);
+
+  useEffect(() => {
+    getRecurringDb();
+  }, [state.user.userId]);
 
   return (
     <ScrollView
@@ -117,6 +128,7 @@ const RecurringScreen = () => {
         backgroundColor: theme.background,
       }}
       showsVerticalScrollIndicator={false}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
       <View>
         <DefaultText style={{ fontSize: 30, textAlign: "center" }}>

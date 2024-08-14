@@ -1,10 +1,11 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useCallback } from "react";
 import {
   SafeAreaView,
   View,
   FlatList,
   ScrollView,
   TouchableOpacity,
+  RefreshControl,
 } from "react-native";
 import FooterList from "../components/footer/footerList";
 import { AuthContext } from "../context/auth";
@@ -27,8 +28,8 @@ const Home = () => {
   const [state, setState] = useContext(AuthContext);
   const { theme, toggleTheme } = useTheme();
 
-  // const [linkToken, setLinkToken] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const [balance, setBalance] = useState(null);
   const [accounts, setAccounts] = useState([]);
@@ -48,15 +49,32 @@ const Home = () => {
   };
   const userId = state.user.userId;
 
+  const onRefresh = useCallback(() => {
+    try {
+      setRefreshing(true);
+      fetchBalance();
+      fetchTransactions();
+    } catch (error) {
+      console.log("Error in refreshing: ", error);
+    } finally {
+      setRefreshing(false);
+    }
+    // fetchBalance();
+    // fetchTransactions();
+    // setRefreshing(false);
+  }, []);
+
   const fetchBalance = async () => {
     try {
       const response = await getBalance(userId);
-      console.log("Balance fetched from Plaid: ", response);
+      // console.log("Balance Plaid: ", response);
+      console.log("Balance Plaid");
       const netBalance = response.netBalance.reduce(
         (sum, account) => sum + (account.balances.current || 0),
         0
       );
       setBalance(netBalance);
+      fetchBalanceDB();
     } catch (error) {
       console.log("Error fetching balance: ", error);
       setBalance(null);
@@ -66,8 +84,8 @@ const Home = () => {
   const fetchBalanceDB = async () => {
     try {
       const response = await getBalanceDb(userId);
-      // console.log("Balance fetched from DB: ", response.netBalance);
-      console.log("Balance fetched from DB");
+      // console.log("Balance DB: ", response.netBalance);
+      console.log("Balance DB");
       const netBalance = response.netBalance.reduce(
         (sum, account) => sum + (account.balances.current || 0),
         0
@@ -90,8 +108,8 @@ const Home = () => {
     try {
       setLoading(true);
       const response = await syncTransactions(userId);
-      console.log("Transactions synced from Plaid: ", response);
-      // setTransactions(response.transactions);
+      console.log("Transactions synced Plaid: ", response);
+      fetchTransactionsDB();
       setLoading(false);
     } catch (error) {
       console.log("Error in fetching transactions: ", error);
@@ -103,8 +121,8 @@ const Home = () => {
     try {
       setLoading(true);
       const response = await getTransactionsDb(userId, 5, null);
-      // console.log("Transactions fetched from DB: ", response);
-      console.log("Transactions fetched from DB");
+      // console.log("Transactions DB: ", response);
+      console.log("Transactions DB");
       setTransactions(response.transactions);
       setLoading(false);
     } catch (error) {
@@ -114,8 +132,6 @@ const Home = () => {
   };
 
   useEffect(() => {
-    // fetchBalance();
-    // fetchTransactions();
     fetchBalanceDB();
     fetchTransactionsDB();
   }, [state.user.userId]);
@@ -138,25 +154,6 @@ const Home = () => {
     </View>
   );
 
-  // Loading sign
-  if (loading) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          padding: 20,
-        }}
-      >
-        <ActivityIndicator size="large" color="#4285F4" />
-        <DefaultText style={{ marginTop: 10, fontSize: 16, color: "#333" }}>
-          Loading...
-        </DefaultText>
-      </View>
-    );
-  }
-
   return (
     <>
       <View
@@ -169,7 +166,15 @@ const Home = () => {
           height: "92%",
         }}
       >
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+            />
+          }
+        >
           <View
             style={{
               flexDirection: "row",
@@ -185,7 +190,10 @@ const Home = () => {
             <View>
               {/* <DefaultText>Check</DefaultText> */}
               <TouchableOpacity style={{ padding: 10 }} onPress={toggleTheme}>
-                <FontAwesome5Icon name="star-half-alt" style={{color: theme.text}} />
+                <FontAwesome5Icon
+                  name="star-half-alt"
+                  style={{ color: theme.text }}
+                />
               </TouchableOpacity>
             </View>
           </View>
@@ -225,6 +233,29 @@ const Home = () => {
         </ScrollView>
       </View>
       <FooterList />
+
+      {/* Loading Overlay */}
+      {loading && (
+        <View
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "gray",
+            opacity: 0.85, // Semi-transparent background
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000, 
+          }}
+        >
+          <ActivityIndicator size="large" color="#000" />
+          <DefaultText style={{ marginTop: 10, fontSize: 16, color: "#000" }}>
+            Loading...
+          </DefaultText>
+        </View>
+      )}
     </>
   );
 };

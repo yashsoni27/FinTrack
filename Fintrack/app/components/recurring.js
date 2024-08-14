@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View, ScrollView } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import DefaultText from "./defaultText";
 import { AuthContext } from "../context/auth";
@@ -14,6 +14,11 @@ const Recurring = () => {
   const { theme } = useTheme();
   const [recurringTransactions, setRecurringTransactions] = useState([]);
 
+  const options = {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  };
   const userId = state.user.userId;
 
   const getRecurring = async () => {
@@ -62,8 +67,8 @@ const Recurring = () => {
           return dateA - dateB; // Sort by the next transaction date
         });
 
-      // console.log("recurring: ", recurring);
       setRecurringTransactions(recurring);
+      console.log("recurring: ", recurring[0]);
     } catch (error) {
       console.log("Error in fetching recurring DB: ", error);
     }
@@ -90,8 +95,45 @@ const Recurring = () => {
           </View>
         </View>
       </TouchableOpacity>
-      <View>
-        <DefaultText>Testing card stack</DefaultText>
+      <View style={{marginTop: 10}}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+            {recurringTransactions.slice(0, 3).map((item, index) => {
+              const date = new Date(item.lastDate);
+              date.setMonth(date.getMonth() + 1);
+              return (
+                <View key={index} style={{ marginHorizontal: 5 }}>
+                  <View>
+                    <DefaultText>
+                      {new Intl.DateTimeFormat("en-US", options).format(date)}
+                    </DefaultText>
+                  </View>
+                  <View
+                    style={{
+                      backgroundColor: theme.secondary,
+                      padding: 15,
+                      marginTop: 5,
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <DefaultText
+                      style={{
+                        textTransform: "capitalize",
+                        maxWidth: 90,
+                      }}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {item.merchantName ? item.merchantName : item.description}
+                    </DefaultText>
+                    <DefaultText>  £ {item.averageAmount.amount}</DefaultText>
+                  </View>
+                </View>
+              );
+            })}
+          </ScrollView>
+        </View>
       </View>
     </View>
   );

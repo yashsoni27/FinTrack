@@ -80,7 +80,6 @@ const AccountSlider = ({ accounts, onAddAccountSuccess }) => {
       style={{
         marginVertical: 10,
         padding: 5,
-        backgroundColor: "lightgrey",
       }}
     >
       {accounts.map((account) => {
@@ -89,9 +88,11 @@ const AccountSlider = ({ accounts, onAddAccountSuccess }) => {
             key={account.accountId}
             style={{
               width: 120,
-              marginRight: 50,
+              marginRight: 20,
               borderWidth: 1,
               borderColor: "#000",
+              padding: 10,
+              borderRadius: 10,
             }}
           >
             <DefaultText>£ {account.balances}</DefaultText>
@@ -106,7 +107,7 @@ const AccountSlider = ({ accounts, onAddAccountSuccess }) => {
             width: 120,
             paddingHorizontal: 20,
             paddingVertical: 10,
-            // borderRadius: 10,
+            borderRadius: 10,
             marginRight: 5,
           }}
         >
