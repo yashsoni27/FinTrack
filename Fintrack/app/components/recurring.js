@@ -62,7 +62,7 @@ const Recurring = () => {
           return dateA - dateB; // Sort by the next transaction date
         });
 
-      console.log("recurring: ", recurring);
+      // console.log("recurring: ", recurring);
       setRecurringTransactions(recurring);
     } catch (error) {
       console.log("Error in fetching recurring DB: ", error);
@@ -78,8 +78,16 @@ const Recurring = () => {
     <View>
       <TouchableOpacity onPress={() => navigation.navigate("Recurring")}>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <DefaultText>Recurring</DefaultText>
-          <FontAwesome5Icon style={{}} name="angle-right" size={20} color="" />
+          <DefaultText>UPCOMING</DefaultText>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <DefaultText>recurrings </DefaultText>
+            <FontAwesome5Icon
+              style={{}}
+              name="angle-right"
+              size={10}
+              color=""
+            />
+          </View>
         </View>
       </TouchableOpacity>
       <View>

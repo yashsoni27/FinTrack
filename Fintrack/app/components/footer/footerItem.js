@@ -8,7 +8,7 @@ const FooterItem = ({ name, text, handlePress, screenName, routeName }) => {
   const { theme } = useTheme();
   // console.log("Theme: ",theme.primary);
 
-  const activeScreenColor = screenName === routeName && theme.primary;
+  const activeScreenColor = screenName === routeName ? theme.primary: theme.text;
   // console.log(activeScreenColor);
 
   return (
@@ -19,7 +19,6 @@ const FooterItem = ({ name, text, handlePress, screenName, routeName }) => {
         style={styles.fontStyle}
         color={activeScreenColor}
       />
-      {/* {activeScreenColor ? <Text style={[styles.textStyle, { color: theme.text }]}>{text}</Text> : null} */}
       <DefaultText style={[styles.textStyle, { color: theme.text }]}>{text}</DefaultText>
     </TouchableOpacity>
   );

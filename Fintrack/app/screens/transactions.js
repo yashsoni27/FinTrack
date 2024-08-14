@@ -25,7 +25,7 @@ const Transactions = () => {
   const [currMonth, setCurrMonth] = useState(new Date().getMonth() + 1);
   const [date, setDate] = useState(new Date());
 
-  const screenWidth = Dimensions.get("window").width;
+  // const screenWidth = Dimensions.get("window").width;
   // let date = new Date();
 
   const userId = state.user.userId;
@@ -54,7 +54,7 @@ const Transactions = () => {
     const daysInMonth = new Date(currentYear, currMonth, 0).getDate();
 
     return Array.from({ length: daysInMonth }, (_, i) => ({
-      value: aggregatedData[i + 1] || 0,
+      value: Math.round(aggregatedData[i + 1]*100)/100 || 0,
     }));
   };
 
@@ -64,8 +64,6 @@ const Transactions = () => {
     const newDate = new Date(date);
     newDate.setMonth(currMonth - 1);
     setDate(newDate);
-    // console.log("testing: ", date.toISOString(), new Date().toISOString());
-    // console.log("condition: ", date.toISOString() > new Date().toISOString());
   }, [currMonth]);
 
   const graphData = generateGraphData(transactions);
@@ -89,11 +87,13 @@ const Transactions = () => {
 
           <LineChart
             data={graphData}
-            width={screenWidth - 40}
+            width={Dimensions.get("window").width - 35}
+            curved
+            curvature={0.02}
             height={150}
-            // initialSpacing={0}
-            spacing={10}
-            hideRules
+            initialSpacing={10}
+            endSpacing={0}
+            spacing={11}
             color1="green"
             thickness={2}
             areaChart
@@ -101,16 +101,39 @@ const Transactions = () => {
             endFillColor="rgba(34,193,195,0)" // End of gradient color
             startOpacity={0.5} // Starting opacity for gradient fill
             endOpacity={0}
+            hideRules
             hideDataPoints
-            // hideYAxisText
-            // pointerConfig={{}}
-            // hideAxesAndRules
-            curved
-            curvature={0.02}
-            // showVerticalLines
-            verticalLinesColor="#e0e0e0" // Color of grid lines
+            hideYAxisText
             yAxisTextStyle={{ color: "gray" }}
-            // yAxisOffset={20}
+            pointerConfig={{
+              pointerColor: "green",
+              radius: 3,
+              // pointerStripHeight: 100,
+              pointerStripWidth: 2,
+              activatePointersOnLongPress: true,
+              autoAdjustPointerLabelPosition: true,
+              pointerLabelComponent: items => {
+                return (
+                  <View
+                    style={{
+                      // height: 20,
+                      width: 70,
+                      backgroundColor: '#282C3E',
+                      borderRadius: 4,
+                      justifyContent:'center',
+                      flex: 1,
+                      alignItems: 'center',
+                      // textAlign: 'center',
+                      // paddingLeft:16,
+                    }}>
+                    <Text style={{color: 'white', fontWeight:'bold'}}>{items[0].value}</Text>
+                  </View>
+                );
+              },
+            }}
+            // hideAxesAndRules
+            // showVerticalLines
+            // verticalLinesColor="#e0e0e0" // Color of grid lines
 
             // focusEnabled={true}
             // showDataPointOnFocus={true}

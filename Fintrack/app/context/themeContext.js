@@ -5,17 +5,20 @@ const ThemeContext = createContext();
 
 export const themes = {
   light: {
-    background: "#ACACAC",
+    background: "#DCDEE0",
+    secondary: "#DCDDD0",
     text: "#000000",
     // primary: "#D1FF32",
     primary: "#7FB143",
+
     statusBarStyle: "dark-content",
   },
   dark: {
-    // background: "#17181A", // darkgrey
-    background: "#262626", // darkgrey
+    background: "#17181A", 
+    secondary: "#262626", 
     text: "#ffffff",
-    primary: "#B4F077", // lightgreen
+    primary: "#B4F077",
+
     statusBarStyle: "light-content",
   },
 };

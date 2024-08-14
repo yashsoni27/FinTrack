@@ -53,7 +53,7 @@ export const createLinkToken = async (request, response) => {
   }
 };
 
-// For exchanging public token with access token
+// For exchanging public token with permanent access token
 export const exchangePublicToken = async (request, response) => {
   const { userId, public_token, metadata } = request.body;
   // console.log(metadata);
@@ -90,50 +90,7 @@ export const exchangePublicToken = async (request, response) => {
     } else {
       accessToken = user.institutions[0].accessToken;
     }
-
-    // getting balance after initial connect
-    // const balanceResponse = await plaidClient.accountsBalanceGet({
-    //   access_token: accessToken,
-    // });
-
-    // for (const accountData in balanceResponse.data.accounts) {
-    //   try {
-    //     const existingAccount = await Account.findOne({
-    //       account_id: accountData.account_id,
-    //     });
-
-    //     if (!existingAccount) {
-    //       const newAccount = new Account({
-    //         account_id: accountData.account_id,
-    //         balances: {
-    //           available: accountData.balances.available,
-    //           current: accountData.balances.current,
-    //           iso_currency_code: accountData.balances.iso_currency_code,
-    //           limit: accountData.balances.limit,
-    //           unofficial_currency_code:
-    //             accountData.balances.unofficial_currency_code,
-    //         },
-    //         mask: accountData.mask,
-    //         name: accountData.name,
-    //         type: accountData.type,
-    //         subType: accountData.subType,
-    //         persistent_account_id: accountData.persistent_account_id,
-    //         userId: user.userId,
-    //       });
-    //       await newAccount.save();
-    //       console.log("Bank account saved: ", accountData.account_id);
-    //     } else {
-    //       console.log("Bank account already exists: ", accountData.account_id);
-    //     }
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // }
-
-    // getting authData from plaid
-    // const authData = await auth({userId});
-    // console.log("authData", authData);
-
+    
     const authData = await plaidClient.accountsGet({
       access_token: accessToken,
     });
@@ -184,7 +141,7 @@ export const getBalance = async (request, response) => {
             mask: accountData.mask,
             name: accountData.name,
             type: accountData.type,
-            subType: accountData.subType,
+            subType: accountData.subtype,
             persistent_account_id: accountData.persistent_account_id,
             userId: userId,
           });

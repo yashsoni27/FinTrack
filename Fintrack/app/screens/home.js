@@ -1,5 +1,11 @@
 import React, { useContext, useState, useEffect } from "react";
-import { SafeAreaView, View, FlatList, ScrollView } from "react-native";
+import {
+  SafeAreaView,
+  View,
+  FlatList,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import FooterList from "../components/footer/footerList";
 import { AuthContext } from "../context/auth";
 import { ActivityIndicator } from "react-native";
@@ -15,10 +21,11 @@ import DefaultText from "../components/defaultText";
 import { useTheme } from "../context/themeContext";
 import AccountSlider from "../components/accountSlider";
 import Recurring from "../components/recurring";
+import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 
 const Home = () => {
   const [state, setState] = useContext(AuthContext);
-  const { theme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
 
   // const [linkToken, setLinkToken] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -168,16 +175,18 @@ const Home = () => {
               flexDirection: "row",
               justifyContent: "space-between",
               alignItems: "center",
-              backgroundColor: "lightgrey",
             }}
           >
-            <View style={{ backgroundColor: "grey" }}>
+            <View>
               <DefaultText style={{ fontSize: 30, color: theme.text }}>
                 Hi {state.user.name}
               </DefaultText>
             </View>
             <View>
-              <DefaultText>Check</DefaultText>
+              {/* <DefaultText>Check</DefaultText> */}
+              <TouchableOpacity style={{ padding: 10 }} onPress={toggleTheme}>
+                <FontAwesome5Icon name="star-half-alt" style={{color: theme.text}} />
+              </TouchableOpacity>
             </View>
           </View>
 

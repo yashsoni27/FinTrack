@@ -163,6 +163,7 @@ const Analysis = () => {
             hideRules
             hideYAxisText
             yAxisOffset={1}
+            disableScroll={true}
             // pointerConfig={{
             //   pointer1Color: "red",
             //   pointer2Color: "green",
