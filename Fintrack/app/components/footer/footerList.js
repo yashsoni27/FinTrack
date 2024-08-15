@@ -11,7 +11,7 @@ const FooterList = () => {
 
   return (
     <>
-      <View style={[styles.container, { backgroundColor:theme.secondary }]}>
+      <View style={[styles.container, { backgroundColor:theme.surface }]}>
         <FooterItem name="home" text="Home" screenName="Home" handlePress={() => navigation.navigate("Home")} routeName={route.name} />
         {/* <FooterItem name="plus-square" text="Add" screenName="Add" handlePress={() => navigation.navigate("Add")} routeName={route.name}/> */}
         <FooterItem name="list" text="Transactions" screenName="Transactions" handlePress={() => navigation.navigate("Transactions")} routeName={route.name}/>
@@ -25,7 +25,7 @@ const FooterList = () => {
 const styles = StyleSheet.create({
   container: {
     position: "absolute",
-    bottom: 10,
+    bottom: 7,
     width: "90%",
     flexDirection: "row",
     justifyContent: "space-between",

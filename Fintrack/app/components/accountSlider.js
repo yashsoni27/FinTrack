@@ -1,20 +1,35 @@
-import { ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import DefaultText from "./defaultText";
 import PlaidLink from "react-native-plaid-link-sdk";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { createLinkToken, exchangePublicToken } from "../../api/plaidAPI";
 import { AuthContext } from "../context/auth";
-import { useTheme } from "../context/themeContext";
+import { useTheme, themes } from "../context/themeContext";
 
 const AccountSlider = ({ accounts, onAddAccountSuccess }) => {
   const [state, setState] = useContext(AuthContext);
   const [linkToken, setLinkToken] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const { theme } = useTheme();
-
+  const { theme, mode } = useTheme();
   const userId = state.user.userId;
+  let background = theme.background;
+  let text = theme.text;
+
+  if (mode == "light") {
+    background = theme.text;
+    text = theme.background;
+  } else {
+    background = theme.primary;
+    text = theme.background;
+  }
 
   const generateLinkToken = async () => {
     try {
@@ -87,23 +102,37 @@ const AccountSlider = ({ accounts, onAddAccountSuccess }) => {
           <View
             key={account.accountId}
             style={{
-              width: 120,
+              width: 150,
+              height: 100,
               marginRight: 20,
               borderWidth: 1,
-              borderColor: "#000",
               padding: 10,
               borderRadius: 10,
+              backgroundColor: background,
+              justifyContent: "space-between",
             }}
           >
-            <DefaultText>£ {account.balances}</DefaultText>
-            <DefaultText>{account.name}</DefaultText>
+            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+              <DefaultText style={{ color: text, fontSize: 22 }}>
+                £ {account.balances}
+              </DefaultText>
+              <View>
+                <View style={{backgroundColor: text, padding: 5, borderRadius: 15}}>
+                  <FontAwesome5Icon name="university" size={15} color={background}/>
+                </View>
+              </View>
+            </View>
+            <DefaultText style={{ color: text }}>{account.name}</DefaultText>
           </View>
         );
       })}
       {linkToken && (
         <TouchableOpacity
           style={{
-            backgroundColor: "darkolivegreen",
+            backgroundColor: theme.background,
+            borderStyle: "dashed",
+            borderWidth: 1,
+            borderColor: theme.text,
             width: 120,
             paddingHorizontal: 20,
             paddingVertical: 10,
@@ -124,9 +153,11 @@ const AccountSlider = ({ accounts, onAddAccountSuccess }) => {
               style={{ alignSelf: "center", margin: 5 }}
               name="plus-circle"
               size={30}
-              color="white"
+              color={theme.text}
             />
-            <DefaultText style={{ color: "white", fontSize: 16 }}>
+            <DefaultText
+              style={{ color: theme.text, fontSize: 16, textAlign: "center" }}
+            >
               Add Account
             </DefaultText>
           </PlaidLink>

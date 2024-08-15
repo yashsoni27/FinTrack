@@ -2,10 +2,10 @@ import React, { useContext, useState, useEffect, useCallback } from "react";
 import {
   SafeAreaView,
   View,
-  FlatList,
   ScrollView,
   TouchableOpacity,
   RefreshControl,
+  Image,
 } from "react-native";
 import FooterList from "../components/footer/footerList";
 import { AuthContext } from "../context/auth";
@@ -37,15 +37,9 @@ const Home = () => {
   // console.log("home.js auth console: ", mode);
 
   const options = {
-    // weekday: "long",
-    year: "numeric",
-    // month: "long",
-    month: "numeric",
+    month: "short",
     day: "numeric",
-    // hour: "numeric",
-    // minute: "numeric",
-    // second: "numeric",
-    // timeZoneName: "short",
+    // weekday: "short",
   };
   const userId = state.user.userId;
 
@@ -84,8 +78,8 @@ const Home = () => {
   const fetchBalanceDB = async () => {
     try {
       const response = await getBalanceDb(userId);
-      // console.log("Balance DB: ", response.netBalance);
-      console.log("Balance DB");
+      console.log("Balance DB: ", response.netBalance);
+      // console.log("Balance DB");
       const netBalance = response.netBalance.reduce(
         (sum, account) => sum + (account.balances.current || 0),
         0
@@ -120,9 +114,9 @@ const Home = () => {
   const fetchTransactionsDB = async () => {
     try {
       setLoading(true);
-      const response = await getTransactionsDb(userId, 5, null);
-      // console.log("Transactions DB: ", response);
-      console.log("Transactions DB");
+      const response = await getTransactionsDb(userId, 4, null);
+      console.log("Transactions DB: ", response.transactions);
+      // console.log("Transactions DB");
       setTransactions(response.transactions);
       setLoading(false);
     } catch (error) {
@@ -136,24 +130,6 @@ const Home = () => {
     fetchTransactionsDB();
   }, [state.user.userId]);
 
-  const renderTransactions = ({ item }) => (
-    <View
-      style={{
-        flexDirection: "row",
-        justifyContent: "space-between",
-        padding: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: "#ccc",
-      }}
-    >
-      <DefaultText>
-        {new Intl.DateTimeFormat("en-US", options).format(new Date(item.date))}
-      </DefaultText>
-      <DefaultText>{item.name}</DefaultText>
-      <DefaultText>£ {item.amount.toFixed(2)}</DefaultText>
-    </View>
-  );
-
   return (
     <>
       <View
@@ -163,7 +139,7 @@ const Home = () => {
           // alignItems: "center",
           margin: 10,
           backgroundColor: theme.background,
-          height: "92%",
+          height: "90%",
         }}
       >
         <ScrollView
@@ -186,7 +162,6 @@ const Home = () => {
               </DefaultText>
             </View>
             <View>
-              {/* <DefaultText>Check</DefaultText> */}
               <TouchableOpacity style={{ padding: 10 }} onPress={toggleTheme}>
                 <FontAwesome5Icon
                   name="star-half-alt"
@@ -205,8 +180,7 @@ const Home = () => {
             </DefaultText>
           </View>
 
-          <View style={{ marginVertical: 10, paddingHorizontal: 10 }}>
-            {/* <View style={{ flexDirection: "row", justifyContent: "space-between" }}> */}
+          <View style={{ marginVertical: 5, paddingHorizontal: 5 }}>
             <DefaultText style={{ color: theme.text }}>Accounts</DefaultText>
             <AccountSlider
               accounts={accounts}
@@ -215,18 +189,63 @@ const Home = () => {
           </View>
 
           <View style={{ margin: 10 }}>
-            <DefaultText style={{ fontSize: 20 }}>
-              Total Transactions...
+            <DefaultText style={{ fontSize: 18 }}>
+              Recent Transactions
             </DefaultText>
-            <FlatList
-              // data={transactions.slice(0, 5)}
-              data={transactions}
-              renderItem={renderTransactions}
-              scrollEnabled={false}
-              keyExtractor={(item, index) =>
-                item.id?.toString() || index.toString()
-              }
-            />
+            <View style={{ marginTop: 10 }}>
+              {transactions.map((item, index) => {
+                return (
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      padding: 10,
+                      backgroundColor: theme.surface,
+                      borderWidth: 1,
+                      borderColor: theme.text2,
+                      borderRadius: 10,
+                      marginVertical: 2,
+                    }}
+                    key={index}
+                  >
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <Image
+                        source={{
+                          uri: item.logoUrl
+                            ? item.logoUrl
+                            : item.personalFinanceCategoryIconUrl,
+                        }}
+                        style={{
+                          width: 30,
+                          height: 30,
+                          borderRadius: 30,
+                          borderWidth: 1,
+                          borderColor: theme.text,
+                        }}
+                        resizeMode="contain"
+                      />
+                      <View style={{ marginLeft: 10 }}>
+                        <DefaultText>
+                          {item.merchantName ? item.merchantName : item.name}
+                        </DefaultText>
+                        <DefaultText>
+                          {new Intl.DateTimeFormat("en-US", options).format(
+                            new Date(item.date)
+                          )}
+                        </DefaultText>
+                      </View>
+                    </View>
+                    <View style={{ alignSelf: "center"}}>
+                      <DefaultText style={{ fontSize: 18 }}>
+                        £ {Math.round(item.amount * 100) / 100}
+                      </DefaultText>
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
           </View>
 
           <View style={{ margin: 10 }}>

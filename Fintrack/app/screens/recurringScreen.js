@@ -1,10 +1,16 @@
-import { RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { useTheme } from "../context/themeContext";
 import DefaultText from "../components/defaultText";
 import { getRecurringTransactionsDb } from "../../api/db";
 import { AuthContext } from "../context/auth";
-import { PieChart } from "react-native-gifted-charts";
+// import { PieChart } from "react-native-gifted-charts";
 import CircularProgress from "react-native-circular-progress-indicator";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { getRecurringTransactions } from "../../api/plaidAPI";
@@ -12,10 +18,15 @@ import { getRecurringTransactions } from "../../api/plaidAPI";
 const RecurringScreen = () => {
   const [state, setState] = useContext(AuthContext);
   const { theme } = useTheme();
-  const [amount, setAmount] = useState({ paid: 0, unpaid: 0, totalToPay: 0, percent: 0 });
+  const [amount, setAmount] = useState({
+    paid: 0,
+    unpaid: 0,
+    totalToPay: 0,
+    percent: 0,
+  });
   const [subscription, setSubscription] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
-
+  const styles = createStyles(theme);
   const userId = state.user.userId;
 
   const getRecurring = async () => {
@@ -103,7 +114,7 @@ const RecurringScreen = () => {
         unpaid: Math.round(unpaidTotal * 100) / 100,
         totalToPay: Math.round(totalToPay * 100) / 100,
         // maxValue: Math.round((amount.paid / amount.totalToPay) * 100)
-        percent: Math.round((paidTotal / totalToPay) * 100)
+        percent: Math.round((paidTotal / totalToPay) * 100),
       });
       setSubscription(subscriptions);
       console.log("recurring DB");
@@ -113,12 +124,7 @@ const RecurringScreen = () => {
     }
   };
 
-  // const pieData = [
-  //   { value: amount.paid, color: "#177AD5" },
-  //   { value: amount.unpaid, color: "#79D2DE" },
-  // ];
-
-  const onRefresh = useCallback(() => {    
+  const onRefresh = useCallback(() => {
     getRecurring();
   }, []);
 
@@ -133,21 +139,26 @@ const RecurringScreen = () => {
         backgroundColor: theme.background,
       }}
       showsVerticalScrollIndicator={false}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
     >
       <View>
         <DefaultText style={{ fontSize: 30, textAlign: "center" }}>
-          Recurring Screen
+          Recurrings
         </DefaultText>
       </View>
 
       <View style={{}}>
         <View
           style={{
-            margin: 20,
-            borderColor: "#000",
+            margin: 15,
             borderWidth: 1,
-            padding: 10,
+            borderRadius: 10,
+            backgroundColor: theme.surface,
+            borderColor: theme.text2,
+            paddingVertical: 10,
+            paddingHorizontal: 20,
             alignItems: "center",
             flexDirection: "row",
             justifyContent: "space-between",
@@ -155,7 +166,8 @@ const RecurringScreen = () => {
         >
           <View style={[styles.amountContainer, { alignItems: "flex-start" }]}>
             <DefaultText style={{ fontSize: 20 }}>
-              £ {amount.unpaid}
+              <DefaultText style={{ fontSize: 14 }}>£</DefaultText>{" "}
+              {amount.unpaid}
             </DefaultText>
             <DefaultText>left to pay</DefaultText>
           </View>
@@ -168,17 +180,22 @@ const RecurringScreen = () => {
               innerRadius={25}
               innerCircleColor={theme.background}
             /> */}
-            <CircularProgress 
-              initialValue={0}
+            <CircularProgress
+              radius={40}
               value={amount.percent}
-              duration={800}
+              duration={1000}
               activeStrokeWidth={10}
-              inActiveStrokeWidth={5}
+              activeStrokeColor={theme.primary}
+              inActiveStrokeWidth={15}
+              inActiveStrokeColor={theme.text2}
               showProgressValue={false}
             />
           </View>
           <View style={styles.amountContainer}>
-            <DefaultText style={{ fontSize: 20 }}>£ {amount.paid}</DefaultText>
+            <DefaultText style={{ fontSize: 20 }}>
+              <DefaultText style={{ fontSize: 14 }}>£</DefaultText>{" "}
+              {amount.paid}
+            </DefaultText>
             <DefaultText>paid so far</DefaultText>
           </View>
         </View>
@@ -235,55 +252,61 @@ const RecurringScreen = () => {
 
 export default RecurringScreen;
 
-const styles = StyleSheet.create({
-  amountContainer: {
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
-    width: "25%",
-  },
-  subscriptionContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    paddingVertical: 10,
-  },
-  subscriptionCard: {
-    width: "30%",
-    height: 100,
-    borderColor: "#000",
-    borderWidth: 1,
-    borderRadius: 10,
-    backgroundColor: "#1c1c1e",
-    margin: 5,
-    padding: 5,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  cardTitle: {
-    color: "#fff",
-    fontSize: 15,
-    // fontWeight: "bold",
-    textTransform: "capitalize",
-    textAlign: "center",
-  },
-  cardAmount: {
-    color: "#fff",
-    fontSize: 14,
-  },
-  cardDate: {
-    color: "#a1a1a1",
-    fontSize: 12,
-  },
-  paidIndicator: {
-    width: 20,
-    height: 20,
-    position: "absolute",
-    backgroundColor: "green",
-    top: -1,
-    right: -1,
-    borderTopRightRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});
+const createStyles = (theme) => {
+  return StyleSheet.create({
+    amountContainer: {
+      flexDirection: "column",
+      justifyContent: "space-between",
+      alignItems: "flex-end",
+      width: "25%",
+    },
+    subscriptionContainer: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "space-between",
+      paddingVertical: 10,
+      flex:1,
+    },
+    subscriptionCard: {
+      width: "30%",
+      height: 100,
+      borderWidth: 1,
+      borderRadius: 5,
+      borderColor: theme.secondary,
+      backgroundColor: theme.surface,
+      margin: 3,
+      padding: 3,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    cardTitle: {
+      // color: "#fff",
+      color: theme.text,
+      fontSize: 15,
+      textTransform: "capitalize",
+      textAlign: "center",
+    },
+    cardAmount: {
+      // color: "#fff",
+      color: theme.text,
+      fontSize: 14,
+    },
+    cardDate: {
+      // color: "#a1a1a1",
+      color: theme.text,
+      opacity: 0.6,
+      fontSize: 12,
+    },
+    paidIndicator: {
+      width: 20,
+      height: 20,
+      position: "absolute",
+      backgroundColor: "green",
+      top: -1,
+      right: -1,
+      borderTopRightRadius: 5,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+  });
+};

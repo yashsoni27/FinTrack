@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { AuthContext } from "../context/auth";
 import SignUp from "../screens/auth/signUp";
@@ -11,7 +11,6 @@ import Landing from "../screens/static/landing";
 import ForgotPassword from "../screens/auth/forgotPassword";
 import Add from "../screens/add";
 import Transactions from "../screens/transactions";
-import { Appearance } from "react-native";
 import { useTheme } from "../context/themeContext";
 import RecurringScreen from "../screens/recurringScreen";
 

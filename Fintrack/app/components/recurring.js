@@ -21,20 +21,6 @@ const Recurring = () => {
   };
   const userId = state.user.userId;
 
-  const getRecurring = async () => {
-    try {
-      const response = await getRecurringTransactions(userId);
-      // console.log("recurring: ", response);
-      const subscriptions = response.outflowStreams.filter(
-        (stream) => stream.category[0] === "Service"
-        // && stream.category[1] === "Subscription"
-      );
-      // console.log("Subscriptions: ", subscriptions);
-    } catch (error) {
-      console.log("Error in fetching recurring: ", error);
-    }
-  };
-
   const getRecurringDb = async () => {
     try {
       const response = await getRecurringTransactionsDb(userId);
@@ -42,7 +28,6 @@ const Recurring = () => {
         (stream) => stream.category[0] === "Service"
         // && stream.category[1] === "Subscription"
       );
-      // console.log("subs:  ", subscriptions);
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -68,14 +53,13 @@ const Recurring = () => {
         });
 
       setRecurringTransactions(recurring);
-      console.log("recurring: ", recurring[0]);
+      // console.log("recurring: ", recurring[0]);
     } catch (error) {
       console.log("Error in fetching recurring DB: ", error);
     }
   };
 
   useEffect(() => {
-    // getRecurring();
     getRecurringDb();
   }, []);
 
@@ -110,8 +94,9 @@ const Recurring = () => {
                   </View>
                   <View
                     style={{
-                      backgroundColor: theme.secondary,
+                      backgroundColor: theme.surface,
                       padding: 15,
+                      borderRadius: 10,
                       marginTop: 5,
                       flexDirection: "row",
                       alignItems: "center",
