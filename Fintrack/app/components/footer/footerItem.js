@@ -5,10 +5,17 @@ import { useTheme } from "../../context/themeContext";
 import DefaultText from "../defaultText";
 
 const FooterItem = ({ name, text, handlePress, screenName, routeName }) => {
-  const { theme } = useTheme();
+  const { theme, mode } = useTheme();
   // console.log("Theme: ",theme.primary);
+  let activeScreenColor = theme.text;
 
-  const activeScreenColor = screenName === routeName ? theme.primary: theme.text;
+  if (mode == "light") {
+    activeScreenColor = screenName === routeName ? theme.text: theme.text2;
+  } else {
+    activeScreenColor = screenName === routeName ? theme.primary2: theme.text2;
+  }
+
+
   // console.log(activeScreenColor);
 
   return (
@@ -19,7 +26,7 @@ const FooterItem = ({ name, text, handlePress, screenName, routeName }) => {
         style={styles.fontStyle}
         color={activeScreenColor}
       />
-      <DefaultText style={[styles.textStyle, { color: theme.text }]}>{text}</DefaultText>
+      <DefaultText style={[styles.textStyle, { color: activeScreenColor }]}>{text}</DefaultText>
     </TouchableOpacity>
   );
 };

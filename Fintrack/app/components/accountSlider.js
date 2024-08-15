@@ -79,7 +79,7 @@ const AccountSlider = ({ accounts, onAddAccountSuccess }) => {
       showsHorizontalScrollIndicator={false}
       style={{
         marginVertical: 10,
-        padding: 5,
+        // padding: 5,
       }}
     >
       {accounts.map((account) => {

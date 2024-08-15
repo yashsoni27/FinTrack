@@ -26,7 +26,7 @@ import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 
 const Home = () => {
   const [state, setState] = useContext(AuthContext);
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, mode } = useTheme();
 
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -34,7 +34,7 @@ const Home = () => {
   const [balance, setBalance] = useState(null);
   const [accounts, setAccounts] = useState([]);
   const [transactions, setTransactions] = useState([]);
-  // console.log("home.js auth console: ", state);
+  // console.log("home.js auth console: ", mode);
 
   const options = {
     // weekday: "long",
@@ -161,7 +161,7 @@ const Home = () => {
           // flex: 1,
           // justifyContent: "space-between",
           // alignItems: "center",
-          padding: 10,
+          margin: 10,
           backgroundColor: theme.background,
           height: "92%",
         }}
@@ -169,10 +169,7 @@ const Home = () => {
         <ScrollView
           showsVerticalScrollIndicator={false}
           refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-            />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         >
           <View
@@ -180,10 +177,11 @@ const Home = () => {
               flexDirection: "row",
               justifyContent: "space-between",
               alignItems: "center",
+              paddingHorizontal: 10,
             }}
           >
             <View>
-              <DefaultText style={{ fontSize: 30, color: theme.text }}>
+              <DefaultText style={{ fontSize: 25, color: theme.text }}>
                 Hi {state.user.name}
               </DefaultText>
             </View>
@@ -198,14 +196,18 @@ const Home = () => {
             </View>
           </View>
 
-          <View style={{ marginVertical: 10 }}>
-            <DefaultText style={{ fontSize: 20 }}>
-              My Total Balance: £ {balance}
+          <View style={{ marginVertical: 10, paddingHorizontal: 10 }}>
+            <DefaultText style={{ fontSize: 18, color: theme.text }}>
+              My total balance
+            </DefaultText>
+            <DefaultText style={{ fontSize: 35, color: theme.text }}>
+              £ {balance}
             </DefaultText>
           </View>
 
-          <View>
+          <View style={{ marginVertical: 10, paddingHorizontal: 10 }}>
             {/* <View style={{ flexDirection: "row", justifyContent: "space-between" }}> */}
+            <DefaultText style={{ color: theme.text }}>Accounts</DefaultText>
             <AccountSlider
               accounts={accounts}
               onAddAccountSuccess={fetchBalanceDB}
@@ -247,7 +249,7 @@ const Home = () => {
             opacity: 0.85, // Semi-transparent background
             justifyContent: "center",
             alignItems: "center",
-            zIndex: 1000, 
+            zIndex: 1000,
           }}
         >
           <ActivityIndicator size="large" color="#000" />

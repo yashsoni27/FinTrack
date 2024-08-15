@@ -5,19 +5,22 @@ const ThemeContext = createContext();
 
 export const themes = {
   light: {
-    background: "#DCDEE0",
-    secondary: "#DCDDD0",
-    text: "#000000",
-    // primary: "#D1FF32",
-    primary: "#7FB143",
+    background: "#F0F0F0",
+    secondary: "#FFFFFF",
+    text: "#17181A",
+    text2: "#BBBBBB",
+    primary: "#D1FF32",
+    primary2: "#7FB143",
 
     statusBarStyle: "dark-content",
   },
   dark: {
-    background: "#17181A", 
+    background: "#141414", 
     secondary: "#262626", 
-    text: "#ffffff",
-    primary: "#B4F077",
+    text: "#ACACAC",
+    text2: "#BBBBBB",
+    primary: "#D1FF32",
+    primary2: "#7FB143", 
 
     statusBarStyle: "light-content",
   },
@@ -49,7 +52,7 @@ export const ThemeProvider = ({ children }) => {
   };
 
   return (
-    <ThemeContext.Provider value={{ theme: themes[theme], toggleTheme }}>
+    <ThemeContext.Provider value={{ theme: themes[theme], toggleTheme, mode: theme }}>
       {children}
     </ThemeContext.Provider>
   );

@@ -5,13 +5,14 @@ import DefaultText from "../components/defaultText";
 import { getRecurringTransactionsDb } from "../../api/db";
 import { AuthContext } from "../context/auth";
 import { PieChart } from "react-native-gifted-charts";
+import CircularProgress from "react-native-circular-progress-indicator";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { getRecurringTransactions } from "../../api/plaidAPI";
 
 const RecurringScreen = () => {
   const [state, setState] = useContext(AuthContext);
   const { theme } = useTheme();
-  const [amount, setAmount] = useState({ paid: 0, unpaid: 0 });
+  const [amount, setAmount] = useState({ paid: 0, unpaid: 0, totalToPay: 0, percent: 0 });
   const [subscription, setSubscription] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -100,18 +101,22 @@ const RecurringScreen = () => {
       setAmount({
         paid: Math.round(paidTotal * 100) / 100,
         unpaid: Math.round(unpaidTotal * 100) / 100,
+        totalToPay: Math.round(totalToPay * 100) / 100,
+        // maxValue: Math.round((amount.paid / amount.totalToPay) * 100)
+        percent: Math.round((paidTotal / totalToPay) * 100)
       });
       setSubscription(subscriptions);
       console.log("recurring DB");
+      console.log("amount- ", amount);
     } catch (error) {
       console.log("Error in fetching recurring DB: ", error);
     }
   };
 
-  const pieData = [
-    { value: amount.paid, color: "#177AD5" },
-    { value: amount.unpaid, color: "#79D2DE" },
-  ];
+  // const pieData = [
+  //   { value: amount.paid, color: "#177AD5" },
+  //   { value: amount.unpaid, color: "#79D2DE" },
+  // ];
 
   const onRefresh = useCallback(() => {    
     getRecurring();
@@ -119,7 +124,7 @@ const RecurringScreen = () => {
 
   useEffect(() => {
     getRecurringDb();
-  }, [state.user.userId]);
+  }, []);
 
   return (
     <ScrollView
@@ -155,33 +160,21 @@ const RecurringScreen = () => {
             <DefaultText>left to pay</DefaultText>
           </View>
           <View style={{ paddingVertical: 20, alignItems: "center" }}>
-            <PieChart
+            {/* <PieChart
               data={pieData}
               donut
-              // showGradient
-              sectionAutoFocus
-              // focusOnPress
-              // semiCircle
+              sectionAutoFocus              
               radius={40}
               innerRadius={25}
               innerCircleColor={theme.background}
-              // centerLabelComponent={() => {
-              //   return (
-              //     <View
-              //       style={{ justifyContent: "center", alignItems: "center" }}
-              //     >
-              //       <Text
-              //         style={{
-              //           fontSize: 22,
-              //           color: "white",
-              //           fontWeight: "bold",
-              //         }}
-              //       >
-              //         47%
-              //       </Text>
-              //     </View>
-              //   );
-              // }}
+            /> */}
+            <CircularProgress 
+              initialValue={0}
+              value={amount.percent}
+              duration={800}
+              activeStrokeWidth={10}
+              inActiveStrokeWidth={5}
+              showProgressValue={false}
             />
           </View>
           <View style={styles.amountContainer}>
