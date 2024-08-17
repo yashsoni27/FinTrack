@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
-  PanResponder,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import FooterList from "../components/footer/footerList";
@@ -24,17 +23,14 @@ const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
   const [currMonth, setCurrMonth] = useState(new Date().getMonth() + 1);
   const [date, setDate] = useState(new Date());
-
-  // const screenWidth = Dimensions.get("window").width;
-  // let date = new Date();
-
+  const styles = createStyles(theme);
   const userId = state.user.userId;
 
   const fetchTransactionsDB = async (selectedMonth) => {
     try {
       const response = await getTransactionsDb(userId, 0, selectedMonth);
-      // console.log("Transactions fetched from DB: ", response);
-      console.log("Transactions fetched from DB");
+      console.log("Transactions DB: ", response.transactions[0]);
+      // console.log("Transactions DB");
       setTransactions(response.transactions);
     } catch (error) {
       console.log("Error in fetching transactions:  ", error);
@@ -54,7 +50,7 @@ const Transactions = () => {
     const daysInMonth = new Date(currentYear, currMonth, 0).getDate();
 
     return Array.from({ length: daysInMonth }, (_, i) => ({
-      value: Math.round(aggregatedData[i + 1]*100)/100 || 0,
+      value: Math.round(aggregatedData[i + 1] * 100) / 100 || 0,
     }));
   };
 
@@ -74,7 +70,6 @@ const Transactions = () => {
       <View style={{ height: "90%" }}>
         <ScrollView
           style={{
-            // padding: 10,
             backgroundColor: theme.background,
           }}
           showsVerticalScrollIndicator={false}
@@ -112,21 +107,24 @@ const Transactions = () => {
               pointerStripWidth: 2,
               activatePointersOnLongPress: true,
               autoAdjustPointerLabelPosition: true,
-              pointerLabelComponent: items => {
+              pointerLabelComponent: (items) => {
                 return (
                   <View
                     style={{
                       // height: 20,
                       width: 70,
-                      backgroundColor: '#282C3E',
+                      backgroundColor: "#282C3E",
                       borderRadius: 4,
-                      justifyContent:'center',
+                      justifyContent: "center",
                       flex: 1,
-                      alignItems: 'center',
+                      alignItems: "center",
                       // textAlign: 'center',
                       // paddingLeft:16,
-                    }}>
-                    <Text style={{color: 'white', fontWeight:'bold'}}>{items[0].value}</Text>
+                    }}
+                  >
+                    <Text style={{ color: "white", fontWeight: "bold" }}>
+                      {items[0].value}
+                    </Text>
                   </View>
                 );
               },
@@ -144,7 +142,6 @@ const Transactions = () => {
               marginTop: 20,
               margin: 10,
               padding: 10,
-              // borderColor: "#000",
               // borderWidth: 1,
             }}
           >
@@ -176,9 +173,24 @@ const Transactions = () => {
             </View>
 
             {/* Beautify this View  */}
-            <View>
+            <View style={{ marginTop: 10 }}>
               {transactions.map((transaction) => (
-                <View key={transaction._id} style={{ marginVertical: 3 }}>
+                <View
+                  key={transaction._id}
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    padding: 10,
+                    backgroundColor: theme.surface,
+                    borderWidth: 1,
+                    borderColor: theme.text2,
+                    borderRadius: 10,
+                    marginVertical: 2,
+                  }}
+                >
+                  <View>
+
+                  </View>
                   <DefaultText>{transaction.name}</DefaultText>
                   <DefaultText>£ {transaction.amount}</DefaultText>
                 </View>
@@ -188,7 +200,7 @@ const Transactions = () => {
         </ScrollView>
       </View>
 
-      <View style={{ position: "absolute", bottom: 90, right: 20 }}>
+      <View style={{ position: "absolute", bottom: 85, right: 20 }}>
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => {
@@ -206,23 +218,22 @@ const Transactions = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  addButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 30,
-    backgroundColor: "#ff5722", // FAB color
-    justifyContent: "center",
-    alignItems: "center",
-    // position: "absolute",
-    // bottom: 0,
-    // right: 0,
-  },
-  monthButton: {
-    backgroundColor: "lightblue",
-    padding: 5,
-    borderRadius: 20,
-  },
-});
+const createStyles = (theme) => {
+  return StyleSheet.create({
+    addButton: {
+      width: 50,
+      height: 50,
+      borderRadius: 30,
+      backgroundColor: theme.primary2, // FAB color
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    monthButton: {
+      backgroundColor: theme.secondary,
+      padding: 10,
+      borderRadius: 30,
+    },
+  });
+};
 
 export default Transactions;
