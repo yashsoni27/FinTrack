@@ -86,7 +86,7 @@ const Recurring = () => {
               const date = new Date(item.lastDate);
               date.setMonth(date.getMonth() + 1);
               return (
-                <View key={index} style={{ marginHorizontal: 5 }}>
+                <View key={index} style={{ marginHorizontal: 5, width: 150 }}>
                   <View>
                     <DefaultText>
                       {new Intl.DateTimeFormat("en-US", options).format(date)}
@@ -97,22 +97,25 @@ const Recurring = () => {
                       backgroundColor: theme.surface,
                       padding: 15,
                       borderRadius: 10,
+                      // width: "100%",
                       marginTop: 5,
                       flexDirection: "row",
                       alignItems: "center",
+                      justifyContent: "space-between",
                     }}
                   >
                     <DefaultText
                       style={{
                         textTransform: "capitalize",
-                        maxWidth: 90,
+                        width: 80,
+                        // borderWidth: 1,
                       }}
                       numberOfLines={1}
                       ellipsizeMode="tail"
                     >
                       {item.merchantName ? item.merchantName : item.description}
                     </DefaultText>
-                    <DefaultText>  £ {item.averageAmount.amount}</DefaultText>
+                    <DefaultText style={{fontWeight: "bold"}}>   £ {item.averageAmount.amount}</DefaultText>
                   </View>
                 </View>
               );

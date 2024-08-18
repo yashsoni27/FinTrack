@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
+  Image,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import FooterList from "../components/footer/footerList";
@@ -25,6 +26,12 @@ const Transactions = () => {
   const [date, setDate] = useState(new Date());
   const styles = createStyles(theme);
   const userId = state.user.userId;
+
+  const options = {
+    month: "short",
+    day: "numeric",
+    // weekday: "short",
+  };
 
   const fetchTransactionsDB = async (selectedMonth) => {
     try {
@@ -174,25 +181,67 @@ const Transactions = () => {
 
             {/* Beautify this View  */}
             <View style={{ marginTop: 10 }}>
-              {transactions.map((transaction) => (
+              {transactions.map((transaction, index) => (
                 <View
-                  key={transaction._id}
+                  key={index}
                   style={{
                     flexDirection: "row",
                     justifyContent: "space-between",
+                    alignItems: "center",
                     padding: 10,
                     backgroundColor: theme.surface,
                     borderWidth: 1,
                     borderColor: theme.text2,
                     borderRadius: 10,
-                    marginVertical: 2,
+                    marginBottom: 10,
                   }}
                 >
-                  <View>
-
+                  <DefaultText
+                    style={{
+                      position: "absolute",
+                      top: -10,
+                      left: 10,
+                      padding: 1,
+                      zIndex: 100,
+                      backgroundColor: theme.background,
+                      borderRadius: 10,
+                    }}
+                  >
+                    {new Intl.DateTimeFormat("en-US", options).format(
+                      new Date(transaction.date)
+                    )}
+                  </DefaultText>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Image
+                      source={{
+                        uri: transaction.logoUrl
+                          ? transaction.logoUrl
+                          : transaction.personalFinanceCategoryIconUrl,
+                      }}
+                      style={{
+                        width: 30,
+                        height: 30,
+                        borderRadius: 30,
+                        borderWidth: 1,
+                        borderColor: theme.text,
+                      }}
+                      resizeMode="contain"
+                    />
+                    <DefaultText style={{ marginLeft: 10 }}>
+                      {transaction.merchantName
+                        ? transaction.merchantName
+                        : transaction.name}
+                    </DefaultText>
                   </View>
-                  <DefaultText>{transaction.name}</DefaultText>
-                  <DefaultText>£ {transaction.amount}</DefaultText>
+                  <DefaultText>
+                    {transaction.amount > 0 ? "- " : "+ "}£
+                    {Math.abs(transaction.amount)}
+                  </DefaultText>
+                  {/* {transaction.amount > 0 ? (
+                    <DefaultText style={{ color: "red" }}>- £{Math.abs(transaction.amount)}</DefaultText>
+                  ) : (
+                    <DefaultText style={{ color: "green" }}>+ £{Math.abs(transaction.amount)}</DefaultText>
+                  )} */}
                 </View>
               ))}
             </View>

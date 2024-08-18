@@ -239,7 +239,8 @@ const Home = () => {
                     </View>
                     <View style={{ alignSelf: "center"}}>
                       <DefaultText style={{ fontSize: 18 }}>
-                        £ {Math.round(item.amount * 100) / 100}
+                        {item.amount > 0 ? "-" : "+"}
+                        £{Math.abs(Math.round(item.amount * 100) / 100)}
                       </DefaultText>
                     </View>
                   </View>

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   SafeAreaView,
@@ -18,18 +18,24 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { useNavigation } from "@react-navigation/native";
 import { saveTransactionDb } from "../../api/db";
 import { AuthContext } from "../context/auth";
+import { useTheme } from "../context/themeContext";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const Add = () => {
   const [state, setState] = useContext(AuthContext);
-  const [imageUri, setImageUri] = useState(null);
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
   const navigation = useNavigation();
-
   const userId = state.user.userId;
 
-  const [date, setDate] = useState("");
+  const [imageUri, setImageUri] = useState(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [date, setDate] = useState(new Date());
   const [merchantName, setMerchantName] = useState("");
   const [amount, setAmount] = useState();
-  const [desc, setDesc] = useState("");
+  const [desc, setDesc] = useState(""); 
+
+  const [saveDisabled, setSaveDisabled] = useState(true);
 
   const handleChoosePhoto = () => {
     Alert.alert(
@@ -39,6 +45,7 @@ const Add = () => {
         {
           text: "Camera",
           onPress: () => handleImagePicker("camera"),
+          style: "default",
         },
         {
           text: "Gallery",
@@ -101,7 +108,7 @@ const Add = () => {
       setDate(response.receiptData.date);
       setAmount(response.receiptData.amount);
       setMerchantName(response.receiptData.merchantName);
-      console.log("data: ", date, amount, merchantName);
+      console.log("data: ", response);
     } catch (error) {
       console.error("Error uploading image: ", error);
     }
@@ -123,25 +130,59 @@ const Add = () => {
     }
   };
 
+  const onChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShowDatePicker(false);
+    setDate(currentDate);
+  };
+
+  const showDatePickerModal = () => {
+    setShowDatePicker(true);
+  };
+
+  useEffect(() => {
+    if (date != "" && amount!= ""  && merchantName != "") {
+      setSaveDisabled(false);
+    } else {
+      setSaveDisabled(true);
+    }
+  }, [date, amount, merchantName])
+  
+
   return (
-    <SafeAreaView style={{ flex: 1, padding: 15 }}>
-      <FontAwesome5Icon
-        style={{ alignSelf: "flex-end", padding: 10 }}
-        name="times"
-        size={15}
-        onPress={() => navigation.goBack()}
-      />
-      <DefaultText
-        style={{ fontSize: 30, textAlign: "center", marginBottom: 10 }}
+    <View style={{ padding: 15 }}>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
       >
-        Add Transaction
-      </DefaultText>
+        <DefaultText
+          style={{
+            fontSize: 30,
+            textAlign: "center",
+            flex: 1,
+            alignItems: "center",
+          }}
+        >
+          Add Transaction
+        </DefaultText>
+        <FontAwesome5Icon
+          style={{ alignItems: "flex-end"}}
+          name="times"
+          size={15}
+          onPress={() => navigation.goBack()}
+        />
+      </View>
 
       <KeyboardAwareScrollView
         style={{ marginTop: 10 }}
         showsVerticalScrollIndicator={false}
       >
-        <Button title="Choose Photo" onPress={handleChoosePhoto} />
+        <TouchableOpacity style={styles.button} onPress={handleChoosePhoto}>
+          <DefaultText style={styles.buttonText}>Scan Receipt</DefaultText>
+        </TouchableOpacity>
         {imageUri && (
           <>
             <Image source={{ uri: imageUri }} style={styles.image} />
@@ -153,13 +194,23 @@ const Add = () => {
 
         <View style={styles.inputContainer}>
           <DefaultText style={styles.label}>Date</DefaultText>
-          <TextInput
-            style={styles.input}
-            placeholder="YYYY-MM-DD"
-            type="date"
-            value={date}
-            onChangeText={(e) => setDate(e)}
-          />
+          <TouchableOpacity onPress={showDatePickerModal}>
+            <View pointerEvents="none">
+              <TextInput
+                style={styles.input}
+                placeholder="YYYY-MM-DD"
+                value={date ? date.toLocaleDateString() : ""}
+              />
+            </View>
+            {showDatePicker && (
+              <DateTimePicker
+                value={date}
+                mode="date"
+                display="default"
+                onChange={onChange}
+              />
+            )}
+          </TouchableOpacity>
 
           <DefaultText style={styles.label}>Merchant Name</DefaultText>
           <TextInput
@@ -186,61 +237,72 @@ const Add = () => {
             onChangeText={(e) => setDesc(e)}
           />
 
-          {/* <Button title="Save Transaction" onPress={saveTransaction} /> */}
           <TouchableOpacity
-            style={{ backgroundColor: "#2196F3" }}
+            style={[styles.button, saveDisabled ? styles.disabledButton : null]}
             onPress={saveTransaction}
+            disabled={saveDisabled}
           >
-            <DefaultText
-              style={{
-                color: "white",
-                fontSize: 15,
-                textAlign: "center",
-                padding: 10,
-              }}
-            >
+            <DefaultText style={styles.buttonText}>
               Save Transaction
             </DefaultText>
           </TouchableOpacity>
         </View>
       </KeyboardAwareScrollView>
       {/* <FooterList /> */}
-    </SafeAreaView>
+    </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 16,
-  },
-  image: {
-    width: 200,
-    height: 200,
-    marginVertical: 16,
-  },
-  textContainer: {
-    flex: 1,
-    marginTop: 16,
-  },
-  inputContainer: {
-    marginTop: 20,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 8,
-  },
-  input: {
-    height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 16,
-  },
-});
+const createStyles = (theme) => {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 16,
+    },
+    image: {
+      width: 200,
+      height: 200,
+      marginVertical: 16,
+    },
+    button: {
+      // backgroundColor: theme.primary2,
+      backgroundColor: theme.text,
+      borderRadius: 20,
+    },
+    buttonText: {
+      color: theme.surface,
+      // color: theme.text,
+      // fontSize: 15,
+      // fontWeight: "bold",
+      textAlign: "center",
+      padding: 10,
+    },
+    disabledButton: {
+      opacity: 0.75
+    },
+    textContainer: {
+      flex: 1,
+      marginTop: 16,
+    },
+    inputContainer: {
+      marginTop: 20,
+    },
+    label: {
+      fontSize: 16,
+      fontWeight: "bold",
+      marginBottom: 8,
+    },
+    input: {
+      height: 40,
+      borderColor: "#ccc",
+      borderWidth: 1,
+      borderRadius: 5,
+      paddingHorizontal: 10,
+      marginBottom: 16,
+    },
+  });
+};
 
 export default Add;
