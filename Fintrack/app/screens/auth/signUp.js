@@ -11,6 +11,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../../context/auth";
 import { userSignUp } from "../../../api/auth";
+import DefaultText from "../../components/defaultText";
 
 const SignUp = ({ navigation }) => {
   const [name, setName] = useState("");
@@ -31,7 +32,7 @@ const SignUp = ({ navigation }) => {
     } else {
         setState(response);
         await AsyncStorage.setItem("auth", JSON.stringify(response));
-        alert("User created successfully");
+        // alert("User created successfully");
         navigation.navigate("Home");
     }
   };
@@ -39,15 +40,15 @@ const SignUp = ({ navigation }) => {
   return (
     <KeyboardAwareScrollView contentContainerStyle={styles.container}>
       <View style={{ marginVertical: 100 }}>
-        <View style={{ justifyContent: "center", alignItems: "center" }}>
+        {/* <View style={{ justifyContent: "center", alignItems: "center" }}>
           <Image
             source={require("../../../assets/favicon.png")}
             style={{ width: 100, height: 100, marginVertical: 20 }}
           />
-        </View>
-        <Text style={styles.signUpText}>SignUp</Text>
+        </View> */}
+        <DefaultText style={styles.signUpText}>SignUp</DefaultText>
         <View style={{ marginHorizontal: 24 }}>
-          <Text style={{ fontSize: 16, color: "#8e93a1" }}>NAME</Text>
+          <DefaultText style={{ fontSize: 16, color: "#8e93a1" }}>NAME</DefaultText>
           <TextInput
             style={styles.signUpInput}
             value={name}
@@ -57,7 +58,7 @@ const SignUp = ({ navigation }) => {
           />
         </View>
         <View style={{ marginHorizontal: 24 }}>
-          <Text style={{ fontSize: 16, color: "#8e93a1" }}>EMAIL</Text>
+          <DefaultText style={{ fontSize: 16, color: "#8e93a1" }}>EMAIL</DefaultText>
           <TextInput
             style={styles.signUpInput}
             value={email}
@@ -67,7 +68,7 @@ const SignUp = ({ navigation }) => {
           />
         </View>
         <View style={{ marginHorizontal: 24 }}>
-          <Text style={{ fontSize: 16, color: "#8e93a1" }}>PASSWORD</Text>
+          <DefaultText style={{ fontSize: 16, color: "#8e93a1" }}>PASSWORD</DefaultText>
           <TextInput
             style={styles.signUpInput}
             value={password}
@@ -77,16 +78,13 @@ const SignUp = ({ navigation }) => {
           />
         </View>
         <TouchableOpacity onPress={handleSubmit} style={styles.buttonStyle}>
-          <Text style={styles.buttonText}>Submit</Text>
+          <DefaultText style={styles.buttonText}>Submit</DefaultText>
         </TouchableOpacity>
-        <Text style={{ fontSize: 12, textAlign: "center" }}>
+        <DefaultText style={{ fontSize: 12, textAlign: "center" }}>
           Already Joined? {" "} 
-          {/* <Text style={{ color: "darakred", fontWeight: "bold" }} onPress={() => navigation.navigate('SignIn')}>
-            Sign In
-          </Text> */}
-        </Text>
+        </DefaultText>
         <TouchableOpacity onPress={() => navigation.navigate("SignIn")} style={styles.buttonStyle}>
-          <Text style={styles.buttonText}>Sign In</Text>
+          <DefaultText style={styles.buttonText}>Sign In</DefaultText>
         </TouchableOpacity>
       </View>
     </KeyboardAwareScrollView>

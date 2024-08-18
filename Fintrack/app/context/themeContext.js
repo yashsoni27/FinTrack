@@ -31,12 +31,14 @@ export const themes = {
 export const ThemeProvider = ({ children }) => {
   const initialColorScheme = Appearance.getColorScheme();
   const [theme, setTheme] = useState(initialColorScheme == 'light' ? "dark" : 'light');
+  // const [theme, setTheme] = useState(initialColorScheme == 'light' ? "light" : 'dark');
 
   useEffect(() => {
-    console.log(initialColorScheme);
+    console.log(theme);
     const handleAppearanceChange = (pref) => {
         const newScheme = pref.colorScheme;
         setTheme(newScheme == 'light' ? "dark" : 'light');        
+        // setTheme(newScheme == 'light' ? "light" : 'dark');        
     };
     
     const listener = Appearance.addChangeListener(handleAppearanceChange);

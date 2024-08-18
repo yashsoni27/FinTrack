@@ -11,14 +11,18 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { userSignIn } from "../../../api/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../../context/auth";
+import { useTheme } from "../../context/themeContext";
+import DefaultText from "../../components/defaultText";
+import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 
-const SignIn = ({ navigation }) => {  
+const SignIn = ({ navigation }) => {
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [state, setState] = useContext(AuthContext);
 
   const handleSubmit = async () => {
-    
     if (email === "" || password === "") {
       alert("All fields are required");
       return;
@@ -30,89 +34,163 @@ const SignIn = ({ navigation }) => {
     } else {
       setState(response);
       await AsyncStorage.setItem("auth", JSON.stringify(response));
-      alert("Sign In Successful");
+      // alert("Sign In Successful");
       navigation.navigate("Home");
     }
   };
+
   return (
-    <KeyboardAwareScrollView contentCotainerStyle={styles.container}>
-      <View style={{ marginVertical: 100 }}>
-        <Text style={{fontSize: 30, fontWeight:"bold", textAlign: "center", marginBottom: 20}}>Welcome</Text>
-        <View style={styles.imageContainer}>
-          <Image
-            source={require("../../../assets/favicon.png")}
-            style={styles.imageStyles}
-          />
+    // <View style={{ backgroundColor: theme.background }}>
+    <KeyboardAwareScrollView contentContainerStyle={styles.container}>
+      <DefaultText
+        style={{
+          fontSize: 30,
+          textAlign: "left",
+          marginLeft: 30,
+          color: theme.text,
+          marginTop: 150,
+        }}
+      >
+        Welcome back
+      </DefaultText>
+      <View>
+        <View style={{}}>
+          <View style={styles.inputContainer}>
+            {/* <DefaultText style={{ fontSize: 16, color: theme.text }}>
+              Email
+            </DefaultText> */}
+            <FontAwesome5Icon
+              style={{ padding: 10 }}
+              name="user"
+              size={20}
+              color="black"
+            />
+            <TextInput
+              placeholder="Email"
+              style={styles.signupInput}
+              value={email}
+              onChangeText={(text) => setEmail(text)}
+              autoCompleteType="email"
+              keyboardType="email-address"
+              underlineColorAndroid="transparent"
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            {/* <DefaultText style={{ fontSize: 16, color: theme.text }}>
+              Password
+            </DefaultText> */}
+            <FontAwesome5Icon
+              style={{ padding: 10 }}
+              name="key"
+              size={20}
+              color="black"
+            />
+            <TextInput
+              placeholder="Password"
+              style={styles.signupInput}
+              value={password}
+              onChangeText={(text) => setPassword(text)}
+              secureTextEntry={true}
+              autoComplteType="password"
+            />
+          </View>
+          <View style={{ marginHorizontal: 30 }}>
+            <DefaultText
+              onPress={() => navigation.navigate("ForgotPassword")}
+              style={{
+                fontSize: 15,
+                textAlign: "right",
+                marginTop: 0,
+                fontWeight: "bold",
+              }}
+            >
+              Forgot Password?
+            </DefaultText>
+          </View>
         </View>
-        <Text style={styles.signupText}>Sign In</Text>
-        <View style={{ marginHorizontal: 24 }}>
-          <Text style={{ fontSize: 16, color: "#8e93a1" }}>Email</Text>
-          <TextInput
-            style={styles.signupInput}
-            value={email}
-            onChangeText={(text) => setEmail(text)}
-            autoCompleteType="email"
-            keyboardType="email-address"
-          />
+        <View style={{marginVertical: 30}}>
+          <TouchableOpacity onPress={handleSubmit} style={styles.buttonStyle}>
+            <DefaultText style={styles.buttonText}>Log In</DefaultText>
+          </TouchableOpacity>
+          <View style={styles.rulerContainer}>
+            <View style={styles.rulerLine}>
+              <DefaultText style={styles.rulerText}>or</DefaultText>
+            </View>
+          </View>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("SignUp")}
+            style={styles.buttonStyle}
+          >
+            <DefaultText style={styles.buttonText}>Sign Up</DefaultText>
+          </TouchableOpacity>
         </View>
-        <View style={{ marginHorizontal: 24 }}>
-          <Text style={{ fontSize: 16, color: "#8e93a1" }}>Password</Text>
-          <TextInput
-            style={styles.signupInput}
-            value={password}
-            onChangeText={(text) => setPassword(text)}
-            secureTextEntry={true}
-            autoComplteType="password"
-          />
-        </View>
-        <TouchableOpacity onPress={handleSubmit} style={styles.buttonStyle}>
-          <Text style={styles.buttonText}>Log In</Text>
-        </TouchableOpacity>
-        <Text onPress={() => navigation.navigate("ForgotPassword")} style={{ fontSize: 12, textAlign: "center", marginTop: 0, fontWeight: "bold" }}>
-          Forgot Password?
-        </Text>
-        <TouchableOpacity onPress={() => navigation.navigate("SignUp")} style={styles.buttonStyle}>
-          <Text style={styles.buttonText}>Sign Up</Text>
-        </TouchableOpacity>
-        
       </View>
     </KeyboardAwareScrollView>
+    // </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-  },
-  signupText: {
-    fontSize: 30,
-    textAlign: "center",
-  },
-  signupInput: {
-    borderBottomWidth: 0.5,
-    height: 50,
-    borderBottomColor: "#8e93a1",
-    marginBottom: 20,
-  },
-  buttonStyle: {
-    backgroundColor: "darkmagenta",
-    height: 50,
-    margin: 15,
-    justifyContent: "center",
-    alignSelf: "center",
-    borderRadius: 30,
-    width: "50%",
-  },
-  buttonText: {
-    fontSize: 20,
-    textAlign: "center",
-    color: "#fff",
-    textTransform: "capitalize",
-    fontWeight: "bold",
-  },
-  imageContainer: { justifyContent: "center", alignItems: "center" },
-  imageStyles: { width: 100, height: 100, marginVertical: 20 },
-});
+const createStyles = (theme) => {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: "space-between",
+      // alignItems: "center",
+      paddingHorizontal: 10,
+    },
+    inputContainer: {
+      marginHorizontal: 30,
+      marginVertical: 10, 
+      // flex: 1,
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+      // backgroundColor: "#fff",
+    },
+
+    signupInput: {
+      flex: 1,
+      paddingTop: 10,
+      paddingRight: 10,
+      paddingBottom: 10,
+      paddingLeft: 0,
+      borderBottomWidth: 0.5,
+      height: 50,
+      borderBottomColor: "#8e93a1",
+    },
+    buttonStyle: {
+      backgroundColor: theme.text,
+      height: 50,
+      margin: 25,
+      justifyContent: "center",
+      alignSelf: "center",
+      borderRadius: 30,
+      width: "80%",
+    },
+    buttonText: {
+      fontSize: 20,
+      textAlign: "center",
+      color: theme.surface,
+      textTransform: "capitalize",
+    },
+    rulerContainer: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    rulerLine: {
+      height: 1,
+      backgroundColor: "#8e93a1",
+      width: "70%",
+    },
+    rulerText: {
+      position: "absolute",
+      alignSelf: "center",
+      top: -10, // Adjust position as needed
+      paddingHorizontal: 5,
+      backgroundColor: theme.background,
+    },
+  });
+};
 
 export default SignIn;

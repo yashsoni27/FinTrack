@@ -4,7 +4,7 @@ import { AuthContext } from "../context/auth";
 import SignUp from "../screens/auth/signUp";
 import SignIn from "../screens/auth/signIn";
 import Home from "../screens/home";
-import HeaderTabs from "./header/headerTabs";
+// import HeaderTabs from "./header/headerTabs";
 import Account from "../screens/account";
 import Analysis from "../screens/analysis";
 import Landing from "../screens/static/landing";
@@ -46,7 +46,7 @@ const NavigationScreen = () => {
         </>
       ) : (
         <>
-          {/* <Stack.Screen name="Landing" component={Landing} /> */}
+          <Stack.Screen name="Landing" component={Landing} />
           <Stack.Screen name="SignIn" component={SignIn} />
           <Stack.Screen name="SignUp" component={SignUp} />
           <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
