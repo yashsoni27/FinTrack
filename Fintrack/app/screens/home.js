@@ -78,8 +78,8 @@ const Home = () => {
   const fetchBalanceDB = async () => {
     try {
       const response = await getBalanceDb(userId);
-      console.log("Balance DB: ", response.netBalance);
-      // console.log("Balance DB");
+      // console.log("Balance DB: ", response.netBalance);
+      console.log("Balance DB");
       const netBalance = response.netBalance.reduce(
         (sum, account) => sum + (account.balances.current || 0),
         0
