@@ -36,8 +36,8 @@ const Transactions = () => {
   const fetchTransactionsDB = async (selectedMonth) => {
     try {
       const response = await getTransactionsDb(userId, 0, selectedMonth);
-      console.log("Transactions DB: ", response.transactions[0]);
-      // console.log("Transactions DB");
+      // console.log("Transactions DB: ", response.transactions[0]);
+      console.log("Transactions DB");
       setTransactions(response.transactions);
     } catch (error) {
       console.log("Error in fetching transactions:  ", error);

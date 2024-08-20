@@ -5,7 +5,7 @@ const transactionSchema = mongoose.Schema({
   transactionId: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
   accountId: String,
   amount: Number,
@@ -15,8 +15,13 @@ const transactionSchema = mongoose.Schema({
   logoUrl: String,
   personalFinanceCategoryIconUrl: String,
   category: [String],
-  personalFinanceCategory: Object,
-  description: String,  
+  personalFinanceCategory: {
+    primary: { type: String, required: true },
+    detailed: String,
+    confidenceLevel: String,
+  },
+  description: String,
+  excludeFromAnalytics: { type: Boolean, default: false },
 });
 
 export default mongoose.model("Transaction", transactionSchema);

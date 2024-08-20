@@ -114,9 +114,9 @@ const Home = () => {
   const fetchTransactionsDB = async () => {
     try {
       setLoading(true);
-      const response = await getTransactionsDb(userId, 4, null);
-      console.log("Transactions DB: ", response.transactions);
-      // console.log("Transactions DB");
+      const response = await getTransactionsDb(userId, 3, null);
+      // console.log("Transactions DB: ", response.transactions);
+      console.log("Transactions DB");
       setTransactions(response.transactions);
       setLoading(false);
     } catch (error) {
@@ -128,7 +128,7 @@ const Home = () => {
   useEffect(() => {
     fetchBalanceDB();
     fetchTransactionsDB();
-  }, [state.user.userId]);
+  }, [state.user.userId, onRefresh]);
 
   return (
     <>
