@@ -248,6 +248,7 @@ export const syncTransactions = async (request, response) => {
         logoUrl: transaction.logo_url,
         personalFinanceCategoryIconUrl: transaction.personal_finance_category_icon_url,
         category: transaction.category,
+        personalFinanceCategory: transaction.personal_finance_category,
         // description: transaction.description, -- Not for plaid response
       });
     }
@@ -261,6 +262,7 @@ export const syncTransactions = async (request, response) => {
           name: transaction.name,
           merchantName: transaction.merchant_name,
           category: transaction.category[0],
+          personalFinanceCategory: transaction.personal_finance_category,
         }
       );
     }

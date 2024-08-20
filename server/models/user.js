@@ -38,8 +38,6 @@ const userSchema = mongoose.Schema({
   mobile: String,  // Not used uptil now
   institutions: [InstitutionSchema],
   resetCode: String,      
-  // accessToken: String,   
-  // plaidCursor: String, 
 });
 
 export default mongoose.model("Users", userSchema);

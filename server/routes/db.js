@@ -1,5 +1,13 @@
 import express from "express";
-import { getBalanceDb, getChartData, getRecurringDb, getTransactionsDb, saveTransactionDb } from "../controllers/db.js";
+import {
+  getBalanceDb,
+  getBudget,
+  getChartData,
+  getRecurringDb,
+  getTransactionsDb,
+  saveTransactionDb,
+  setBudget,
+} from "../controllers/db.js";
 
 const router = express.Router();
 
@@ -15,5 +23,7 @@ router.post("/transactions/recurring/get", getRecurringDb);
 
 router.post("/transactions/save", saveTransactionDb);
 router.post("/chartData/get", getChartData);
+router.post("/budget/get", getBudget);
+router.post("/budget/set", setBudget);
 
 export default router;

@@ -15,6 +15,7 @@ const transactionSchema = mongoose.Schema({
   logoUrl: String,
   personalFinanceCategoryIconUrl: String,
   category: [String],
+  personalFinanceCategory: Object,
   description: String,  
 });
 

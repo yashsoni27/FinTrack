@@ -7,6 +7,7 @@ import User from "../models/user.js";
 import Account from "../models/account.js";
 import Transaction from "../models/transaction.js";
 import Recurring from "../models/recurring.js";
+import Budget from "../models/budget.js";
 
 export const getAccountsDb = async (request, response) => {
   try {
@@ -43,7 +44,7 @@ export const getBalanceDb = async (request, response) => {
 export const getTransactionsDb = async (request, response) => {
   try {
     const { userId, count, month } = request.body;
-    console.log("count, month: ", count, month);
+    // console.log("count, month: ", count, month);
     // console.log("userId: ", userId);
 
     const user = await User.findOne({ userId });
@@ -144,8 +145,8 @@ export const getChartData = async (request, response) => {
     // console.log("userId: ", userId);
 
     const prevMonth = month - 1;
-    console.log(month);
-    console.log(prevMonth);
+    // console.log(month);
+    // console.log(prevMonth);
 
     const currMonthResponse = await callController(getTransactionsDb, {
       userId: userId,
@@ -208,6 +209,38 @@ export const getChartData = async (request, response) => {
     response.json({ currMonthData, prevMonthData });
   } catch (error) {
     console.error("Error fetching chartData: ", error);
+    response.status(500).send(error);
+  }
+};
+
+export const getBudget = async (request, response) => {
+  try {
+    const { userId, month } = request.body;
+
+    const today = new Date();
+    const currentMonth = month || today.getMonth() + 1;
+    const currentYear = today.getFullYear();
+    console.log("month: ", currentMonth);
+    console.log("year: ", currentYear);
+
+    // const budgetResponse = await Budget.find({ userId: userId.month, year });
+
+    // response.json({ budgetResponse: budgetResponse });
+  } catch (error) {
+    console.error("Error fetching budget: ", error);
+    response.status(500).send(error);
+  }
+};
+
+export const setBudget = async (request, response) => {
+  try {
+    const { userId, month, amount } = request.body;
+
+    await Budget.create({
+      userId: userId,
+    });
+  } catch (error) {
+    console.error("Error setting budget: ", error);
     response.status(500).send(error);
   }
 };
