@@ -71,3 +71,13 @@ export const getBudget = async (userId, month = null) => {
     throw error;
   }
 }
+
+export const setBudget = async (userId, data) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/db/budget/set`, { userId, data });
+    return response.data;
+  } catch (error) {
+    console.error("Error setting budget: ", error);
+    throw error;
+  }
+}

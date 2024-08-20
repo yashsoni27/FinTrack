@@ -227,50 +227,72 @@ export const getBudget = async (request, response) => {
         $match: {
           userId,
           date: { $gte: startDate, $lt: endDate },
-          excludeFromAnalytics: { $ne: true }
+          excludeFromAnalytics: { $ne: true },
         },
       },
       {
         $group: {
           _id: null, // Set to null as we want overall summary
           totalSpent: { $sum: "$amount" },
-          shoppingSpent: {
+          shopping: {
             $sum: {
               $cond: {
-                if: { $eq: ["$personalFinanceCategory.primary", "GENERAL_MERCHANDISE"] },
+                if: {
+                  $eq: [
+                    "$personalFinanceCategory.primary",
+                    "GENERAL_MERCHANDISE",
+                  ],
+                },
                 then: "$amount",
                 else: 0,
               },
             },
           },
-          entertainmentSpent: {
+          entertainment: {
             $sum: {
               $cond: {
-                if: { $eq: ["$personalFinanceCategory.primary", "ENTERTAINMENT"] },
+                if: {
+                  $eq: ["$personalFinanceCategory.primary", "ENTERTAINMENT"],
+                },
                 then: "$amount",
                 else: 0,
               },
             },
           },
-          foodAndDrinkSpent: {
+          foodAndDrink: {
             $sum: {
               $cond: {
-                if: { $eq: ["$personalFinanceCategory.primary", "FOOD_AND_DRINK"] },
+                if: {
+                  $eq: ["$personalFinanceCategory.primary", "FOOD_AND_DRINK"],
+                },
                 then: "$amount",
                 else: 0,
               },
             },
           },
-          transportationSpent: {
+          transportation: {
             $sum: {
               $cond: {
-                if: { $eq: ["$personalFinanceCategory.primary", "TRANSPORTATION"] },
+                if: {
+                  $eq: ["$personalFinanceCategory.primary", "TRANSPORTATION"],
+                },
                 then: "$amount",
                 else: 0,
               },
             },
           },
-          otherSpent: {
+          home: {
+            $sum: {
+              $cond: {
+                if: {
+                  $eq: ["$personalFinanceCategory.primary", "HOME_IMPROVEMENT"],
+                },
+                then: "$amount",
+                else: 0,
+              },
+            },
+          },
+          other: {
             $sum: {
               $cond: [
                 {
@@ -278,41 +300,59 @@ export const getBudget = async (request, response) => {
                     {
                       $in: [
                         "$personalFinanceCategory.primary",
-                        ["GENERAL_MERCHANDISE", "ENTERTAINMENT", "FOOD_AND_DRINK", "TRANSPORTATION"]
-                      ]
-                    }
-                  ]
+                        [
+                          "GENERAL_MERCHANDISE",
+                          "ENTERTAINMENT",
+                          "FOOD_AND_DRINK",
+                          "TRANSPORTATION",
+                          "HOME_IMPROVEMENT",
+                        ],
+                      ],
+                    },
+                  ],
                 },
                 "$amount",
-                0
-              ]
-            }
-          }
+                0,
+              ],
+            },
+          },
         },
       },
-      // {
-      //   $project: {
-      //     _id: 0,
-      //     totalSpent: { $ifNull: ["$totalSpent", 0] },
-      //     shoppingSpent: { $ifNull: ["$shoppingSpent", 0] },
-      //     entertainmentSpent: { $ifNull: ["$entertainmentSpent", 0] },
-      //     foodAndDrinkSpent: { $ifNull: ["$foodAndDrinkSpent", 0] },
-      //     transportationSpent: { $ifNull: ["$transportationSpent", 0] },
-      //     // otherSpent: { $ifNull: ["$otherSpent", 0] },
-      //   }
-      // },
+      {
+        $project: {
+          _id: 0,
+          total: { $ifNull: ["$totalSpent", 0] },
+          shopping: { $ifNull: ["$shopping", 0] },
+          entertainment: { $ifNull: ["$entertainment", 0] },
+          foodAndDrink: { $ifNull: ["$foodAndDrink", 0] },
+          transportation: { $ifNull: ["$transportation", 0] },
+          home: { $ifNull: ["$home", 0] },
+          other: { $ifNull: ["$other", 0] },
+        },
+      },
     ];
 
     const transactionResponse = await Transaction.aggregate(pipeline);
     // console.log("response: ", transactionResponse);
 
     const budgetResponse = await Budget.find({
-      userId: userId.month,
+      userId: userId,
       month: currentMonth,
       year: currentYear,
     });
 
-    response.json({ budgetResponse: budgetResponse });
+    // console.log(budgetResponse);
+    if (budgetResponse.length > 0) {
+      budgetResponse[0].spent = transactionResponse[0].totalSpent;
+      budgetResponse[0].category.shopping.spent = transactionResponse[0].shopping;
+      budgetResponse[0].category.entertainment.spent = transactionResponse[0].entertainment;
+      budgetResponse[0].category.foodAndDrink.spent = transactionResponse[0].foodAndDrink;
+      budgetResponse[0].category.transportation.spent = transactionResponse[0].transportation;
+      budgetResponse[0].category.home.spent = transactionResponse[0].home;
+      budgetResponse[0].category.other.spent = transactionResponse[0].other;
+    }
+
+    response.json(budgetResponse);
   } catch (error) {
     console.error("Error fetching budget: ", error);
     response.status(500).send(error);
@@ -321,14 +361,7 @@ export const getBudget = async (request, response) => {
 
 export const setBudget = async (request, response) => {
   try {
-    const { userId, month, data } = request.body;
-
-    // Shopping: GENERAL_MERCHANDISE
-    // Entertainment: ENTERTAINMENT
-    // FoodAndDrink: FOOD_AND_DRINK
-    // Transportation: TRANSPORTATION
-    // Home: HOME_IMPROVEMENT
-    // Other: RENT
+    const { userId, data } = request.body;
 
     // { _id: 'GENERAL_MERCHANDISE', count: 89 },
     // { _id: 'ENTERTAINMENT', count: 58 },
@@ -344,21 +377,48 @@ export const setBudget = async (request, response) => {
     // { _id: 'GOVERNMENT_AND_NON_PROFIT', count: 10 },
     // { _id: 'MEDICAL', count: 10 }
 
-    await Budget.create({
+    const budgetResponse = await Budget.find({
       userId: userId,
-      month: month || new Date().getMonth() + 1,
+      month: new Date().getMonth() + 1,
       year: new Date().getFullYear(),
-      budget: data.budget,
-      spent: data.spent,
-      category: {
-        shopping: { budget: data.category.shopping.budget },
-        entertainment: { budget: data.category.entertainment.budget },
-        foodAndDrink: { budget: data.category.foodAndDrink.budget },
-        transportation: { budget: data.category.transportation.budget },
-        home: { budget: data.category.home.budget },
-        other: { budget: data.category.other.budget },
-      },
     });
+
+    if (budgetResponse.length > 0) {
+      await Budget.findOneAndUpdate(
+        {
+          userId: userId,
+          month: new Date().getMonth() + 1,
+          year: new Date().getFullYear(),
+        },
+        {
+          budget: data.totalSpending,
+          category: {
+            shopping: { budget: data.shopping },
+            entertainment: { budget: data.entertainment },
+            foodAndDrink: { budget: data.foodAndDrink },
+            transportation: { budget: data.transportation },
+            home: { budget: data.home },
+            other: { budget: data.other },
+          },
+        }
+      );
+    } else {
+      await Budget.create({
+        userId: userId,
+        month: new Date().getMonth() + 1,
+        year: new Date().getFullYear(),
+        budget: data.totalSpending,
+        // spent: data.spent,
+        category: {
+          shopping: { budget: data.shopping },
+          entertainment: { budget: data.entertainment },
+          foodAndDrink: { budget: data.foodAndDrink },
+          transportation: { budget: data.transportation },
+          home: { budget: data.home },
+          other: { budget: data.other },
+        },
+      });
+    }
 
     return response.json({ message: "Budget set successfully" });
   } catch (error) {

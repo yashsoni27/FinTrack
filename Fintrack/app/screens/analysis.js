@@ -1,10 +1,9 @@
 import {
   View,
-  Text,
-  SafeAreaView,
   ScrollView,
   Dimensions,
   StyleSheet,
+  TouchableOpacity,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import FooterList from "../components/footer/footerList";
@@ -12,9 +11,12 @@ import DefaultText from "../components/defaultText";
 import { AuthContext } from "../context/auth";
 import { useTheme } from "../context/themeContext";
 import { LineChart } from "react-native-gifted-charts";
-import { getBudget, getChartData, getTransactionsDb } from "../../api/db";
+import { getBudget, getChartData } from "../../api/db";
+import CircularProgress from "react-native-circular-progress-indicator";
+import { useNavigation } from "@react-navigation/native";
 
 const Analysis = () => {
+  const navigation = useNavigation();
   const [state, setState] = useContext(AuthContext);
   const { theme } = useTheme();
   const [currMonth, setCurrMonth] = useState(new Date().getMonth() + 1);
@@ -25,72 +27,7 @@ const Analysis = () => {
   const styles = createStyles(theme);
   const userId = state.user.userId;
 
-  // REDUNDANT - placing the logic in server side
-  const fetchTransactionsDB = async (selectedMonth = 7) => {
-    try {
-      setIsLoading(true);
-
-      const today = new Date();
-      const currentMonth = today.getMonth() + 1;
-      const currentDate = today.getDate();
-
-      const lastDay = selectedMonth === currentMonth ? currentDate : 31;
-
-      const income = Array(lastDay)
-        .fill()
-        .map((_, index) => ({ value: 0, dataPointText: `${index + 1}` }));
-      const expense = Array(lastDay)
-        .fill()
-        .map((_, index) => ({ value: 0, dataPointText: `${index + 1}` }));
-
-      const response = await getTransactionsDb(userId, 0, selectedMonth);
-      const transactions = response.transactions;
-
-      const filteredTransactions = transactions.filter((transaction) => {
-        const date = new Date(transaction.date);
-        return (
-          date.getMonth() + 1 === selectedMonth && date.getDate() <= lastDay
-        );
-      });
-      // console.log("filtered:  ", filteredTransactions);
-
-      filteredTransactions.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-      let cumulativeIncome = 0;
-      let cumulativeExpense = 0;
-
-      filteredTransactions.forEach((transaction) => {
-        const date = new Date(transaction.date);
-        const day = date.getDate() - 1; // Adjusting for 0-based index
-
-        if (transaction.amount < 0) {
-          // income[day].value += Math.abs(transaction.amount);
-          cumulativeIncome += Math.abs(transaction.amount);
-          income[day].value = Number(cumulativeIncome.toFixed(2));
-        } else {
-          // expense[day].value += transaction.amount;
-          cumulativeExpense += transaction.amount;
-          expense[day].value = Number(cumulativeExpense.toFixed(2));
-        }
-      });
-
-      // Fill in cumulative values for days without transactions
-      for (let i = 1; i < lastDay; i++) {
-        if (income[i].value === 0) income[i].value = income[i - 1].value;
-        if (expense[i].value === 0) expense[i].value = expense[i - 1].value;
-      }
-
-      // console.log("income data: ", income);
-      // console.log("expense data: ", expense);
-
-      setIncomeData(income);
-      setExpenseData(expense);
-    } catch (error) {
-      console.log("Error in fetching transactions: ", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const [selectedTab, setSelectedTab] = useState("budget");
 
   const fetchChartData = async (selectedMonth) => {
     try {
@@ -144,16 +81,15 @@ const Analysis = () => {
   const fetchBudget = async (selectedMonth) => {
     try {
       const response = await getBudget(userId, selectedMonth);
+      console.log("response:", response);
     } catch (error) {
       console.log("Error in fetching budget: ", error);
     }
-  }
-
-
+  };
 
   useEffect(() => {
-    // fetchTransactionsDB();
-    fetchChartData(currMonth);    
+    fetchChartData(currMonth);
+    // fetchBudget(currMonth);
   }, []);
 
   const renderChart = () => {
@@ -196,25 +132,20 @@ const Analysis = () => {
             pointerConfig={{
               pointer1Color: "red",
               pointer2Color: "green",
-              // height: 0,
-              // width: 0,
-              radius: 2,
+              radius: 3,
               activatePointersOnLongPress: true,
               autoAdjustPointerLabelPosition: true,
+              pointerLabelWidth: 50,
               pointerLabelComponent: (items) => {
-                // console.log("test:: ", items);
                 return (
                   <>
                     <View
                       style={{
-                        width: 70,
                         backgroundColor: theme.secondary,
                         borderRadius: 4,
                         justifyContent: "center",
                         flex: 1,
                         alignItems: "center",
-                        // textAlign: 'center',
-                        // padding:16,
                       }}
                     >
                       <DefaultText style={{ color: theme.text }}>
@@ -224,14 +155,12 @@ const Analysis = () => {
                     <View
                       style={{
                         // height: 20,
-                        width: 70,
+                        // width: 70,
                         backgroundColor: theme.secondary,
                         borderRadius: 4,
                         justifyContent: "center",
                         flex: 1,
                         alignItems: "center",
-                        // textAlign: 'center',
-                        // paddingLeft:16,
                       }}
                     >
                       <DefaultText style={{ color: theme.text }}>
@@ -282,6 +211,54 @@ const Analysis = () => {
     );
   };
 
+  const renderBudget = () => {
+    return (
+      <>
+        <View style={{ margin: 10 }}>
+          <View style={styles.budgetGraphContainer}>
+            <View
+              style={[styles.budgetContainer, { alignItems: "flex-start" }]}
+            >
+              <DefaultText style={{ fontSize: 20 }}>
+                <DefaultText style={{ fontSize: 14 }}>£</DefaultText> {100}
+              </DefaultText>
+              <DefaultText>left to spend</DefaultText>
+            </View>
+            <View style={{ paddingVertical: 20, alignItems: "center" }}>
+              <CircularProgress
+                radius={40}
+                value={40}
+                duration={1000}
+                activeStrokeWidth={10}
+                activeStrokeColor={theme.text}
+                inActiveStrokeWidth={15}
+                inActiveStrokeColor={theme.secondary}
+                showProgressValue={false}
+              />
+            </View>
+            <View style={styles.budgetContainer}>
+              <DefaultText style={{ fontSize: 20 }}>
+                <DefaultText style={{ fontSize: 14 }}>£</DefaultText> {200}
+              </DefaultText>
+              <DefaultText>total budget</DefaultText>
+            </View>
+          </View>
+
+          <View style={styles.categoryContainer}>
+            <View>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("ManageBudgets")}
+                style={styles.buttonStyle}
+              >
+                <DefaultText style={styles.buttonText}>Manage budgets</DefaultText>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </>
+    );
+  };
+
   return (
     <>
       <View
@@ -289,29 +266,63 @@ const Analysis = () => {
           height: "92%",
         }}
       >
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={{ marginBottom: 10 }}>
-            <DefaultText style={{ fontSize: 30, textAlign: "center" }}>
-              Analysis
-            </DefaultText>
-          </View>
+        <View style={{ marginBottom: 10 }}>
+          <DefaultText style={{ fontSize: 30, textAlign: "center" }}>
+            Spending
+          </DefaultText>
+        </View>
 
-          <View>
-            <DefaultText style={{ textAlign: "center", marginBottom: 5 }}>
-              Expense vs Income
-            </DefaultText>
-            <View style={{ padding: 10 }}>{renderChart()}</View>
-          </View>
-
-          <View>
-            <DefaultText style={{ textAlign: "center", marginBottom: 5 }}>
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[styles.tab, selectedTab === "budget" && styles.activeTab]}
+            onPress={() => setSelectedTab("budget")}
+          >
+            <DefaultText
+              style={[
+                styles.tabText,
+                selectedTab === "budget" && styles.activeTabText,
+              ]}
+            >
               Budget
             </DefaultText>
-            <View style={{ padding: 10 }}>
+          </TouchableOpacity>
 
-            </View>
-          </View>
-        </ScrollView>
+          <TouchableOpacity
+            style={[styles.tab, selectedTab === "analysis" && styles.activeTab]}
+            onPress={() => setSelectedTab("analysis")}
+          >
+            <DefaultText
+              style={[
+                styles.tabText,
+                selectedTab === "analysis" && styles.activeTabText,
+              ]}
+            >
+              Analysis
+            </DefaultText>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.contentContainer}>
+          {selectedTab === "budget" ? (
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <View>
+                <DefaultText style={{ textAlign: "center", marginBottom: 5 }}>
+                  Budget
+                </DefaultText>
+                <View style={{ padding: 10 }}>{renderBudget()}</View>
+              </View>
+            </ScrollView>
+          ) : (
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <View>
+                <DefaultText style={{ textAlign: "center", marginBottom: 5 }}>
+                  Expense vs Income
+                </DefaultText>
+                <View style={{ padding: 10 }}>{renderChart()}</View>
+              </View>
+            </ScrollView>
+          )}
+        </View>
       </View>
       <FooterList />
     </>
@@ -319,7 +330,71 @@ const Analysis = () => {
 };
 
 const createStyles = (theme) => {
-  return StyleSheet.create({});
+  return StyleSheet.create({
+    tabContainer: {
+      flexDirection: "row",
+      backgroundColor: theme.secondary,
+      borderRadius: 25,
+      padding: 5,
+      marginHorizontal: 20,
+    },
+    tab: {
+      flex: 1,
+      alignItems: "center",
+      paddingVertical: 10,
+      borderRadius: 20,
+    },
+    activeTab: {
+      backgroundColor: theme.primary2,
+    },
+    tabText: {
+      color: theme.text,
+      fontWeight: "bold",
+    },
+    activeTabText: {
+      color: theme.surface,
+    },
+    contentContainer: {
+      marginTop: 20,
+      // alignItems: "center",
+      // borderWidth: 1,
+    },
+    budgetGraphContainer: {
+      // margin: 15,
+      borderWidth: 1,
+      borderRadius: 10,
+      backgroundColor: theme.surface,
+      borderColor: theme.text2,
+      paddingVertical: 5,
+      paddingHorizontal: 20,
+      alignItems: "center",
+      flexDirection: "row",
+      justifyContent: "space-between",
+    },
+    budgetContainer: {
+      flexDirection: "column",
+      justifyContent: "space-between",
+      alignItems: "flex-end",
+      width: "25%",
+    },
+    categoryContainer: {},
+    buttonStyle: {
+      backgroundColor: theme.surface,
+      height: 50,
+      margin: 20,
+      justifyContent: "center",
+      borderRadius: 30,
+      borderWidth: 1,
+      borderColor: theme.text2,
+      // width: "80%",
+    },
+    buttonText: {
+      fontSize: 15,
+      textAlign: "center",
+      color: theme.text,
+      textTransform: "capitalize",
+    }
+  });
 };
 
 export default Analysis;

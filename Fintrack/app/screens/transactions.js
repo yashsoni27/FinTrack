@@ -75,12 +75,6 @@ const Transactions = () => {
   return (
     <>
       <View style={{ height: "90%" }}>
-        {/* <ScrollView
-          style={{
-            backgroundColor: theme.background,
-          }}
-          showsVerticalScrollIndicator={false}
-        > */}
         <View>
           <DefaultText style={{ fontSize: 30, textAlign: "center" }}>
             Transactions
@@ -117,15 +111,12 @@ const Transactions = () => {
               return (
                 <View
                   style={{
-                    // height: 20,
                     width: 70,
                     backgroundColor: theme.secondary,
                     borderRadius: 4,
                     justifyContent: "center",
                     flex: 1,
                     alignItems: "center",
-                    // textAlign: 'center',
-                    // paddingLeft:16,
                   }}
                 >
                   <DefaultText style={{ color: theme.text }}>

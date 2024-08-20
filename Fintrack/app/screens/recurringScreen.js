@@ -185,9 +185,9 @@ const RecurringScreen = () => {
               value={amount.percent}
               duration={1000}
               activeStrokeWidth={10}
-              activeStrokeColor={theme.primary}
+              activeStrokeColor={theme.text}
               inActiveStrokeWidth={15}
-              inActiveStrokeColor={theme.text2}
+              inActiveStrokeColor={theme.secondary}
               showProgressValue={false}
             />
           </View>

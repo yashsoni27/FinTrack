@@ -6,13 +6,13 @@ const budgetSchema = mongoose.Schema({
   year: String,
   budget: Number,
   spent: Number,
-  categories: {
-    Shopping: { spent: Number, budget: Number },
-    Entertainment: { spent: Number, budget: Number },
-    FoodAndDrink: { spent: Number, budget: Number },
-    Transportation: { spent: Number, budget: Number },
-    Home: { spent: Number, budget: Number },
-    Other: { spent: Number, budget: Number },
+  category: {
+    shopping: { spent: Number, budget: Number },
+    entertainment: { spent: Number, budget: Number },
+    foodAndDrink: { spent: Number, budget: Number },
+    transportation: { spent: Number, budget: Number },
+    home: { spent: Number, budget: Number },
+    other: { spent: Number, budget: Number },
   },
 });
 
