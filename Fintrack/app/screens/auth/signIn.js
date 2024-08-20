@@ -40,28 +40,14 @@ const SignIn = ({ navigation }) => {
   };
 
   return (
-    // <View style={{ backgroundColor: theme.background }}>
     <KeyboardAwareScrollView contentContainerStyle={styles.container}>
-      <DefaultText
-        style={{
-          fontSize: 30,
-          textAlign: "left",
-          marginLeft: 30,
-          color: theme.text,
-          marginTop: 150,
-        }}
-      >
-        Welcome back
-      </DefaultText>
+      <DefaultText style={styles.headerText}>Welcome back</DefaultText>
       <View>
         <View style={{}}>
           <View style={styles.inputContainer}>
-            {/* <DefaultText style={{ fontSize: 16, color: theme.text }}>
-              Email
-            </DefaultText> */}
             <FontAwesome5Icon
               style={{ padding: 10 }}
-              name="user"
+              name="envelope"
               size={20}
               color="black"
             />
@@ -76,12 +62,9 @@ const SignIn = ({ navigation }) => {
             />
           </View>
           <View style={styles.inputContainer}>
-            {/* <DefaultText style={{ fontSize: 16, color: theme.text }}>
-              Password
-            </DefaultText> */}
             <FontAwesome5Icon
               style={{ padding: 10 }}
-              name="key"
+              name="lock"
               size={20}
               color="black"
             />
@@ -108,7 +91,7 @@ const SignIn = ({ navigation }) => {
             </DefaultText>
           </View>
         </View>
-        <View style={{marginVertical: 30}}>
+        <View style={{ marginVertical: 30 }}>
           <TouchableOpacity onPress={handleSubmit} style={styles.buttonStyle}>
             <DefaultText style={styles.buttonText}>Log In</DefaultText>
           </TouchableOpacity>
@@ -119,14 +102,22 @@ const SignIn = ({ navigation }) => {
           </View>
           <TouchableOpacity
             onPress={() => navigation.navigate("SignUp")}
-            style={styles.buttonStyle}
+            style={[
+              styles.buttonStyle,
+              {
+                backgroundColor: theme.background,
+                borderWidth: 1,
+                borderColor: theme.text,
+              },
+            ]}
           >
-            <DefaultText style={styles.buttonText}>Sign Up</DefaultText>
+            <DefaultText style={[styles.buttonText, { color: theme.text }]}>
+              Sign Up
+            </DefaultText>
           </TouchableOpacity>
         </View>
       </View>
     </KeyboardAwareScrollView>
-    // </View>
   );
 };
 
@@ -138,9 +129,17 @@ const createStyles = (theme) => {
       // alignItems: "center",
       paddingHorizontal: 10,
     },
+    headerText: {
+      fontSize: 30,
+      fontWeight: "bold",
+      textAlign: "left",
+      marginLeft: 30,
+      color: theme.text,
+      marginTop: 150,
+    },
     inputContainer: {
       marginHorizontal: 30,
-      marginVertical: 10, 
+      marginVertical: 10,
       // flex: 1,
       flexDirection: "row",
       justifyContent: "center",

@@ -75,110 +75,116 @@ const Transactions = () => {
   return (
     <>
       <View style={{ height: "90%" }}>
-        <ScrollView
+        {/* <ScrollView
           style={{
             backgroundColor: theme.background,
           }}
           showsVerticalScrollIndicator={false}
+        > */}
+        <View>
+          <DefaultText style={{ fontSize: 30, textAlign: "center" }}>
+            Transactions
+          </DefaultText>
+        </View>
+
+        <LineChart
+          data={graphData}
+          width={Dimensions.get("window").width - 35}
+          curved
+          curvature={0.02}
+          height={150}
+          initialSpacing={10}
+          endSpacing={0}
+          spacing={11}
+          color1="green"
+          thickness={2}
+          areaChart
+          startFillColor="rgba(34,193,195,0.2)" // Start of gradient color
+          endFillColor="rgba(34,193,195,0)" // End of gradient color
+          startOpacity={0.5} // Starting opacity for gradient fill
+          endOpacity={0}
+          hideRules
+          hideDataPoints
+          hideYAxisText
+          yAxisThickness={0}
+          pointerConfig={{
+            pointerColor: "green",
+            radius: 3,
+            pointerStripWidth: 2,
+            activatePointersOnLongPress: true,
+            autoAdjustPointerLabelPosition: true,
+            pointerLabelComponent: (items) => {
+              return (
+                <View
+                  style={{
+                    // height: 20,
+                    width: 70,
+                    backgroundColor: theme.secondary,
+                    borderRadius: 4,
+                    justifyContent: "center",
+                    flex: 1,
+                    alignItems: "center",
+                    // textAlign: 'center',
+                    // paddingLeft:16,
+                  }}
+                >
+                  <DefaultText style={{ color: theme.text }}>
+                    {items[0].value}
+                  </DefaultText>
+                </View>
+              );
+            },
+          }}
+          // hideAxesAndRules
+          // showVerticalLines
+          // verticalLinesColor="#e0e0e0" // Color of grid lines
+
+          // focusEnabled={true}
+          // showDataPointOnFocus={true}
+        />
+
+        <View
+          style={{
+            marginTop: 20,
+            margin: 10,
+            padding: 10,
+            // borderWidth: 1,
+          }}
         >
-          <View>
-            <DefaultText style={{ fontSize: 30, textAlign: "center" }}>
-              Transactions
-            </DefaultText>
-          </View>
-
-          <LineChart
-            data={graphData}
-            width={Dimensions.get("window").width - 35}
-            curved
-            curvature={0.02}
-            height={150}
-            initialSpacing={10}
-            endSpacing={0}
-            spacing={11}
-            color1="green"
-            thickness={2}
-            areaChart
-            startFillColor="rgba(34,193,195,0.2)" // Start of gradient color
-            endFillColor="rgba(34,193,195,0)" // End of gradient color
-            startOpacity={0.5} // Starting opacity for gradient fill
-            endOpacity={0}
-            hideRules
-            hideDataPoints
-            hideYAxisText
-            yAxisTextStyle={{ color: "gray" }}
-            pointerConfig={{
-              pointerColor: "green",
-              radius: 3,
-              // pointerStripHeight: 100,
-              pointerStripWidth: 2,
-              activatePointersOnLongPress: true,
-              autoAdjustPointerLabelPosition: true,
-              pointerLabelComponent: (items) => {
-                return (
-                  <View
-                    style={{
-                      // height: 20,
-                      width: 70,
-                      backgroundColor: "#282C3E",
-                      borderRadius: 4,
-                      justifyContent: "center",
-                      flex: 1,
-                      alignItems: "center",
-                      // textAlign: 'center',
-                      // paddingLeft:16,
-                    }}
-                  >
-                    <Text style={{ color: "white", fontWeight: "bold" }}>
-                      {items[0].value}
-                    </Text>
-                  </View>
-                );
-              },
-            }}
-            // hideAxesAndRules
-            // showVerticalLines
-            // verticalLinesColor="#e0e0e0" // Color of grid lines
-
-            // focusEnabled={true}
-            // showDataPointOnFocus={true}
-          />
-
           <View
             style={{
-              marginTop: 20,
-              margin: 10,
-              padding: 10,
-              // borderWidth: 1,
+              marginVertical: 10,
+              flexDirection: "row",
+              justifyContent: "space-between",
             }}
           >
-            <View
-              style={{
-                marginVertical: 10,
-                flexDirection: "row",
-                justifyContent: "space-between",
-              }}
-            >
-              <FontAwesome5Icon
-                style={styles.monthButton}
-                name="angle-left"
-                size={20}
-                color=""
-                onPress={() => setCurrMonth(currMonth - 1)}
-              />
-              <DefaultText style={{ fontSize: 20, textAlign: "center" }}>
-                History for {date.toLocaleString("default", { month: "short" })}
-              </DefaultText>
-              <FontAwesome5Icon
-                style={styles.monthButton}
-                name="angle-right"
-                size={20}
-                color=""
-                disabled={date.toISOString() >= new Date().toISOString()}
-                onPress={() => setCurrMonth(currMonth + 1)}
-              />
-            </View>
+            <FontAwesome5Icon
+              style={styles.monthButton}
+              name="angle-left"
+              size={20}
+              // color=""
+              onPress={() => setCurrMonth(currMonth - 1)}
+            />
+            <DefaultText style={{ fontSize: 20, textAlign: "center" }}>
+              History for {date.toLocaleString("default", { month: "short" })}
+            </DefaultText>
+            <FontAwesome5Icon
+              style={styles.monthButton}
+              name="angle-right"
+              size={20}
+              // color=""
+              disabled={date.toISOString() >= new Date().toISOString()}
+              onPress={() => setCurrMonth(currMonth + 1)}
+            />
+          </View>
 
+          <ScrollView
+            style={{
+              backgroundColor: theme.background,
+              height: "65%"
+            }}
+            showsVerticalScrollIndicator={false}
+          >
             {/* Beautify this View  */}
             <View style={{ marginTop: 10 }}>
               {transactions.map((transaction, index) => (
@@ -245,8 +251,9 @@ const Transactions = () => {
                 </View>
               ))}
             </View>
-          </View>
-        </ScrollView>
+          </ScrollView>
+        </View>
+        {/* </ScrollView> */}
       </View>
 
       <View style={{ position: "absolute", bottom: 85, right: 20 }}>
@@ -258,7 +265,7 @@ const Transactions = () => {
             navigation.navigate("Add");
           }}
         >
-          <Text style={{ color: "#fff", fontSize: 24 }}>+</Text>
+          <DefaultText style={{ color: theme.text, fontSize: 24 }}>+</DefaultText>
         </TouchableOpacity>
       </View>
 
@@ -273,14 +280,16 @@ const createStyles = (theme) => {
       width: 50,
       height: 50,
       borderRadius: 30,
-      backgroundColor: theme.primary2, // FAB color
+      backgroundColor: theme.primary2, // FAB color      
       justifyContent: "center",
       alignItems: "center",
+      // alignContent: "center",
     },
     monthButton: {
-      backgroundColor: theme.secondary,
+      backgroundColor: theme.primary2,
       padding: 10,
       borderRadius: 30,
+      color: theme.text,
     },
   });
 };

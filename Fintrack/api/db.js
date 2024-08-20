@@ -61,3 +61,13 @@ export const getChartData = async (userId, count = 0, month = null) => {
     throw error;
   }
 }
+
+export const getBudget = async (userId, month = null) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/db/budget/get`, { userId, month });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching budget: ", error);
+    throw error;
+  }
+}

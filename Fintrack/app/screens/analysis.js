@@ -1,21 +1,31 @@
-import { View, Text, SafeAreaView, ScrollView, Dimensions } from "react-native";
+import {
+  View,
+  Text,
+  SafeAreaView,
+  ScrollView,
+  Dimensions,
+  StyleSheet,
+} from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import FooterList from "../components/footer/footerList";
 import DefaultText from "../components/defaultText";
 import { AuthContext } from "../context/auth";
 import { useTheme } from "../context/themeContext";
 import { LineChart } from "react-native-gifted-charts";
-import { getChartData, getTransactionsDb } from "../../api/db";
+import { getBudget, getChartData, getTransactionsDb } from "../../api/db";
 
 const Analysis = () => {
   const [state, setState] = useContext(AuthContext);
   const { theme } = useTheme();
+  const [currMonth, setCurrMonth] = useState(new Date().getMonth() + 1);
   const [incomeData, setIncomeData] = useState([]);
   const [expenseData, setExpenseData] = useState([]);
+  const [pctChange, setPctChange] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-
+  const styles = createStyles(theme);
   const userId = state.user.userId;
 
+  // REDUNDANT - placing the logic in server side
   const fetchTransactionsDB = async (selectedMonth = 7) => {
     try {
       setIsLoading(true);
@@ -82,7 +92,7 @@ const Analysis = () => {
     }
   };
 
-  const fetchChartData = async (selectedMonth = 8) => {
+  const fetchChartData = async (selectedMonth) => {
     try {
       setIsLoading(true);
       const response = await getChartData(userId, 0, selectedMonth);
@@ -96,36 +106,54 @@ const Analysis = () => {
 
       let currMonthIncom = currMonthData.income;
       let currMonthExpense = currMonthData.expense;
-      console.log("currMonthIncome: ", currMonthIncom.slice(-1)[0].value);
-      console.log("currMonthExpense: ", currMonthExpense.slice(-1)[0].value);
+      // console.log("currMonthIncome: ", currMonthIncom.slice(-1)[0].value);
+      // console.log("currMonthExpense: ", currMonthExpense.slice(-1)[0].value);
 
       let prevMonthIncome = prevMonthData.income;
       let prevMonthExpense = prevMonthData.expense;
-      console.log("prevMonthIncome: ", prevMonthIncome.slice(-1)[0].value);
-      console.log("prevMonthExpense: ", prevMonthExpense.slice(-1)[0].value);
+      // console.log("prevMonthIncome: ", prevMonthIncome.slice(-1)[0].value);
+      // console.log("prevMonthExpense: ", prevMonthExpense.slice(-1)[0].value);
 
       const currMonthIncomeValue = currMonthIncom.slice(-1)[0].value;
       const currMonthExpenseValue = currMonthExpense.slice(-1)[0].value;
       const prevMonthIncomeValue = prevMonthIncome.slice(-1)[0].value;
       const prevMonthExpenseValue = prevMonthExpense.slice(-1)[0].value;
 
-      const incomeChange = ((currMonthIncomeValue - prevMonthIncomeValue) / prevMonthIncomeValue) * 100;
-      const expenseChange = ((currMonthExpenseValue - prevMonthExpenseValue) / prevMonthExpenseValue) * 100;
+      const incomeChange =
+        ((currMonthIncomeValue - prevMonthIncomeValue) / prevMonthIncomeValue) *
+        100;
+      const expenseChange =
+        ((currMonthExpenseValue - prevMonthExpenseValue) /
+          prevMonthExpenseValue) *
+        100;
 
-      console.log("Income percentage change:", incomeChange.toFixed(2) + "%");
-      console.log("Expense percentage change:", expenseChange.toFixed(2) + "%");
-
-
+      // console.log("Income percentage change:", incomeChange.toFixed(2) + "%");
+      // console.log("Expense percentage change:", expenseChange.toFixed(2) + "%");
+      setPctChange({
+        incomepct: incomeChange.toFixed(2),
+        expensepct: expenseChange.toFixed(2),
+      });
+      // console.log("pctChange: ", pctChange);
     } catch (error) {
       console.log("Error in fetching chart data: ", error);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const fetchBudget = async (selectedMonth) => {
+    try {
+      const response = await getBudget(userId, selectedMonth);
+    } catch (error) {
+      console.log("Error in fetching budget: ", error);
+    }
   }
+
+
 
   useEffect(() => {
     // fetchTransactionsDB();
-    fetchChartData();
+    fetchChartData(currMonth);    
   }, []);
 
   const renderChart = () => {
@@ -164,14 +192,56 @@ const Analysis = () => {
             hideYAxisText
             yAxisOffset={1}
             disableScroll={true}
-            // pointerConfig={{
-            //   pointer1Color: "red",
-            //   pointer2Color: "green",
-            //   height: 0,
-            //   width: 0,
-            //   radius: 2,
-            // }}
             hideAxesAndRules
+            pointerConfig={{
+              pointer1Color: "red",
+              pointer2Color: "green",
+              // height: 0,
+              // width: 0,
+              radius: 2,
+              activatePointersOnLongPress: true,
+              autoAdjustPointerLabelPosition: true,
+              pointerLabelComponent: (items) => {
+                // console.log("test:: ", items);
+                return (
+                  <>
+                    <View
+                      style={{
+                        width: 70,
+                        backgroundColor: theme.secondary,
+                        borderRadius: 4,
+                        justifyContent: "center",
+                        flex: 1,
+                        alignItems: "center",
+                        // textAlign: 'center',
+                        // padding:16,
+                      }}
+                    >
+                      <DefaultText style={{ color: theme.text }}>
+                        {items[0].value}
+                      </DefaultText>
+                    </View>
+                    <View
+                      style={{
+                        // height: 20,
+                        width: 70,
+                        backgroundColor: theme.secondary,
+                        borderRadius: 4,
+                        justifyContent: "center",
+                        flex: 1,
+                        alignItems: "center",
+                        // textAlign: 'center',
+                        // paddingLeft:16,
+                      }}
+                    >
+                      <DefaultText style={{ color: theme.text }}>
+                        {items[1].value}
+                      </DefaultText>
+                    </View>
+                  </>
+                );
+              },
+            }}
           />
         </View>
         <View
@@ -180,17 +250,32 @@ const Analysis = () => {
             justifyContent: "space-around",
             flex: 1,
             margin: 10,
-            borderWidth: 1,
-            borderColor: "black",
+            // borderWidth: 1,
           }}
         >
-          <View style={{ padding:10, margin: 10, borderWidth: 1, borderColor: "black" }}>
-            <DefaultText>Income</DefaultText>
+          <View
+            style={{
+              padding: 10,
+              margin: 10,
+              // borderWidth: 1,
+              alignItems: "center",
+            }}
+          >
+            <DefaultText style={{ fontSize: 18 }}>Income</DefaultText>
             <DefaultText>£ {incomeData.slice(-1)[0].value}</DefaultText>
+            <DefaultText>{pctChange.incomepct}%</DefaultText>
           </View>
-          <View style={{ padding:10, margin: 10, borderWidth: 1, borderColor: "black" }}>
-            <DefaultText>Expense</DefaultText>
+          <View
+            style={{
+              padding: 10,
+              margin: 10,
+              // borderWidth: 1,
+              alignItems: "center",
+            }}
+          >
+            <DefaultText style={{ fontSize: 18 }}>Expense</DefaultText>
             <DefaultText>£ {expenseData.slice(-1)[0].value}</DefaultText>
+            <DefaultText>{pctChange.expensepct}%</DefaultText>
           </View>
         </View>
       </>
@@ -212,13 +297,18 @@ const Analysis = () => {
           </View>
 
           <View>
-            <DefaultText
-              style={{ fontSize: 15, textAlign: "center", marginBottom: 5 }}
-            >
+            <DefaultText style={{ textAlign: "center", marginBottom: 5 }}>
               Expense vs Income
             </DefaultText>
+            <View style={{ padding: 10 }}>{renderChart()}</View>
+          </View>
+
+          <View>
+            <DefaultText style={{ textAlign: "center", marginBottom: 5 }}>
+              Budget
+            </DefaultText>
             <View style={{ padding: 10 }}>
-              {renderChart()}              
+
             </View>
           </View>
         </ScrollView>
@@ -226,6 +316,10 @@ const Analysis = () => {
       <FooterList />
     </>
   );
+};
+
+const createStyles = (theme) => {
+  return StyleSheet.create({});
 };
 
 export default Analysis;
