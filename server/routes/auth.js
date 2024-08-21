@@ -9,7 +9,7 @@ import {
 
 const router = express.Router();
 
-router.get("/auth", (req, res) => {
+router.get("/", (req, res) => {
   return res.json({
     data: "Hello from auth",
   });

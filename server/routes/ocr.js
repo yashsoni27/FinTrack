@@ -6,7 +6,7 @@ const upload = multer({ dest: "uploads/" });
 
 const router = express.Router();
 
-router.get("/ocr", (req, res) => {
+router.get("/", (req, res) => {
   return res.json({
     data: "Hello from OCR API",
   });

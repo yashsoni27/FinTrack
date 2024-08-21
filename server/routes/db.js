@@ -11,9 +11,9 @@ import {
 
 const router = express.Router();
 
-router.get("/db", (req, res) => {
+router.get("/", (req, res) => {
   return res.json({
-    data: "Hello from Plaid API",
+    data: "Hello from DB",
   });
 });
 

@@ -11,7 +11,7 @@ import PlaidLink from "react-native-plaid-link-sdk";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { createLinkToken, exchangePublicToken } from "../../api/plaidAPI";
 import { AuthContext } from "../context/auth";
-import { useTheme, themes } from "../context/themeContext";
+import { useTheme } from "../context/themeContext";
 
 const AccountSlider = ({ accounts, onAddAccountSuccess }) => {
   const [state, setState] = useContext(AuthContext);
