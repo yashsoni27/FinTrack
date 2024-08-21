@@ -341,9 +341,8 @@ export const getBudget = async (request, response) => {
       year: currentYear,
     });
 
-    // console.log(budgetResponse);
     if (budgetResponse.length > 0) {
-      budgetResponse[0].spent = transactionResponse[0].totalSpent;
+      budgetResponse[0].spent = transactionResponse[0].total;
       budgetResponse[0].category.shopping.spent = transactionResponse[0].shopping;
       budgetResponse[0].category.entertainment.spent = transactionResponse[0].entertainment;
       budgetResponse[0].category.foodAndDrink.spent = transactionResponse[0].foodAndDrink;
@@ -351,7 +350,7 @@ export const getBudget = async (request, response) => {
       budgetResponse[0].category.home.spent = transactionResponse[0].home;
       budgetResponse[0].category.other.spent = transactionResponse[0].other;
     }
-
+    
     response.json(budgetResponse);
   } catch (error) {
     console.error("Error fetching budget: ", error);

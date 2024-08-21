@@ -19,15 +19,19 @@ const Analysis = () => {
   const navigation = useNavigation();
   const [state, setState] = useContext(AuthContext);
   const { theme } = useTheme();
+  const styles = createStyles(theme);
+  const [isLoading, setIsLoading] = useState(true);
   const [currMonth, setCurrMonth] = useState(new Date().getMonth() + 1);
+
+  const [selectedTab, setSelectedTab] = useState("budget");
+  
+  const [budgets, setBudgets] = useState({});
+
   const [incomeData, setIncomeData] = useState([]);
   const [expenseData, setExpenseData] = useState([]);
   const [pctChange, setPctChange] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
-  const styles = createStyles(theme);
+  
   const userId = state.user.userId;
-
-  const [selectedTab, setSelectedTab] = useState("budget");
 
   const fetchChartData = async (selectedMonth) => {
     try {
@@ -81,15 +85,17 @@ const Analysis = () => {
   const fetchBudget = async (selectedMonth) => {
     try {
       const response = await getBudget(userId, selectedMonth);
-      console.log("response:", response);
+      setBudgets(response[0]);
+      console.log(budgets);
     } catch (error) {
-      console.log("Error in fetching budget: ", error);
+      console.log("Error in fetching budget:  ", error);
     }
   };
+  
 
   useEffect(() => {
     fetchChartData(currMonth);
-    // fetchBudget(currMonth);
+    fetchBudget(currMonth);
   }, []);
 
   const renderChart = () => {
@@ -220,14 +226,15 @@ const Analysis = () => {
               style={[styles.budgetContainer, { alignItems: "flex-start" }]}
             >
               <DefaultText style={{ fontSize: 20 }}>
-                <DefaultText style={{ fontSize: 14 }}>£</DefaultText> {100}
+                <DefaultText style={{ fontSize: 14 }}>£</DefaultText> {(budgets.budget - budgets.spent) < 0 ? 0 : (budgets.budget - budgets.spent)}
               </DefaultText>
               <DefaultText>left to spend</DefaultText>
             </View>
             <View style={{ paddingVertical: 20, alignItems: "center" }}>
               <CircularProgress
                 radius={40}
-                value={40}
+                value={(budgets.spent > budgets.budget) ? budgets.budget : budgets.spent}
+                maxValue={budgets.budget}
                 duration={1000}
                 activeStrokeWidth={10}
                 activeStrokeColor={theme.text}
@@ -238,7 +245,7 @@ const Analysis = () => {
             </View>
             <View style={styles.budgetContainer}>
               <DefaultText style={{ fontSize: 20 }}>
-                <DefaultText style={{ fontSize: 14 }}>£</DefaultText> {200}
+                <DefaultText style={{ fontSize: 14 }}>£</DefaultText> {budgets.budget}
               </DefaultText>
               <DefaultText>total budget</DefaultText>
             </View>

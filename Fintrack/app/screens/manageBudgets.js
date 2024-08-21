@@ -33,7 +33,6 @@ const ManageBudgets = () => {
   const fetchBudget = async (selectedMonth) => {
     try {
       const response = await getBudget(userId, selectedMonth);
-      console.log("budget response: ", response);
       if (response.length > 0) {
         setBudgets({
           totalSpending: response[0].budget || 0,
@@ -61,7 +60,6 @@ const ManageBudgets = () => {
 
   useEffect(() => {
     fetchBudget(currMonth);
-    console.log(budgets);
   }, []);
 
   return (

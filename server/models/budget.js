@@ -4,8 +4,8 @@ const budgetSchema = mongoose.Schema({
   userId: String,
   month: String,
   year: String,
-  budget: Number,
-  spent: Number,
+  budget: { type: Number, default: 0 },
+  spent: { type: Number, default: 0 },
   category: {
     shopping: { spent: Number, budget: Number },
     entertainment: { spent: Number, budget: Number },
