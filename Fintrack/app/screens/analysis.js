@@ -100,33 +100,35 @@ const Analysis = () => {
         setBudgets({
           spent: response[0].spent || 0,
           budget: response[0].budget || 0,
-          shopping: {
+          category: {
+          Shopping: {
             budget: response[0].category.shopping.budget,
             spent: response[0].category.shopping.spent,
           },
-          entertainment: {
+          Entertainment: {
             budget: response[0].category.entertainment.budget,
             spent: response[0].category.entertainment.spent,
           },
-          foodAndDrink: {
+          "Food & Drink": {
             budget: response[0].category.foodAndDrink.budget,
             spent: response[0].category.foodAndDrink.spent,
           },
-          transportation: {
+          Transportation: {
             budget: response[0].category.transportation.budget,
             spent: response[0].category.transportation.spent,
           },
-          home: {
+          Home: {
             budget: response[0].category.home.budget,
             spent: response[0].category.home.spent,
           },
-          other: {
+          Other: {
             budget: response[0].category.other.budget,
             spent: response[0].category.other.spent,
           },
+        }
         });
       }
-      console.log("budgets: ", budgets);
+      // console.log("budgets: ", budgets);
     } catch (error) {
       console.log("Error in fetching budget:  ", error);
     } finally {
@@ -304,169 +306,30 @@ const Analysis = () => {
           </View>
 
           <View style={styles.categoryContainer}>
-            <View style={[styles.row, {marginBottom: 12}]}>
+            <View style={[styles.row, { marginBottom: 12 }]}>
               <View></View>
               <DefaultText style={{ fontWeight: "bold" }}>SPENT</DefaultText>
               <DefaultText style={{ fontWeight: "bold" }}>BUDGET</DefaultText>
             </View>
-            <View style={styles.row}>
-              <DefaultText>Shopping</DefaultText>
-              <View style={styles.progressContainer}>
-                <DefaultText style={styles.budgetAmount}>
-                  £{Math.round(budgets.shopping.spent)}
-                </DefaultText>
-                <Progress.Bar
-                  progress={
-                    budgets.shopping.spent / budgets.shopping.budget > 1
-                      ? 1
-                      : budgets.shopping.spent / budgets.shopping.budget
-                  }
-                  color={
-                    budgets.shopping.spent / budgets.shopping.budget > 1
-                      ? theme.danger
-                      : theme.success
-                  }
-                  width={120}
-                  style={{ marginHorizontal: 10 }}
-                />
-                <DefaultText style={styles.budgetAmount}>
-                  £{budgets.shopping.budget}
-                </DefaultText>
+            {Object.entries(budgets.category).map(([category, { spent, budget }]) => (
+              <View key={category} style={styles.row}>
+                <DefaultText>{category}</DefaultText>
+                <View style={styles.progressContainer}>
+                  <DefaultText style={styles.budgetAmount}>
+                    £ {Math.round(spent)}
+                  </DefaultText>
+                  <Progress.Bar
+                    progress={spent / budget > 1 ? 1 : spent / budget}
+                    color={spent / budget > 1 ? theme.danger : theme.success}
+                    width={120}
+                    style={{ marginHorizontal: 10 }}
+                  />
+                  <DefaultText style={styles.budgetAmount}>
+                    £ {budget}
+                  </DefaultText>
+                </View>
               </View>
-            </View>
-            <View style={styles.row}>
-              <DefaultText>Entertainment</DefaultText>
-              <View style={styles.progressContainer}>
-                <DefaultText style={styles.budgetAmount}>
-                  £{Math.round(budgets.entertainment.spent)}
-                </DefaultText>
-                <Progress.Bar
-                  progress={
-                    budgets.entertainment.spent / budgets.entertainment.budget >
-                    1
-                      ? 1
-                      : budgets.entertainment.spent /
-                        budgets.entertainment.budget
-                  }
-                  color={
-                    budgets.entertainment.spent / budgets.entertainment.budget >
-                    1
-                      ? theme.danger
-                      : theme.success
-                  }
-                  width={120}
-                  style={{ marginHorizontal: 10 }}
-                />
-                <DefaultText style={styles.budgetAmount}>
-                  £{budgets.entertainment.budget}
-                </DefaultText>
-              </View>
-            </View>
-            <View style={styles.row}>
-              <DefaultText>Food & Drink</DefaultText>
-              <View style={styles.progressContainer}>
-                <DefaultText style={styles.budgetAmount}>
-                  £{Math.round(budgets.foodAndDrink.spent)}
-                </DefaultText>
-                <Progress.Bar
-                  progress={
-                    budgets.foodAndDrink.spent / budgets.foodAndDrink.budget > 1
-                      ? 1
-                      : budgets.foodAndDrink.spent / budgets.foodAndDrink.budget
-                  }
-                  color={
-                    budgets.foodAndDrink.spent / budgets.foodAndDrink.budget > 1
-                      ? theme.danger
-                      : theme.success
-                  }
-                  width={120}
-                  style={{ marginHorizontal: 10 }}
-                />
-                <DefaultText style={styles.budgetAmount}>
-                  £{budgets.foodAndDrink.budget}
-                </DefaultText>
-              </View>
-            </View>
-            <View style={styles.row}>
-              <DefaultText>Transportation</DefaultText>
-              <View style={styles.progressContainer}>
-                <DefaultText style={styles.budgetAmount}>
-                  £{Math.round(budgets.transportation.spent)}
-                </DefaultText>
-                <Progress.Bar
-                  progress={
-                    budgets.transportation.spent /
-                      budgets.transportation.budget >
-                    1
-                      ? 1
-                      : budgets.transportation.spent /
-                        budgets.transportation.budget
-                  }
-                  color={
-                    budgets.transportation.spent /
-                      budgets.transportation.budget >
-                    1
-                      ? theme.danger
-                      : theme.success
-                  }
-                  width={120}
-                  style={{ marginHorizontal: 10 }}
-                />
-                <DefaultText style={styles.budgetAmount}>
-                  £{budgets.transportation.budget}
-                </DefaultText>
-              </View>
-            </View>
-            <View style={styles.row}>
-              <DefaultText>Home</DefaultText>
-              <View style={styles.progressContainer}>
-                <DefaultText style={styles.budgetAmount}>
-                  £{Math.round(budgets.home.spent)}
-                </DefaultText>
-                <Progress.Bar
-                  progress={
-                    budgets.home.spent / budgets.home.budget > 1
-                      ? 1
-                      : budgets.home.spent / budgets.home.budget
-                  }
-                  color={
-                    budgets.home.spent / budgets.home.budget > 1
-                      ? theme.danger
-                      : theme.success
-                  }
-                  width={120}
-                  style={{ marginHorizontal: 10 }}
-                />
-                <DefaultText style={styles.budgetAmount}>
-                  £{budgets.home.budget}
-                </DefaultText>
-              </View>
-            </View>
-            <View style={styles.row}>
-              <DefaultText>Other</DefaultText>
-              <View style={styles.progressContainer}>
-                <DefaultText style={styles.budgetAmount}>
-                  £{Math.round(budgets.other.spent)}
-                </DefaultText>
-                <Progress.Bar
-                  progress={
-                    budgets.other.spent / budgets.other.budget > 1
-                      ? 1
-                      : budgets.other.spent / budgets.other.budget
-                  }
-                  color={
-                    budgets.other.spent / budgets.other.budget > 1
-                      ? theme.danger
-                      : theme.success
-                  }
-                  width={120}
-                  style={{ marginHorizontal: 10 }}
-                />
-                <DefaultText style={styles.budgetAmount}>
-                  £{budgets.other.budget}
-                </DefaultText>
-              </View>
-            </View>
+            ))}
           </View>
 
           <View style={{ marginVertical: 5 }}>
