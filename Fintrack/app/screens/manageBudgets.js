@@ -3,11 +3,13 @@ import React, { useContext, useEffect, useState } from "react";
 import DefaultText from "../components/defaultText";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { useTheme } from "../context/themeContext";
+import { useNavigation } from "@react-navigation/native";
 import { AuthContext } from "../context/auth";
 import { getBudget, setBudget } from "../../api/db";
 
 const ManageBudgets = () => {
   const [state, setState] = useContext(AuthContext);
+  const navigation = useNavigation();
   const { theme } = useTheme();
   const styles = createStyles(theme);
   const [currMonth, setCurrMonth] = useState(new Date().getMonth() + 1);
@@ -66,7 +68,7 @@ const ManageBudgets = () => {
     <>
       <View style={{ margin: 10 }}>
         <View style={styles.header}>
-          <FontAwesome5Icon name="times" size={18} color="black" />
+          <FontAwesome5Icon name="times" size={18} color={theme.text} onPress={() => navigation.goBack()}/>
           <DefaultText style={{ fontSize: 18 }}>Your budget</DefaultText>
           <View></View>
         </View>
@@ -82,6 +84,7 @@ const ManageBudgets = () => {
                 placeholder="0"
                 style={styles.inputField}
                 keyboardType="numeric"
+                
                 value={budgets.totalSpending.toString()}
                 onChangeText={(value) =>
                   handleInputChange("totalSpending", value)
@@ -209,6 +212,7 @@ const createStyles = (theme) => {
       paddingLeft: 3,
       width: 30,
       borderBottomColor: "#8e93a1",
+      color: theme.text,
     },
     sectionContainer: {
       margin: 10,

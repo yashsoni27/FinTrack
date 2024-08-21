@@ -13,6 +13,7 @@ import { useTheme } from "../context/themeContext";
 import { LineChart } from "react-native-gifted-charts";
 import { getBudget, getChartData } from "../../api/db";
 import CircularProgress from "react-native-circular-progress-indicator";
+import * as Progress from "react-native-progress";
 import { useNavigation } from "@react-navigation/native";
 
 const Analysis = () => {
@@ -24,13 +25,22 @@ const Analysis = () => {
   const [currMonth, setCurrMonth] = useState(new Date().getMonth() + 1);
 
   const [selectedTab, setSelectedTab] = useState("budget");
-  
-  const [budgets, setBudgets] = useState({});
+
+  const [budgets, setBudgets] = useState({
+    spent: 0,
+    budget: 0,
+    shopping: { budget: 0, spent: 0 },
+    entertainment: { budget: 0, spent: 0 },
+    foodAndDrink: { budget: 0, spent: 0 },
+    transportation: { budget: 0, spent: 0 },
+    home: { budget: 0, spent: 0 },
+    other: { budget: 0, spent: 0 },
+  });
 
   const [incomeData, setIncomeData] = useState([]);
   const [expenseData, setExpenseData] = useState([]);
   const [pctChange, setPctChange] = useState({});
-  
+
   const userId = state.user.userId;
 
   const fetchChartData = async (selectedMonth) => {
@@ -84,14 +94,45 @@ const Analysis = () => {
 
   const fetchBudget = async (selectedMonth) => {
     try {
+      setIsLoading(true);
       const response = await getBudget(userId, selectedMonth);
-      setBudgets(response[0]);
-      console.log(budgets);
+      if (response.length > 0) {
+        setBudgets({
+          spent: response[0].spent || 0,
+          budget: response[0].budget || 0,
+          shopping: {
+            budget: response[0].category.shopping.budget,
+            spent: response[0].category.shopping.spent,
+          },
+          entertainment: {
+            budget: response[0].category.entertainment.budget,
+            spent: response[0].category.entertainment.spent,
+          },
+          foodAndDrink: {
+            budget: response[0].category.foodAndDrink.budget,
+            spent: response[0].category.foodAndDrink.spent,
+          },
+          transportation: {
+            budget: response[0].category.transportation.budget,
+            spent: response[0].category.transportation.spent,
+          },
+          home: {
+            budget: response[0].category.home.budget,
+            spent: response[0].category.home.spent,
+          },
+          other: {
+            budget: response[0].category.other.budget,
+            spent: response[0].category.other.spent,
+          },
+        });
+      }
+      console.log("budgets: ", budgets);
     } catch (error) {
       console.log("Error in fetching budget:  ", error);
+    } finally {
+      setIsLoading(false);
     }
   };
-  
 
   useEffect(() => {
     fetchChartData(currMonth);
@@ -218,22 +259,29 @@ const Analysis = () => {
   };
 
   const renderBudget = () => {
+    if (isLoading) {
+      return <DefaultText>Loading data...</DefaultText>;
+    }
+
     return (
       <>
         <View style={{ margin: 10 }}>
           <View style={styles.budgetGraphContainer}>
-            <View
-              style={[styles.budgetContainer, { alignItems: "flex-start" }]}
-            >
+            <View style={styles.budgetContainer}>
               <DefaultText style={{ fontSize: 20 }}>
-                <DefaultText style={{ fontSize: 14 }}>£</DefaultText> {(budgets.budget - budgets.spent) < 0 ? 0 : (budgets.budget - budgets.spent)}
+                <DefaultText style={{ fontSize: 14 }}>£</DefaultText>{" "}
+                {budgets.budget}
               </DefaultText>
-              <DefaultText>left to spend</DefaultText>
+              <DefaultText>total budget</DefaultText>
             </View>
             <View style={{ paddingVertical: 20, alignItems: "center" }}>
               <CircularProgress
                 radius={40}
-                value={(budgets.spent > budgets.budget) ? budgets.budget : budgets.spent}
+                value={
+                  budgets.spent > budgets.budget
+                    ? budgets.budget
+                    : budgets.spent
+                }
                 maxValue={budgets.budget}
                 duration={1000}
                 activeStrokeWidth={10}
@@ -243,23 +291,193 @@ const Analysis = () => {
                 showProgressValue={false}
               />
             </View>
-            <View style={styles.budgetContainer}>
+            <View style={[styles.budgetContainer, { alignItems: "flex-end" }]}>
               <DefaultText style={{ fontSize: 20 }}>
-                <DefaultText style={{ fontSize: 14 }}>£</DefaultText> {budgets.budget}
+                <DefaultText style={{ fontSize: 14 }}>£</DefaultText>{" "}
+                {budgets.budget - budgets.spent < 0
+                  ? 0
+                  : // : Math.round(budgets.budget - budgets.spent) * 100 / 100}
+                    (budgets.budget - budgets.spent).toFixed(2)}
               </DefaultText>
-              <DefaultText>total budget</DefaultText>
+              <DefaultText>left to spend</DefaultText>
             </View>
           </View>
 
           <View style={styles.categoryContainer}>
-            <View>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("ManageBudgets")}
-                style={styles.buttonStyle}
-              >
-                <DefaultText style={styles.buttonText}>Manage budgets</DefaultText>
-              </TouchableOpacity>
+            <View style={[styles.row, {marginBottom: 12}]}>
+              <View></View>
+              <DefaultText style={{ fontWeight: "bold" }}>SPENT</DefaultText>
+              <DefaultText style={{ fontWeight: "bold" }}>BUDGET</DefaultText>
             </View>
+            <View style={styles.row}>
+              <DefaultText>Shopping</DefaultText>
+              <View style={styles.progressContainer}>
+                <DefaultText style={styles.budgetAmount}>
+                  £{Math.round(budgets.shopping.spent)}
+                </DefaultText>
+                <Progress.Bar
+                  progress={
+                    budgets.shopping.spent / budgets.shopping.budget > 1
+                      ? 1
+                      : budgets.shopping.spent / budgets.shopping.budget
+                  }
+                  color={
+                    budgets.shopping.spent / budgets.shopping.budget > 1
+                      ? theme.danger
+                      : theme.success
+                  }
+                  width={120}
+                  style={{ marginHorizontal: 10 }}
+                />
+                <DefaultText style={styles.budgetAmount}>
+                  £{budgets.shopping.budget}
+                </DefaultText>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <DefaultText>Entertainment</DefaultText>
+              <View style={styles.progressContainer}>
+                <DefaultText style={styles.budgetAmount}>
+                  £{Math.round(budgets.entertainment.spent)}
+                </DefaultText>
+                <Progress.Bar
+                  progress={
+                    budgets.entertainment.spent / budgets.entertainment.budget >
+                    1
+                      ? 1
+                      : budgets.entertainment.spent /
+                        budgets.entertainment.budget
+                  }
+                  color={
+                    budgets.entertainment.spent / budgets.entertainment.budget >
+                    1
+                      ? theme.danger
+                      : theme.success
+                  }
+                  width={120}
+                  style={{ marginHorizontal: 10 }}
+                />
+                <DefaultText style={styles.budgetAmount}>
+                  £{budgets.entertainment.budget}
+                </DefaultText>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <DefaultText>Food & Drink</DefaultText>
+              <View style={styles.progressContainer}>
+                <DefaultText style={styles.budgetAmount}>
+                  £{Math.round(budgets.foodAndDrink.spent)}
+                </DefaultText>
+                <Progress.Bar
+                  progress={
+                    budgets.foodAndDrink.spent / budgets.foodAndDrink.budget > 1
+                      ? 1
+                      : budgets.foodAndDrink.spent / budgets.foodAndDrink.budget
+                  }
+                  color={
+                    budgets.foodAndDrink.spent / budgets.foodAndDrink.budget > 1
+                      ? theme.danger
+                      : theme.success
+                  }
+                  width={120}
+                  style={{ marginHorizontal: 10 }}
+                />
+                <DefaultText style={styles.budgetAmount}>
+                  £{budgets.foodAndDrink.budget}
+                </DefaultText>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <DefaultText>Transportation</DefaultText>
+              <View style={styles.progressContainer}>
+                <DefaultText style={styles.budgetAmount}>
+                  £{Math.round(budgets.transportation.spent)}
+                </DefaultText>
+                <Progress.Bar
+                  progress={
+                    budgets.transportation.spent /
+                      budgets.transportation.budget >
+                    1
+                      ? 1
+                      : budgets.transportation.spent /
+                        budgets.transportation.budget
+                  }
+                  color={
+                    budgets.transportation.spent /
+                      budgets.transportation.budget >
+                    1
+                      ? theme.danger
+                      : theme.success
+                  }
+                  width={120}
+                  style={{ marginHorizontal: 10 }}
+                />
+                <DefaultText style={styles.budgetAmount}>
+                  £{budgets.transportation.budget}
+                </DefaultText>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <DefaultText>Home</DefaultText>
+              <View style={styles.progressContainer}>
+                <DefaultText style={styles.budgetAmount}>
+                  £{Math.round(budgets.home.spent)}
+                </DefaultText>
+                <Progress.Bar
+                  progress={
+                    budgets.home.spent / budgets.home.budget > 1
+                      ? 1
+                      : budgets.home.spent / budgets.home.budget
+                  }
+                  color={
+                    budgets.home.spent / budgets.home.budget > 1
+                      ? theme.danger
+                      : theme.success
+                  }
+                  width={120}
+                  style={{ marginHorizontal: 10 }}
+                />
+                <DefaultText style={styles.budgetAmount}>
+                  £{budgets.home.budget}
+                </DefaultText>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <DefaultText>Other</DefaultText>
+              <View style={styles.progressContainer}>
+                <DefaultText style={styles.budgetAmount}>
+                  £{Math.round(budgets.other.spent)}
+                </DefaultText>
+                <Progress.Bar
+                  progress={
+                    budgets.other.spent / budgets.other.budget > 1
+                      ? 1
+                      : budgets.other.spent / budgets.other.budget
+                  }
+                  color={
+                    budgets.other.spent / budgets.other.budget > 1
+                      ? theme.danger
+                      : theme.success
+                  }
+                  width={120}
+                  style={{ marginHorizontal: 10 }}
+                />
+                <DefaultText style={styles.budgetAmount}>
+                  £{budgets.other.budget}
+                </DefaultText>
+              </View>
+            </View>
+          </View>
+
+          <View style={{ marginVertical: 5 }}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("ManageBudgets")}
+              style={styles.buttonStyle}
+            >
+              <DefaultText style={styles.buttonText}>
+                Manage budgets
+              </DefaultText>
+            </TouchableOpacity>
           </View>
         </View>
       </>
@@ -313,9 +531,9 @@ const Analysis = () => {
           {selectedTab === "budget" ? (
             <ScrollView showsVerticalScrollIndicator={false}>
               <View>
-                <DefaultText style={{ textAlign: "center", marginBottom: 5 }}>
+                {/* <DefaultText style={{ textAlign: "center", marginBottom: 5 }}>
                   Budget
-                </DefaultText>
+                </DefaultText> */}
                 <View style={{ padding: 10 }}>{renderBudget()}</View>
               </View>
             </ScrollView>
@@ -381,10 +599,12 @@ const createStyles = (theme) => {
     budgetContainer: {
       flexDirection: "column",
       justifyContent: "space-between",
-      alignItems: "flex-end",
+      // alignItems: "flex-end",
       width: "25%",
     },
-    categoryContainer: {},
+    categoryContainer: {
+      marginVertical: 20,
+    },
     buttonStyle: {
       backgroundColor: theme.surface,
       height: 50,
@@ -400,7 +620,22 @@ const createStyles = (theme) => {
       textAlign: "center",
       color: theme.text,
       textTransform: "capitalize",
-    }
+    },
+    row: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginVertical: 8,
+      // borderWidth: 1,
+    },
+    progressContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      // borderWidth: 1
+    },
+    budgetAmount: {
+      width: 40,
+    },
   });
 };
 

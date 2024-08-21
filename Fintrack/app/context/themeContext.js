@@ -12,6 +12,8 @@ export const themes = {
     primary: "#D1FF32",
     primary2: "#7FB143",
     secondary: "#DCDEE0",
+    success: "#04C700",
+    danger: "#dE0000",
 
     statusBarStyle: "dark-content",
   },
@@ -22,7 +24,9 @@ export const themes = {
     text2: "#9E9E9E",
     primary: "#D1FF32",
     primary2: "#7FB143", 
-    secondary: "#262626",    
+    secondary: "#262626",
+    success: "#04C700",
+    danger: "#dE0000",  
 
     statusBarStyle: "light-content",
   },
