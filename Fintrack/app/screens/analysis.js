@@ -15,6 +15,7 @@ import { getBudget, getChartData } from "../../api/db";
 import CircularProgress from "react-native-circular-progress-indicator";
 import * as Progress from "react-native-progress";
 import { useNavigation } from "@react-navigation/native";
+import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 
 const Analysis = () => {
   const navigation = useNavigation();
@@ -49,8 +50,6 @@ const Analysis = () => {
       const response = await getChartData(userId, 0, selectedMonth);
       const currMonthData = response.currMonthData;
       const prevMonthData = response.prevMonthData;
-      // console.log("currMonth: ", currMonthData);
-      // console.log("prevMonth: ", prevMonthData);
 
       setIncomeData(currMonthData.income);
       setExpenseData(currMonthData.expense);
@@ -78,8 +77,6 @@ const Analysis = () => {
           prevMonthExpenseValue) *
         100;
 
-      // console.log("Income percentage change:", incomeChange.toFixed(2) + "%");
-      // console.log("Expense percentage change:", expenseChange.toFixed(2) + "%");
       setPctChange({
         incomepct: incomeChange.toFixed(2),
         expensepct: expenseChange.toFixed(2),
@@ -101,31 +98,31 @@ const Analysis = () => {
           spent: response[0].spent || 0,
           budget: response[0].budget || 0,
           category: {
-          Shopping: {
-            budget: response[0].category.shopping.budget,
-            spent: response[0].category.shopping.spent,
+            Shopping: {
+              budget: response[0].category.shopping.budget,
+              spent: response[0].category.shopping.spent,
+            },
+            Entertainment: {
+              budget: response[0].category.entertainment.budget,
+              spent: response[0].category.entertainment.spent,
+            },
+            "Food & Drink": {
+              budget: response[0].category.foodAndDrink.budget,
+              spent: response[0].category.foodAndDrink.spent,
+            },
+            Transportation: {
+              budget: response[0].category.transportation.budget,
+              spent: response[0].category.transportation.spent,
+            },
+            Home: {
+              budget: response[0].category.home.budget,
+              spent: response[0].category.home.spent,
+            },
+            Other: {
+              budget: response[0].category.other.budget,
+              spent: response[0].category.other.spent,
+            },
           },
-          Entertainment: {
-            budget: response[0].category.entertainment.budget,
-            spent: response[0].category.entertainment.spent,
-          },
-          "Food & Drink": {
-            budget: response[0].category.foodAndDrink.budget,
-            spent: response[0].category.foodAndDrink.spent,
-          },
-          Transportation: {
-            budget: response[0].category.transportation.budget,
-            spent: response[0].category.transportation.spent,
-          },
-          Home: {
-            budget: response[0].category.home.budget,
-            spent: response[0].category.home.spent,
-          },
-          Other: {
-            budget: response[0].category.other.budget,
-            spent: response[0].category.other.spent,
-          },
-        }
         });
       }
       // console.log("budgets: ", budgets);
@@ -222,6 +219,19 @@ const Analysis = () => {
             }}
           />
         </View>
+        <View style={{ justifyContent: "center", alignItems: "center" }}>
+          <DefaultText style={{ fontSize: 20 }}>
+            {new Date().toLocaleString("default", { month: "long" })}
+          </DefaultText>
+          <DefaultText style={{ fontSize: 10, color: theme.text2 }}>
+            vs. {new Date().getDate()}{" "}
+            {new Date(
+              new Date().getFullYear(),
+              new Date().getMonth() - 1,
+              1
+            ).toLocaleString("default", { month: "short" })}
+          </DefaultText>
+        </View>
         <View
           style={{
             flexDirection: "row",
@@ -231,29 +241,64 @@ const Analysis = () => {
             // borderWidth: 1,
           }}
         >
-          <View
-            style={{
-              padding: 10,
-              margin: 10,
-              // borderWidth: 1,
-              alignItems: "center",
-            }}
-          >
-            <DefaultText style={{ fontSize: 18 }}>Income</DefaultText>
-            <DefaultText>£ {incomeData.slice(-1)[0].value}</DefaultText>
-            <DefaultText>{pctChange.incomepct}%</DefaultText>
+          <View style={styles.pctContainer}>
+            <DefaultText style={{ fontSize: 15 }}>Income</DefaultText>
+            <DefaultText style={{ fontSize: 20 }}>
+              £ {incomeData.slice(-1)[0].value}
+            </DefaultText>
+            {pctChange.incomepct < 0 ? (
+              <View style={{ flexDirection: "row" }}>
+                <FontAwesome5Icon
+                  name="sort-down"
+                  color={theme.danger}
+                  size={12}
+                />
+                <DefaultText style={{ color: theme.danger, marginLeft: 5 }}>
+                  {Math.abs(pctChange.incomepct)}%
+                </DefaultText>
+              </View>
+            ) : (
+              <View style={{ flexDirection: "row" }}>
+                <FontAwesome5Icon
+                  name="sort-up"
+                  color={theme.success}
+                  size={12}
+                />
+                <DefaultText style={{ color: theme.success, marginLeft: 5 }}>
+                  {pctChange.incomepct}%
+                </DefaultText>
+              </View>
+            )}
           </View>
-          <View
-            style={{
-              padding: 10,
-              margin: 10,
-              // borderWidth: 1,
-              alignItems: "center",
-            }}
-          >
-            <DefaultText style={{ fontSize: 18 }}>Expense</DefaultText>
-            <DefaultText>£ {expenseData.slice(-1)[0].value}</DefaultText>
-            <DefaultText>{pctChange.expensepct}%</DefaultText>
+          <View style={styles.pctContainer}>
+            <DefaultText style={{ fontSize: 15 }}>Expense</DefaultText>
+            <DefaultText style={{ fontSize: 20 }}>
+              £ {expenseData.slice(-1)[0].value}
+            </DefaultText>
+            {pctChange.expensepct < 0 ? (
+              <View style={{ flexDirection: "row" }}>
+                <FontAwesome5Icon
+                  name="sort-down"
+                  color={theme.success}
+                  size={12}
+                />
+                <DefaultText style={{ color: theme.success, marginLeft: 5 }}>
+                  {Math.abs(pctChange.expensepct)}%
+                </DefaultText>
+              </View>
+            ) : (
+              <View style={{ flexDirection: "row" }}>
+                <FontAwesome5Icon
+                  name="sort-up"
+                  color={theme.danger}
+                  size={12}
+                />
+                <DefaultText style={{ color: theme.danger, marginLeft: 5 }}>
+                  {pctChange.expensepct}%
+                </DefaultText>
+              </View>
+            )}
+            {/* <DefaultText>{pctChange.expensepct}%</DefaultText> */}
           </View>
         </View>
       </>
@@ -298,8 +343,7 @@ const Analysis = () => {
                 <DefaultText style={{ fontSize: 14 }}>£</DefaultText>{" "}
                 {budgets.budget - budgets.spent < 0
                   ? 0
-                  : // : Math.round(budgets.budget - budgets.spent) * 100 / 100}
-                    (budgets.budget - budgets.spent).toFixed(2)}
+                  : (budgets.budget - budgets.spent).toFixed(2)}
               </DefaultText>
               <DefaultText>left to spend</DefaultText>
             </View>
@@ -311,25 +355,27 @@ const Analysis = () => {
               <DefaultText style={{ fontWeight: "bold" }}>SPENT</DefaultText>
               <DefaultText style={{ fontWeight: "bold" }}>BUDGET</DefaultText>
             </View>
-            {Object.entries(budgets.category).map(([category, { spent, budget }]) => (
-              <View key={category} style={styles.row}>
-                <DefaultText>{category}</DefaultText>
-                <View style={styles.progressContainer}>
-                  <DefaultText style={styles.budgetAmount}>
-                    £ {Math.round(spent)}
-                  </DefaultText>
-                  <Progress.Bar
-                    progress={spent / budget > 1 ? 1 : spent / budget}
-                    color={spent / budget > 1 ? theme.danger : theme.success}
-                    width={120}
-                    style={{ marginHorizontal: 10 }}
-                  />
-                  <DefaultText style={styles.budgetAmount}>
-                    £ {budget}
-                  </DefaultText>
+            {Object.entries(budgets.category).map(
+              ([category, { spent, budget }]) => (
+                <View key={category} style={styles.row}>
+                  <DefaultText>{category}</DefaultText>
+                  <View style={styles.progressContainer}>
+                    <DefaultText style={styles.budgetAmount}>
+                      £ {Math.round(spent)}
+                    </DefaultText>
+                    <Progress.Bar
+                      progress={spent / budget > 1 ? 1 : spent / budget}
+                      color={spent / budget > 1 ? theme.danger : theme.success}
+                      width={120}
+                      style={{ marginHorizontal: 10 }}
+                    />
+                    <DefaultText style={styles.budgetAmount}>
+                      £ {budget}
+                    </DefaultText>
+                  </View>
                 </View>
-              </View>
-            ))}
+              )
+            )}
           </View>
 
           <View style={{ marginVertical: 5 }}>
@@ -403,9 +449,9 @@ const Analysis = () => {
           ) : (
             <ScrollView showsVerticalScrollIndicator={false}>
               <View>
-                <DefaultText style={{ textAlign: "center", marginBottom: 5 }}>
-                  Expense vs Income
-                </DefaultText>
+                {/* <DefaultText style={{ textAlign: "center", marginBottom: 5 }}>
+                  Income vs Expense
+                </DefaultText> */}
                 <View style={{ padding: 10 }}>{renderChart()}</View>
               </View>
             </ScrollView>
@@ -444,8 +490,6 @@ const createStyles = (theme) => {
     },
     contentContainer: {
       marginTop: 20,
-      // alignItems: "center",
-      // borderWidth: 1,
     },
     budgetGraphContainer: {
       // margin: 15,
@@ -489,15 +533,23 @@ const createStyles = (theme) => {
       alignItems: "center",
       justifyContent: "space-between",
       marginVertical: 8,
-      // borderWidth: 1,
     },
     progressContainer: {
       flexDirection: "row",
       alignItems: "center",
-      // borderWidth: 1
     },
     budgetAmount: {
       width: 40,
+    },
+    pctContainer: {
+      padding: 20,
+      paddingHorizontal: 30,
+      margin: 10,
+      alignItems: "center",
+      backgroundColor: theme.surface,
+      borderWidth: 1,
+      borderColor: theme.text2,
+      borderRadius: 10,
     },
   });
 };

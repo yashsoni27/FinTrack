@@ -17,7 +17,7 @@ const createStyles = (theme) => {
   return StyleSheet.create({
     defaultText: {
       fontFamily: "Inter",
-      // color: globalStyles.dark.primary,
+      // fontFamily: "Urbanist",
       color: theme.text,
     },
   });

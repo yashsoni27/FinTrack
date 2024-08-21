@@ -32,7 +32,7 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(morgan("dev"));
 
 // routes
-app.use("/api", authRoutes);
+app.use("/auth", authRoutes);
 app.use("/api", plaidRoutes);
 app.use("/db", dbRoutes);
 app.use("/ocr", ocrRoutes);

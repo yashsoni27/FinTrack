@@ -9,6 +9,7 @@ import Transaction from "../models/transaction.js";
 import Recurring from "../models/recurring.js";
 import Budget from "../models/budget.js";
 
+
 export const getAccountsDb = async (request, response) => {
   try {
     const { userId } = request.body;
@@ -137,11 +138,8 @@ export const saveTransactionDb = async (request, response) => {
 export const getChartData = async (request, response) => {
   try {
     const { userId, count, month } = request.body;
-    // console.log("userId: ", userId);
 
     const prevMonth = month - 1;
-    // console.log(month);
-    // console.log(prevMonth);
 
     const currMonthResponse = await callController(getTransactionsDb, {
       userId: userId,
@@ -155,11 +153,13 @@ export const getChartData = async (request, response) => {
     });
 
     const processData = (response, selectedMonth) => {
-      const today = new Date();
-      const currentMonth = today.getMonth() + 1;
-      const currentDate = today.getDate();
+      const date = new Date();
+      const currentMonth = date.getMonth() + 1;
+      const currentDate = date.getDate();
 
-      const lastDay = selectedMonth === currentMonth ? currentDate : 31;
+      // const lastDay = selectedMonth === currentMonth ? currentDate : 31;
+      const lastDay = currentDate;
+      const filteredDate = new Date(date.getFullYear(), selectedMonth - 1, currentDate);
 
       const income = Array(lastDay)
         .fill()
@@ -170,20 +170,22 @@ export const getChartData = async (request, response) => {
 
       const transactions = response.transactions;
       transactions.sort((a, b) => new Date(a.date) - new Date(b.date));
+      const filteredTransactions = transactions.filter(transaction => {
+        const transactionDate = new Date(transaction.date)
+        return transactionDate <=  filteredDate;
+      });
 
       let cumulativeIncome = 0;
       let cumulativeExpense = 0;
 
-      transactions.forEach((transaction) => {
+      filteredTransactions.forEach((transaction) => {
         const date = new Date(transaction.date);
         const day = date.getDate() - 1; // Adjusting for 0-based index
 
         if (transaction.amount < 0) {
-          // income[day].value += Math.abs(transaction.amount);
           cumulativeIncome += Math.abs(transaction.amount);
           income[day].value = Number(cumulativeIncome.toFixed(2));
         } else {
-          // expense[day].value += transaction.amount;
           cumulativeExpense += transaction.amount;
           expense[day].value = Number(cumulativeExpense.toFixed(2));
         }
@@ -216,8 +218,8 @@ export const getBudget = async (request, response) => {
     const today = new Date();
     const currentMonth = month || today.getMonth() + 1;
     const currentYear = today.getFullYear();
-    console.log("month: ", currentMonth);
-    console.log("year: ", currentYear);
+    // console.log("month: ", currentMonth);
+    // console.log("year: ", currentYear);
 
     const startDate = new Date(currentYear, currentMonth - 1, 1); // first day of the month
     const endDate = new Date(currentYear, currentMonth, 0, 23, 59, 59);
