@@ -2,8 +2,6 @@ import axios from "axios";
 
 const BASE_URL = process.env.EXPO_PUBLIC_SERVER_URL;
 
-// console.log("BASE_URL", BASE_URL);
-
 export const userSignIn = async (email, password) => {
   try {
     const response = await axios.post(`${BASE_URL}/api/signin`, {

@@ -506,7 +506,6 @@ const createStyles = (theme) => {
     budgetContainer: {
       flexDirection: "column",
       justifyContent: "space-between",
-      // alignItems: "flex-end",
       width: "25%",
     },
     categoryContainer: {
@@ -520,7 +519,6 @@ const createStyles = (theme) => {
       borderRadius: 30,
       borderWidth: 1,
       borderColor: theme.text2,
-      // width: "80%",
     },
     buttonText: {
       fontSize: 15,

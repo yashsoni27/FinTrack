@@ -62,7 +62,6 @@ const Transactions = () => {
   };
 
   useEffect(() => {
-    // fetchTransactionsDB();
     fetchTransactionsDB(currMonth);
     const newDate = new Date(date);
     newDate.setMonth(currMonth - 1);
@@ -93,9 +92,9 @@ const Transactions = () => {
           color1="green"
           thickness={2}
           areaChart
-          startFillColor="rgba(34,193,195,0.2)" // Start of gradient color
-          endFillColor="rgba(34,193,195,0)" // End of gradient color
-          startOpacity={0.5} // Starting opacity for gradient fill
+          startFillColor="rgba(34,193,195,0.2)" 
+          endFillColor="rgba(34,193,195,0)" 
+          startOpacity={0.5}
           endOpacity={0}
           hideRules
           hideDataPoints
@@ -126,12 +125,6 @@ const Transactions = () => {
               );
             },
           }}
-          // hideAxesAndRules
-          // showVerticalLines
-          // verticalLinesColor="#e0e0e0" // Color of grid lines
-
-          // focusEnabled={true}
-          // showDataPointOnFocus={true}
         />
 
         <View
@@ -139,7 +132,6 @@ const Transactions = () => {
             marginTop: 20,
             margin: 10,
             padding: 10,
-            // borderWidth: 1,
           }}
         >
           <View
@@ -153,7 +145,6 @@ const Transactions = () => {
               style={styles.monthButton}
               name="angle-left"
               size={20}
-              // color=""
               onPress={() => setCurrMonth(currMonth - 1)}
             />
             <DefaultText style={{ fontSize: 20, textAlign: "center" }}>
@@ -163,7 +154,6 @@ const Transactions = () => {
               style={styles.monthButton}
               name="angle-right"
               size={20}
-              // color=""
               disabled={date.toISOString() >= new Date().toISOString()}
               onPress={() => setCurrMonth(currMonth + 1)}
             />
@@ -176,7 +166,6 @@ const Transactions = () => {
             }}
             showsVerticalScrollIndicator={false}
           >
-            {/* Beautify this View  */}
             <View style={{ marginTop: 10 }}>
               {transactions.map((transaction, index) => (
                 <View
@@ -244,14 +233,12 @@ const Transactions = () => {
             </View>
           </ScrollView>
         </View>
-        {/* </ScrollView> */}
       </View>
 
       <View style={{ position: "absolute", bottom: 85, right: 20 }}>
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => {
-            // Handle FAB press
             console.log("FAB pressed");
             navigation.navigate("Add");
           }}
@@ -271,10 +258,9 @@ const createStyles = (theme) => {
       width: 50,
       height: 50,
       borderRadius: 30,
-      backgroundColor: theme.primary2, // FAB color      
+      backgroundColor: theme.primary2,   
       justifyContent: "center",
       alignItems: "center",
-      // alignContent: "center",
     },
     monthButton: {
       backgroundColor: theme.primary2,

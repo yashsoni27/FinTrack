@@ -34,7 +34,6 @@ const Home = () => {
   const [balance, setBalance] = useState(null);
   const [accounts, setAccounts] = useState([]);
   const [transactions, setTransactions] = useState([]);
-  // console.log("home.js auth console: ", mode);
 
   const options = {
     month: "short",
@@ -53,9 +52,6 @@ const Home = () => {
     } finally {
       setRefreshing(false);
     }
-    // fetchBalance();
-    // fetchTransactions();
-    // setRefreshing(false);
   }, []);
 
   const fetchBalance = async () => {
@@ -134,9 +130,6 @@ const Home = () => {
     <>
       <View
         style={{
-          // flex: 1,
-          // justifyContent: "space-between",
-          // alignItems: "center",
           margin: 10,
           backgroundColor: theme.background,
           height: "90%",
@@ -266,7 +259,7 @@ const Home = () => {
             right: 0,
             bottom: 0,
             backgroundColor: "gray",
-            opacity: 0.85, // Semi-transparent background
+            opacity: 0.85, 
             justifyContent: "center",
             alignItems: "center",
             zIndex: 1000,

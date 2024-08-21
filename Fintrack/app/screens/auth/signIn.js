@@ -126,7 +126,6 @@ const createStyles = (theme) => {
     container: {
       flex: 1,
       justifyContent: "space-between",
-      // alignItems: "center",
       paddingHorizontal: 10,
     },
     headerText: {
@@ -140,11 +139,9 @@ const createStyles = (theme) => {
     inputContainer: {
       marginHorizontal: 30,
       marginVertical: 10,
-      // flex: 1,
       flexDirection: "row",
       justifyContent: "center",
       alignItems: "center",
-      // backgroundColor: "#fff",
     },
 
     signupInput: {
@@ -185,7 +182,7 @@ const createStyles = (theme) => {
     rulerText: {
       position: "absolute",
       alignSelf: "center",
-      top: -10, // Adjust position as needed
+      top: -10,
       paddingHorizontal: 5,
       backgroundColor: theme.background,
     },

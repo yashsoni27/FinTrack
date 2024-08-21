@@ -2,14 +2,10 @@ import React from "react";
 import axios from "axios";
 import { StatusBar } from "react-native";
 import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
 import Navigation from "./components/navigation";
 import { ThemeProvider, useTheme } from "./context/themeContext";
 
 axios.defaults.baseURL = process.env.EXPO_PUBLIC_SERVER_URL;
-
-// const Stack = createNativeStackNavigator();
-// const image = { uri: "https://picsum.photos/1600/900" };
 
 export default function Page() {
 

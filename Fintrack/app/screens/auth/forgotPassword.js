@@ -26,7 +26,6 @@ const ForgotPassword = ({ navigation }) => {
       return;
     }
     try {
-      // const { data } = await axios.post("http://localhost:8000/api/forgot-password", { email });
       const data = await forgotPassword(email);
       if (data.error) alert(data.error);
       else {
@@ -41,7 +40,6 @@ const ForgotPassword = ({ navigation }) => {
 
   const handlePasswordReset = async () => {
     try {
-      // const { data } = await axios.post("http://localhost:8000/api/reset-password", { email, resetCode, password });
       const data = await resetPassword(email, resetCode, password);
       if (data.error) alert(data.error);
       else {
@@ -57,12 +55,6 @@ const ForgotPassword = ({ navigation }) => {
   return (
     <KeyboardAwareScrollView contentCotainerStyle={styles.container}>
       <View style={{ marginVertical: 100 }}>
-        {/* <View style={styles.imageContainer}>
-          <Image
-            source={require("../../../assets/favicon.png")}
-            style={styles.imageStyles}
-          />
-        </View> */}
         <Text style={styles.signupText}>Forgot Password</Text>
         <View style={{ marginHorizontal: 24 }}>
           <Text style={{ fontSize: 16, color: "#8e93a1" }}>EMAIL</Text>
@@ -152,7 +144,6 @@ const createStyles = (theme) => {
       textAlign: "center",
       color: theme.surface,
       textTransform: "capitalize",
-      // fontWeight: "bold",
     },
     imageContainer: { justifyContent: "center", alignItems: "center" },
     imageStyles: { width: 100, height: 100, marginVertical: 20 },

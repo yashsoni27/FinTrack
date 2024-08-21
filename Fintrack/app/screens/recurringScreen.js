@@ -10,7 +10,6 @@ import { useTheme } from "../context/themeContext";
 import DefaultText from "../components/defaultText";
 import { getRecurringTransactionsDb } from "../../api/db";
 import { AuthContext } from "../context/auth";
-// import { PieChart } from "react-native-gifted-charts";
 import CircularProgress from "react-native-circular-progress-indicator";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import { getRecurringTransactions } from "../../api/plaidAPI";
@@ -172,14 +171,6 @@ const RecurringScreen = () => {
             <DefaultText>left to pay</DefaultText>
           </View>
           <View style={{ paddingVertical: 20, alignItems: "center" }}>
-            {/* <PieChart
-              data={pieData}
-              donut
-              sectionAutoFocus              
-              radius={40}
-              innerRadius={25}
-              innerCircleColor={theme.background}
-            /> */}
             <CircularProgress
               radius={40}
               value={amount.percent}
@@ -287,12 +278,10 @@ const createStyles = (theme) => {
       textAlign: "center",
     },
     cardAmount: {
-      // color: "#fff",
       color: theme.text,
       fontSize: 14,
     },
     cardDate: {
-      // color: "#a1a1a1",
       color: theme.text,
       opacity: 0.6,
       fontSize: 12,
