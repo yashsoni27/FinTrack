@@ -9,7 +9,6 @@ import Transaction from "../models/transaction.js";
 import Recurring from "../models/recurring.js";
 import Budget from "../models/budget.js";
 
-
 export const getAccountsDb = async (request, response) => {
   try {
     const { userId } = request.body;
@@ -159,7 +158,11 @@ export const getChartData = async (request, response) => {
 
       // const lastDay = selectedMonth === currentMonth ? currentDate : 31;
       const lastDay = currentDate;
-      const filteredDate = new Date(date.getFullYear(), selectedMonth - 1, currentDate);
+      const filteredDate = new Date(
+        date.getFullYear(),
+        selectedMonth - 1,
+        currentDate
+      );
 
       const income = Array(lastDay)
         .fill()
@@ -170,9 +173,9 @@ export const getChartData = async (request, response) => {
 
       const transactions = response.transactions;
       transactions.sort((a, b) => new Date(a.date) - new Date(b.date));
-      const filteredTransactions = transactions.filter(transaction => {
-        const transactionDate = new Date(transaction.date)
-        return transactionDate <=  filteredDate;
+      const filteredTransactions = transactions.filter((transaction) => {
+        const transactionDate = new Date(transaction.date);
+        return transactionDate <= filteredDate;
       });
 
       let cumulativeIncome = 0;
@@ -351,8 +354,13 @@ export const getBudget = async (request, response) => {
       budgetResponse[0].category.transportation.spent = transactionResponse[0].transportation;
       budgetResponse[0].category.home.spent = transactionResponse[0].home;
       budgetResponse[0].category.other.spent = transactionResponse[0].other;
+
+      await Budget.findOneAndUpdate(
+        { userId: userId, month: currentMonth, year: currentYear },
+        { spent: transactionResponse[0].total }
+      );
     }
-    
+
     response.json(budgetResponse);
   } catch (error) {
     console.error("Error fetching budget: ", error);

@@ -150,7 +150,8 @@ export const resetPassword = async (req, res) => {
 
 export const deleteAccount = async (req, res) => {
   try {
-    const { userId, password } = req.body;
+    const { userId } = req.body;
+    console.log(userId);
 
     const user = await User.findOne({ userId });
     if (!user) {
@@ -159,14 +160,15 @@ export const deleteAccount = async (req, res) => {
       });
     }
 
-    const match = await comparePassword(password, user.password);
-    if (!match) {
-      return res.json({
-        error: "Wrong password",
-      });
-    }
+    // const match = await comparePassword(password, user.password);
+    // if (!match) {
+    //   return res.json({
+    //     error: "Wrong password",
+    //   });
+    // }
 
-    await User.deleteOne({ userId });
+    console.log("User deletion process from across every DB");
+    // await User.deleteOne({ userId });
 
     return res.json({ message: "Account deleted successfully" });
   } catch (err) {

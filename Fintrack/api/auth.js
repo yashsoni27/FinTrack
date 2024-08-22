@@ -4,7 +4,7 @@ const BASE_URL = process.env.EXPO_PUBLIC_SERVER_URL;
 
 export const userSignIn = async (email, password) => {
   try {
-    const response = await axios.post(`${BASE_URL}/api/signin`, {
+    const response = await axios.post(`${BASE_URL}/auth/signin`, {
       email,
       password,
     });
@@ -17,7 +17,7 @@ export const userSignIn = async (email, password) => {
 
 export const userSignUp = async (name, email, password) => {
   try {
-    const response = await axios.post(`${BASE_URL}/api/signup`, {
+    const response = await axios.post(`${BASE_URL}/auth/signup`, {
       name,
       email,
       password,
@@ -31,7 +31,7 @@ export const userSignUp = async (name, email, password) => {
 
 export const forgotPassword = async (email) => {
   try {
-    const response = await axios.post(`${BASE_URL}/api/forgot-password`, {
+    const response = await axios.post(`${BASE_URL}/auth/forgot-password`, {
       email,
     });
     return response.data;
@@ -43,7 +43,7 @@ export const forgotPassword = async (email) => {
 
 export const resetPassword = async (email, resetCode, password) => {
   try {
-    const response = await axios.post(`${BASE_URL}/api/reset-password`, {
+    const response = await axios.post(`${BASE_URL}/auth/reset-password`, {
       email,
       resetCode,
       password,
@@ -55,11 +55,10 @@ export const resetPassword = async (email, resetCode, password) => {
   }
 };
 
-export const deleteAccount = async (userId, password) => {
+export const deleteAccount = async (userId) => {
   try {
-    const response = await axios.post(`${BASE_URL}/api/delete-account`, {
+    const response = await axios.post(`${BASE_URL}/auth/delete-account`, {
       userId,
-      password,
     });
     return response.data;
   } catch (error) {

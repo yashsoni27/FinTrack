@@ -93,6 +93,7 @@ const Analysis = () => {
     try {
       setIsLoading(true);
       const response = await getBudget(userId, selectedMonth);
+      console.log("Budget fetched");
       if (response.length > 0) {
         setBudgets({
           spent: response[0].spent || 0,

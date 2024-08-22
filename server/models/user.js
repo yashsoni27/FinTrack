@@ -37,7 +37,15 @@ const userSchema = mongoose.Schema({
   },
   mobile: String,  // Not used uptil now
   institutions: [InstitutionSchema],
-  resetCode: String,      
+  resetCode: String,
+  onBoarded: {
+    type: Boolean,
+    default: false,
+  },
+  fingerprintEnabled: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 export default mongoose.model("Users", userSchema);

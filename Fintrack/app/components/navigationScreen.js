@@ -22,7 +22,7 @@ const NavigationScreen = () => {
   const authenticated = state && state.token !== "" && state.user !== null;
 
   const { theme } = useTheme();
-    
+
   return (
     <Stack.Navigator
       screenOptions={{
@@ -33,10 +33,7 @@ const NavigationScreen = () => {
     >
       {authenticated ? (
         <>
-          <Stack.Screen
-            name="Home"
-            component={Home}
-          />
+          <Stack.Screen name="Home" component={Home} />
           <Stack.Screen name="Account" component={Account} />
           <Stack.Screen name="Analysis" component={Analysis} />
           <Stack.Screen name="Add" component={Add} />
