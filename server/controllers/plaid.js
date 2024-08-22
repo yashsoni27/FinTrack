@@ -344,7 +344,7 @@ export const recurringTransactions = async (request, response) => {
 
     // Fetch all recurring transactions from DB
     const recurringResponse = await callController(getRecurringDb, { userId });
-    console.log("recurringResponse: ", recurringResponse);
+    // console.log("recurringResponse: ", recurringResponse);
     
     response.json(recurringResponse);
 
