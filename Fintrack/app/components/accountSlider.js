@@ -55,10 +55,6 @@ const AccountSlider = ({ accounts, onAddAccountSuccess }) => {
       );
       console.log("Bank account added successfully");
       console.log(response);
-      // Handle success (e.g., navigate to another screen or update UI)
-      // setBalance(response.balances.current)
-      // fetchBalance();
-      // fetchTransactions();
       if (onAddAccountSuccess) {
         onAddAccountSuccess();
       }

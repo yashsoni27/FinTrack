@@ -19,17 +19,6 @@ const FooterItem = ({ name, text, handlePress, screenName, routeName }) => {
 
   return (
     <TouchableOpacity onPress={handlePress} style={styles.footerItem}>
-      {/* {screenName === routeName ? (
-        <View
-          style={{
-            backgroundColor: "green",
-            height: 60,
-            width: 60,
-            borderRadius: 30,
-            position: "absolute",
-          }}
-        />
-      ) : null} */}
       <MaterialIcons
         name={name}
         size={20}

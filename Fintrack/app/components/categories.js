@@ -19,12 +19,11 @@ const Categories = () => {
   const userId = state.user.userId;
 
   const [budgets, setBudgets] = useState({
-    shopping: { budget: 0, spent: 0 },
-    entertainment: { budget: 0, spent: 0 },
-    foodAndDrink: { budget: 0, spent: 0 },
-    transportation: { budget: 0, spent: 0 },
-    home: { budget: 0, spent: 0 },
-    other: { budget: 0, spent: 0 },
+    shopping: { budget: 0, spent: 0, emoji: null },
+    entertainment: { budget: 0, spent: 0, emoji: null },
+    foodAndDrink: { budget: 0, spent: 0, emoji: null },
+    transportation: { budget: 0, spent: 0, emoji: null },
+    home: { budget: 0, spent: 0, emoji: null },
   });
 
   const fetchBudget = async (selectedMonth) => {
@@ -90,7 +89,7 @@ const Categories = () => {
         </View>
       </TouchableOpacity>
 
-      
+
       {isLoading ? (
         <DefaultText>Loading data...</DefaultText>
       ) : (

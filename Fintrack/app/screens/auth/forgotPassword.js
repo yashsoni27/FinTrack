@@ -8,7 +8,6 @@ import {
   StyleSheet,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import axios from "axios";
 import { forgotPassword, resetPassword } from "../../../api/auth";
 import { useTheme } from "../../context/themeContext";
 

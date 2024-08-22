@@ -28,7 +28,6 @@ const SignIn = ({ navigation }) => {
       return;
     }
     const response = await userSignIn(email, password);
-    // console.log("response", response);
     if (response.error) {
       alert(response.error);
     } else {
