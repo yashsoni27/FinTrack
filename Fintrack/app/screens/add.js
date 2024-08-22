@@ -13,7 +13,7 @@ import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 import RNFS from "react-native-fs";
 import { scanInvoice, scanReceipt } from "../../api/ocr";
 import DefaultText from "../components/defaultText";
-import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useNavigation } from "@react-navigation/native";
 import { saveTransactionDb } from "../../api/db";
@@ -168,10 +168,10 @@ const Add = () => {
         >
           Add Transaction
         </DefaultText>
-        <FontAwesome5Icon
-          style={{ alignItems: "flex-end"}}
-          name="times"
-          size={15}
+        <MaterialIcons
+          style={{ alignItems: "flex-end" }}
+          name="close"
+          size={20}
           onPress={() => navigation.goBack()}
         />
       </View>

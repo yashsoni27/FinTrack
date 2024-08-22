@@ -1,7 +1,7 @@
 import { StyleSheet, TouchableOpacity, TextInput, View } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import DefaultText from "../components/defaultText";
-import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useTheme } from "../context/themeContext";
 import { useNavigation } from "@react-navigation/native";
 import { AuthContext } from "../context/auth";
@@ -68,7 +68,7 @@ const ManageBudgets = () => {
     <>
       <View style={{ margin: 10 }}>
         <View style={styles.header}>
-          <FontAwesome5Icon name="times" size={18} color={theme.text} onPress={() => navigation.goBack()}/>
+          <MaterialIcons name="close" size={20} color={theme.text} onPress={() => navigation.goBack()}/>
           <DefaultText style={{ fontSize: 18 }}>Your budget</DefaultText>
           <View></View>
         </View>

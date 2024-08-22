@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useTheme } from "../../context/themeContext";
 import DefaultText from "../defaultText";
 
@@ -30,7 +30,7 @@ const FooterItem = ({ name, text, handlePress, screenName, routeName }) => {
           }}
         />
       ) : null} */}
-      <FontAwesome5
+      <MaterialIcons
         name={name}
         size={20}
         style={styles.fontStyle}

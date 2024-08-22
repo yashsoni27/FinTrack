@@ -1,9 +1,7 @@
 import React, { useContext, useState, useEffect, useCallback } from "react";
 import {
-  SafeAreaView,
   View,
   ScrollView,
-  TouchableOpacity,
   RefreshControl,
   Image,
 } from "react-native";
@@ -11,10 +9,7 @@ import FooterList from "../components/footer/footerList";
 import { AuthContext } from "../context/auth";
 import { ActivityIndicator } from "react-native";
 import {
-  createLinkToken,
-  exchangePublicToken,
   getBalance,
-  getTransactions,
   syncTransactions,
 } from "../../api/plaidAPI";
 import { getBalanceDb, getTransactionsDb } from "../../api/db";
@@ -22,7 +17,6 @@ import DefaultText from "../components/defaultText";
 import { useTheme } from "../context/themeContext";
 import AccountSlider from "../components/accountSlider";
 import Recurring from "../components/recurring";
-import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 
 const Home = () => {
   const [state, setState] = useContext(AuthContext);
@@ -150,17 +144,9 @@ const Home = () => {
             }}
           >
             <View>
-              <DefaultText style={{ fontSize: 25, color: theme.text }}>
+              <DefaultText style={{ fontSize: 27, color: theme.text }}>
                 Hi {state.user.name}
               </DefaultText>
-            </View>
-            <View>
-              <TouchableOpacity style={{ padding: 10 }} onPress={toggleTheme}>
-                <FontAwesome5Icon
-                  name="star-half-alt"
-                  style={{ color: theme.text }}
-                />
-              </TouchableOpacity>
             </View>
           </View>
 

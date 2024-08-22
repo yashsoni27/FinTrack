@@ -11,7 +11,7 @@ import DefaultText from "../components/defaultText";
 import { getRecurringTransactionsDb } from "../../api/db";
 import { AuthContext } from "../context/auth";
 import CircularProgress from "react-native-circular-progress-indicator";
-import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { getRecurringTransactions } from "../../api/plaidAPI";
 
 const RecurringScreen = () => {
@@ -205,9 +205,9 @@ const RecurringScreen = () => {
                   <View key={index} style={styles.subscriptionCard}>
                     {item.paidThisMonth && (
                       <View style={styles.paidIndicator}>
-                        <FontAwesome5Icon
+                        <MaterialIcons
                           name="check"
-                          size={10}
+                          size={12}
                           color="white"
                         />
                       </View>

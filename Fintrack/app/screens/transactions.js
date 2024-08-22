@@ -1,6 +1,5 @@
 import {
   View,
-  Text,
   ScrollView,
   TouchableOpacity,
   StyleSheet,
@@ -15,7 +14,7 @@ import DefaultText from "../components/defaultText";
 import { useTheme } from "../context/themeContext";
 import { useNavigation } from "@react-navigation/native";
 import { LineChart } from "react-native-gifted-charts";
-import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 const Transactions = () => {
   const [state, setState] = useContext(AuthContext);
@@ -92,8 +91,8 @@ const Transactions = () => {
           color1="green"
           thickness={2}
           areaChart
-          startFillColor="rgba(34,193,195,0.2)" 
-          endFillColor="rgba(34,193,195,0)" 
+          startFillColor="rgba(34,193,195,0.2)"
+          endFillColor="rgba(34,193,195,0)"
           startOpacity={0.5}
           endOpacity={0}
           hideRules
@@ -141,18 +140,18 @@ const Transactions = () => {
               justifyContent: "space-between",
             }}
           >
-            <FontAwesome5Icon
+            <MaterialIcons
               style={styles.monthButton}
-              name="angle-left"
+              name="chevron-left"
               size={20}
               onPress={() => setCurrMonth(currMonth - 1)}
             />
             <DefaultText style={{ fontSize: 20, textAlign: "center" }}>
               History for {date.toLocaleString("default", { month: "short" })}
             </DefaultText>
-            <FontAwesome5Icon
+            <MaterialIcons
               style={styles.monthButton}
-              name="angle-right"
+              name="chevron-right"
               size={20}
               disabled={date.toISOString() >= new Date().toISOString()}
               onPress={() => setCurrMonth(currMonth + 1)}
@@ -162,7 +161,7 @@ const Transactions = () => {
           <ScrollView
             style={{
               backgroundColor: theme.background,
-              height: "65%"
+              height: "65%",
             }}
             showsVerticalScrollIndicator={false}
           >
@@ -243,7 +242,7 @@ const Transactions = () => {
             navigation.navigate("Add");
           }}
         >
-          <DefaultText style={{ color: theme.text, fontSize: 24 }}>+</DefaultText>
+          <MaterialIcons name="add" size={24} color={theme.text} />
         </TouchableOpacity>
       </View>
 
@@ -258,7 +257,7 @@ const createStyles = (theme) => {
       width: 50,
       height: 50,
       borderRadius: 30,
-      backgroundColor: theme.primary2,   
+      backgroundColor: theme.primary2,
       justifyContent: "center",
       alignItems: "center",
     },

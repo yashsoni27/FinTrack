@@ -9,6 +9,7 @@ import React, { useContext, useEffect, useState } from "react";
 import DefaultText from "./defaultText";
 import PlaidLink from "react-native-plaid-link-sdk";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { createLinkToken, exchangePublicToken } from "../../api/plaidAPI";
 import { AuthContext } from "../context/auth";
 import { useTheme } from "../context/themeContext";
@@ -149,9 +150,9 @@ const AccountSlider = ({ accounts, onAddAccountSuccess }) => {
               console.log("Exit : ", exit);
             }}
           >
-            <FontAwesome5Icon
+            <MaterialIcons
               style={{ alignSelf: "center", margin: 5 }}
-              name="plus-circle"
+              name="add-circle"
               size={30}
               color={theme.text}
             />

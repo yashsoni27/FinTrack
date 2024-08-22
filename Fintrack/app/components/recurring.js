@@ -4,8 +4,7 @@ import DefaultText from "./defaultText";
 import { AuthContext } from "../context/auth";
 import { useTheme } from "../context/themeContext";
 import { getRecurringTransactionsDb } from "../../api/db";
-import { getRecurringTransactions } from "../../api/plaidAPI";
-import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
 
 const Recurring = () => {
@@ -70,11 +69,11 @@ const Recurring = () => {
           <DefaultText>UPCOMING</DefaultText>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <DefaultText>recurrings </DefaultText>
-            <FontAwesome5Icon
+            <MaterialIcons
               style={{}}
-              name="angle-right"
-              size={10}
-              color=""
+              name="chevron-right"
+              size={15}
+              color={theme.text}
             />
           </View>
         </View>

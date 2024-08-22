@@ -12,11 +12,10 @@ const FooterList = () => {
   return (
     <>
       <View style={[styles.container, { backgroundColor:theme.surface }]}>
-        <FooterItem name="home" text="Home" screenName="Home" handlePress={() => navigation.navigate("Home")} routeName={route.name} />
-        {/* <FooterItem name="plus-square" text="Add" screenName="Add" handlePress={() => navigation.navigate("Add")} routeName={route.name}/> */}
+        <FooterItem name="home-filled" text="Home" screenName="Home" handlePress={() => navigation.navigate("Home")} routeName={route.name} />
         <FooterItem name="list" text="Transactions" screenName="Transactions" handlePress={() => navigation.navigate("Transactions")} routeName={route.name}/>
-        <FooterItem name="chart-bar" text="Analysis" screenName="Analysis" handlePress={() => navigation.navigate("Analysis")} routeName={route.name}/>
-        <FooterItem name="user" text="Account" screenName="Account" handlePress={() => navigation.navigate("Account")} routeName={route.name} />
+        <FooterItem name="analytics" text="Spending" screenName="Analysis" handlePress={() => navigation.navigate("Analysis")} routeName={route.name}/>
+        <FooterItem name="person" text="Account" screenName="Account" handlePress={() => navigation.navigate("Account")} routeName={route.name} />
       </View>
     </>
   );
