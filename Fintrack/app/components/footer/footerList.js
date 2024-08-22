@@ -44,7 +44,6 @@ const createStyles = (theme) => {
       shadowOpacity: 0.1,
       shadowRadius: 10,
       elevation: 2,
-      backgroundColor: "lightgrey",
     },
   });
 };

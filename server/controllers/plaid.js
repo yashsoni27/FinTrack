@@ -34,7 +34,7 @@ export const createLinkToken = async (request, response) => {
       // client_user_id: "user",
       client_user_id: user.userId,
     },
-    client_name: "Plaid Test App",
+    client_name: "Fintracker",
     // products: process.env.PLAID_PRODUCTS.split(","),
     products: ["auth"],
     required_if_supported_products: ["transactions"],
