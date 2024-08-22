@@ -66,7 +66,7 @@ const Recurring = () => {
     <View>
       <TouchableOpacity onPress={() => navigation.navigate("Recurring")}>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <DefaultText>UPCOMING</DefaultText>
+          <DefaultText style={{color: theme.text2}}>UPCOMING</DefaultText>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <DefaultText>recurrings </DefaultText>
             <MaterialIcons
@@ -96,7 +96,6 @@ const Recurring = () => {
                       backgroundColor: theme.surface,
                       padding: 15,
                       borderRadius: 10,
-                      // width: "100%",
                       marginTop: 5,
                       flexDirection: "row",
                       alignItems: "center",
@@ -107,7 +106,6 @@ const Recurring = () => {
                       style={{
                         textTransform: "capitalize",
                         width: 80,
-                        // borderWidth: 1,
                       }}
                       numberOfLines={1}
                       ellipsizeMode="tail"

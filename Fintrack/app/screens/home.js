@@ -1,22 +1,15 @@
 import React, { useContext, useState, useEffect, useCallback } from "react";
-import {
-  View,
-  ScrollView,
-  RefreshControl,
-  Image,
-} from "react-native";
+import { View, ScrollView, RefreshControl, Image } from "react-native";
 import FooterList from "../components/footer/footerList";
 import { AuthContext } from "../context/auth";
 import { ActivityIndicator } from "react-native";
-import {
-  getBalance,
-  syncTransactions,
-} from "../../api/plaidAPI";
+import { getBalance, syncTransactions } from "../../api/plaidAPI";
 import { getBalanceDb, getTransactionsDb } from "../../api/db";
 import DefaultText from "../components/defaultText";
 import { useTheme } from "../context/themeContext";
 import AccountSlider from "../components/accountSlider";
 import Recurring from "../components/recurring";
+import Categories from "../components/categories";
 
 const Home = () => {
   const [state, setState] = useContext(AuthContext);
@@ -216,10 +209,10 @@ const Home = () => {
                         </DefaultText>
                       </View>
                     </View>
-                    <View style={{ alignSelf: "center"}}>
+                    <View style={{ alignSelf: "center" }}>
                       <DefaultText style={{ fontSize: 18 }}>
-                        {item.amount > 0 ? "-" : "+"}
-                        £{Math.abs(Math.round(item.amount * 100) / 100)}
+                        {item.amount > 0 ? "-" : "+"}£
+                        {Math.abs(Math.round(item.amount * 100) / 100)}
                       </DefaultText>
                     </View>
                   </View>
@@ -230,6 +223,10 @@ const Home = () => {
 
           <View style={{ margin: 10 }}>
             <Recurring />
+          </View>
+
+          <View style={{ margin: 10 }}>
+            <Categories />
           </View>
         </ScrollView>
       </View>
@@ -245,14 +242,16 @@ const Home = () => {
             right: 0,
             bottom: 0,
             backgroundColor: "gray",
-            opacity: 0.85, 
+            opacity: 0.85,
             justifyContent: "center",
             alignItems: "center",
             zIndex: 1000,
           }}
         >
-          <ActivityIndicator size="large" color="#000" />
-          <DefaultText style={{ marginTop: 10, fontSize: 16, color: "#000" }}>
+          <ActivityIndicator size="large" color={theme.text} />
+          <DefaultText
+            style={{ marginTop: 10, fontSize: 16, color: theme.text2 }}
+          >
             Loading...
           </DefaultText>
         </View>

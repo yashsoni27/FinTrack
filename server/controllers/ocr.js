@@ -53,29 +53,3 @@ export const scanReceipt = async (request, response) => {
     response.status(500).send(e);
   }
 };
-
-export const scanInvoice = async (request, response) => {
-  try {
-    console.log("scan invoice hit");
-    // const { image } = request.body;
-    // const imageBuffer = Buffer.from(image, "base64");
-
-    // console.log(__dirname);
-    const filePath = path.join(uploadsDir, request.file.path);
-    console.log(filePath);
-
-    Tesseract.recognize(filePath, "eng")
-      .then(({ data: { text } }) => {
-        fs.unlinkSync(filePath); // Clean up the temporary file
-        response.json({ text });
-      })
-      .catch((error) => {
-        fs.unlinkSync(filePath); // Clean up the temporary file on error
-        response.status(500).json({ error: error.message });
-      });
-
-  } catch (e) {
-    console.log("error: ", e);
-    response.status(500).send(e);
-  }
-};

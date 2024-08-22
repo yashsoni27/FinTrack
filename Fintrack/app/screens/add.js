@@ -11,7 +11,8 @@ import {
 } from "react-native";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 import RNFS from "react-native-fs";
-import { scanInvoice, scanReceipt } from "../../api/ocr";
+import TextRecognition from "@react-native-ml-kit/text-recognition";
+import { scanReceipt } from "../../api/ocr";
 import DefaultText from "../components/defaultText";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -33,7 +34,7 @@ const Add = () => {
   const [date, setDate] = useState(new Date());
   const [merchantName, setMerchantName] = useState("");
   const [amount, setAmount] = useState();
-  const [desc, setDesc] = useState(""); 
+  const [desc, setDesc] = useState("");
 
   const [saveDisabled, setSaveDisabled] = useState(true);
 
@@ -85,30 +86,91 @@ const Add = () => {
     } else if (response.assets && response.assets.length > 0) {
       const uri = response.assets[0].uri;
       setImageUri(uri);
-      extractInfo(uri);
+      // extractInfo(uri); // Mindee API
+      performOCR(uri);  // ml-kit with regex
     }
   };
 
+  const performOCR = async (uri) => {
+    try {
+      const result = await TextRecognition.recognize(uri);
+      let structuredText = [];
+
+      result.blocks.forEach((block, blockIndex) => {
+        block.lines.forEach((line, lineIndex) => {
+          structuredText.push({
+            text: line.text,
+            blockIndex,
+            lineIndex,
+            frame: line.frame,
+          });
+        });
+      });
+      console.log("Structured Text: ", structuredText);
+      const {total, date, merchantName} = extractOCRInfo(structuredText);
+      console.log("Extracted Info: ", total, date, merchantName);
+      const dateObj = stringToDate(date);
+      console.log("Date Obj: ", dateObj);
+
+      setDate(dateObj);
+      setAmount(total);
+      setMerchantName(merchantName);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const extractOCRInfo = (structuredText) => {
+    const findLine = (regex) =>
+      structuredText.find((line) => regex.test(line.text))?.text;
+
+    const totalRegex = /\b(total|total to pay|card)[ :]*?([£]?[\d,]+\.?\d*)/i;
+    let total = "Not found";
+    const totalLine = findLine(totalRegex);
+    if (totalLine) {
+      const match = totalLine.match(totalRegex);
+      if (match && match[2]) {
+        total = match[2].replace(",", ".").replace(/[$€£]/, "");
+      }
+    }
+
+    const dateRegex = /\d{2}\/\d{2}\/\d{2}/;
+    const date = findLine(dateRegex)?.match(dateRegex)[0] || "Not found";
+
+    let merchantName = "Not found";
+    // Look for the first all-caps line that's not "TOTAL" or a date
+    const merchantLine = structuredText.find(
+      (line) =>
+        line.text === line.text.toUpperCase() &&
+        line.text.length > 3 &&
+        !/TOTAL|RECEIPT|\d{1,2}[-/]\d{1,2}[-/]\d{2,4}/.test(line.text)
+    );
+    if (merchantLine) {
+      merchantName = merchantLine.text;
+    }
+
+    return { total, date, merchantName };
+  };
+
+  const stringToDate = (dateString) => {
+    const parts = dateString.split("/");
+    const year = parseInt(parts[2]) + (parts[2].length === 2 ? 2000 : 0);
+    const month = parseInt(parts[1]) - 1; // Months are 0-based in JavaScript
+    const day = parseInt(parts[0]);
+    return new Date(year, month, day);
+  };
+
   const extractInfo = async (uri) => {
-    const formData = new FormData();
-    formData.append("file", {
-      uri,
-      type: "image/jpeg", // Adjust MIME type if necessary
-      name: "photo.jpg",
-    });
     try {
       const imageData = await RNFS.readFile(uri, "base64");
       const response = await scanReceipt(imageData);
       console.log("OCR Upload successful:", response);
 
-      // const response = await scanInvoice(formData);
-      // console.log("tesseract upload successful:", response);
-      // console.log("tesseract upload successful:", response.text);
+      console.log("data: ", response);
 
       setDate(response.receiptData.date);
       setAmount(response.receiptData.amount);
       setMerchantName(response.receiptData.merchantName);
-      console.log("data: ", response);
     } catch (error) {
       console.error("Error uploading image: ", error);
     }
@@ -136,18 +198,13 @@ const Add = () => {
     setDate(currentDate);
   };
 
-  const showDatePickerModal = () => {
-    setShowDatePicker(true);
-  };
-
   useEffect(() => {
-    if (date != "" && amount!= ""  && merchantName != "") {
+    if (date != "" && amount != "" && merchantName != "") {
       setSaveDisabled(false);
     } else {
       setSaveDisabled(true);
     }
-  }, [date, amount, merchantName])
-  
+  }, [date, amount, merchantName]);
 
   return (
     <View style={{ padding: 15 }}>
@@ -194,7 +251,7 @@ const Add = () => {
 
         <View style={styles.inputContainer}>
           <DefaultText style={styles.label}>Date</DefaultText>
-          <TouchableOpacity onPress={showDatePickerModal}>
+          <TouchableOpacity onPress={() => setShowDatePicker(true)}>
             <View pointerEvents="none">
               <TextInput
                 style={styles.input}
@@ -248,7 +305,6 @@ const Add = () => {
           </TouchableOpacity>
         </View>
       </KeyboardAwareScrollView>
-      {/* <FooterList /> */}
     </View>
   );
 };
@@ -267,20 +323,16 @@ const createStyles = (theme) => {
       marginVertical: 16,
     },
     button: {
-      // backgroundColor: theme.primary2,
       backgroundColor: theme.text,
       borderRadius: 20,
     },
     buttonText: {
       color: theme.surface,
-      // color: theme.text,
-      // fontSize: 15,
-      // fontWeight: "bold",
       textAlign: "center",
       padding: 10,
     },
     disabledButton: {
-      opacity: 0.75
+      opacity: 0.75,
     },
     textContainer: {
       flex: 1,
@@ -301,6 +353,7 @@ const createStyles = (theme) => {
       borderRadius: 5,
       paddingHorizontal: 10,
       marginBottom: 16,
+      textTransform: "capitalize",
     },
   });
 };

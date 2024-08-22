@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Dimensions,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import FooterList from "../components/footer/footerList";
@@ -21,6 +22,7 @@ const Transactions = () => {
   const navigation = useNavigation();
   const { theme } = useTheme();
   const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [currMonth, setCurrMonth] = useState(new Date().getMonth() + 1);
   const [date, setDate] = useState(new Date());
   const styles = createStyles(theme);
@@ -34,12 +36,15 @@ const Transactions = () => {
 
   const fetchTransactionsDB = async (selectedMonth) => {
     try {
+      setLoading(true);
       const response = await getTransactionsDb(userId, 0, selectedMonth);
       // console.log("Transactions DB: ", response.transactions[0]);
       console.log("Transactions DB");
       setTransactions(response.transactions);
     } catch (error) {
       console.log("Error in fetching transactions:  ", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -69,6 +74,24 @@ const Transactions = () => {
 
   const graphData = generateGraphData(transactions);
   // console.log("graphData: ", graphData);
+
+  if (loading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          padding: 20,
+        }}
+      >
+        <ActivityIndicator size="large" color={theme.text} />
+        <DefaultText style={{ marginTop: 10, fontSize: 16, color: theme.text2 }}>
+          Loading...
+        </DefaultText>
+      </View>
+    );
+  }
 
   return (
     <>
@@ -244,9 +267,31 @@ const Transactions = () => {
         >
           <MaterialIcons name="add" size={24} color={theme.text} />
         </TouchableOpacity>
-      </View>
-
+      </View>      
       <FooterList />
+      
+      {/* Loading Overlay */}
+      {loading && (
+        <View
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "gray",
+            opacity: 0.85,
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+          }}
+        >
+          <ActivityIndicator size="large" color={theme.text}/>
+          <DefaultText style={{ marginTop: 10, fontSize: 16, color: theme.text2 }}>
+            Loading...
+          </DefaultText>
+        </View>
+      )}
     </>
   );
 };

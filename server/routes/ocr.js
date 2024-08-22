@@ -1,5 +1,5 @@
 import express from "express";
-import { scanInvoice, scanReceipt } from "../controllers/ocr.js";
+import { scanReceipt } from "../controllers/ocr.js";
 import multer from "multer";
 
 const upload = multer({ dest: "uploads/" });
@@ -13,6 +13,5 @@ router.get("/", (req, res) => {
 });
 
 router.post("/scan-receipt", scanReceipt);
-router.post("/scan-invoice", upload.single("file"), scanInvoice);
 
 export default router;
