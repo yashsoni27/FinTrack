@@ -11,14 +11,15 @@ import plaidRoutes from "./routes/plaid.js";
 import dbRoutes from "./routes/db.js";
 import ocrRoutes from "./routes/ocr.js";
 
+const port = process.env.PORT || 8000;
 const app = express();
 
 mongoose
   .connect(process.env.MONGO_DB_CONN_STRING)
   .then(() => {
     console.log("Connected to MongoDB");
-    app.listen(8000, () => {
-      console.log("server has started on port 8000");
+    app.listen(port, () => {
+      console.log(`server has started on port ${port}`);
     });
   })
   .catch((err) => {
