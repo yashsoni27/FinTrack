@@ -16,7 +16,8 @@ const transactionSchema = mongoose.Schema({
   personalFinanceCategoryIconUrl: String,
   category: [String],
   personalFinanceCategory: {
-    primary: { type: String, required: true },
+    // primary: { type: String, required: true },
+    primary: String,
     detailed: String,
     confidenceLevel: String,
   },

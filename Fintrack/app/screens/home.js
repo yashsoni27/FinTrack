@@ -36,6 +36,7 @@ const Home = () => {
       fetchTransactions();
     } catch (error) {
       console.log("Error in refreshing: ", error);
+      setRefreshing(false);
     } finally {
       setRefreshing(false);
     }
@@ -58,6 +59,19 @@ const Home = () => {
     }
   };
 
+  const fetchTransactions = async () => {
+    try {
+      setLoading(true);
+      const response = await syncTransactions(userId);
+      console.log("Transactions synced Plaid: ", response);
+      fetchTransactionsDB();
+      setLoading(false);
+    } catch (error) {
+      console.log("Error in fetching transactions: ", error);
+      setLoading(false);
+    }
+  };
+  
   const fetchBalanceDB = async () => {
     try {
       const response = await getBalanceDb(userId);
@@ -78,22 +92,10 @@ const Home = () => {
     } catch (error) {
       console.log("Error fetching balance: ", error);
       setBalance(null);
+      setAccounts(null);
     }
   };
-
-  const fetchTransactions = async () => {
-    try {
-      setLoading(true);
-      const response = await syncTransactions(userId);
-      console.log("Transactions synced Plaid: ", response);
-      fetchTransactionsDB();
-      setLoading(false);
-    } catch (error) {
-      console.log("Error in fetching transactions: ", error);
-      setLoading(false);
-    }
-  };
-
+  
   const fetchTransactionsDB = async () => {
     try {
       setLoading(true);

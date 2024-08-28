@@ -14,7 +14,7 @@ export const getAccountsDb = async (request, response) => {
     const { userId } = request.body;
     const user = await User.findOne({ userId });
     if (!user || !user.institutions || user.institutions.length == 0) {
-      throw new error("User not found");
+      throw new Error("User not found");
     }
 
     const accounts = await Account.find({ userId: userId });
@@ -29,14 +29,16 @@ export const getBalanceDb = async (request, response) => {
   try {
     const { userId } = request.body;
     const user = await User.findOne({ userId });
+    console.log("user: ", user);
     if (!user || !user.institutions || user.institutions.length == 0) {
-      throw new error("User not found");
+      throw new Error("User not found");
     }
 
     const netBalance = await Account.find({ userId: userId });
 
     response.json({ netBalance: netBalance });
   } catch (e) {
+    console.log("balance error", e);
     response.status(500).send(e);
   }
 };
@@ -49,7 +51,7 @@ export const getTransactionsDb = async (request, response) => {
 
     const user = await User.findOne({ userId });
     if (!user || !user.institutions || user.institutions.length == 0) {
-      throw new error("User not found or access token not set");
+      throw new Error("User not found or access token not set");
     }
 
     const currDate = new Date();
@@ -85,7 +87,7 @@ export const getRecurringDb = async (request, response) => {
     const { userId } = request.body;
     const user = await User.findOne({ userId });
     if (!user || !user.institutions || user.institutions.length == 0) {
-      throw new error("User not found or access token not set");
+      throw new Error("User not found or access token not set");
     }
 
     const recurringTransactions = await Recurring.find({

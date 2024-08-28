@@ -78,7 +78,7 @@ const AccountSlider = ({ accounts, onAddAccountSuccess }) => {
         }}
       >
         <ActivityIndicator size="large" color="#4285F4" />
-        <DefaultText style={{ marginTop: 10, fontSize: 16, color: "#333" }}>
+        <DefaultText style={{ marginTop: 10, fontSize: 16, color: theme.text }}>
           Loading...
         </DefaultText>
       </View>
@@ -94,35 +94,54 @@ const AccountSlider = ({ accounts, onAddAccountSuccess }) => {
         // padding: 5,
       }}
     >
-      {accounts.map((account) => {
-        return (
-          <View
-            key={account.accountId}
-            style={{
-              width: 150,
-              height: 100,
-              marginRight: 20,
-              borderWidth: 1,
-              padding: 10,
-              borderRadius: 10,
-              backgroundColor: background,
-              justifyContent: "space-between",
-            }}
-          >
-            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-              <DefaultText style={{ color: text, fontSize: 22 }}>
-                £ {account.balances}
-              </DefaultText>
-              <View>
-                <View style={{backgroundColor: text, padding: 5, borderRadius: 15}}>
-                  <FontAwesome5Icon name="university" size={15} color={background}/>
+      {accounts.length > 0 ? (
+        accounts.map((account) => {
+          return (
+            <View
+              key={account.accountId}
+              style={{
+                width: 150,
+                height: 100,
+                marginRight: 20,
+                borderWidth: 1,
+                padding: 10,
+                borderRadius: 10,
+                backgroundColor: background,
+                justifyContent: "space-between",
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <DefaultText style={{ color: text, fontSize: 22 }}>
+                  £ {account.balances}
+                </DefaultText>
+                <View>
+                  <View
+                    style={{
+                      backgroundColor: text,
+                      padding: 5,
+                      borderRadius: 15,
+                    }}
+                  >
+                    <FontAwesome5Icon
+                      name="university"
+                      size={15}
+                      color={background}
+                    />
+                  </View>
                 </View>
               </View>
+              <DefaultText style={{ color: text }}>{account.name}</DefaultText>
             </View>
-            <DefaultText style={{ color: text }}>{account.name}</DefaultText>
-          </View>
-        );
-      })}
+          );
+        })
+      ) : (
+        <DefaultText>No Accounts linked yet</DefaultText>
+      )}
       {linkToken && (
         <TouchableOpacity
           style={{

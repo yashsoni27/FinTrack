@@ -13,12 +13,13 @@ import Transactions from "../screens/transactions";
 import { useTheme } from "../context/themeContext";
 import RecurringScreen from "../screens/recurringScreen";
 import ManageBudgets from "../screens/manageBudgets";
+import Onboarding from "../screens/onboarding";
 
 const Stack = createNativeStackNavigator();
 
 const NavigationScreen = () => {
   const [state, setState] = useContext(AuthContext);
-  //   console.log("state", state);
+  console.log("state:::", state);
   const authenticated = state && state.token !== "" && state.user !== null;
 
   const { theme } = useTheme();
@@ -33,13 +34,21 @@ const NavigationScreen = () => {
     >
       {authenticated ? (
         <>
-          <Stack.Screen name="Home" component={Home} />
-          <Stack.Screen name="Account" component={Account} />
-          <Stack.Screen name="Analysis" component={Analysis} />
-          <Stack.Screen name="Add" component={Add} />
-          <Stack.Screen name="Transactions" component={Transactions} />
-          <Stack.Screen name="Recurring" component={RecurringScreen} />
-          <Stack.Screen name="ManageBudgets" component={ManageBudgets} />
+          {state.user.onBoarded == true ? (
+            <>
+              <Stack.Screen name="Home" component={Home} />
+              <Stack.Screen name="Account" component={Account} />
+              <Stack.Screen name="Analysis" component={Analysis} />
+              <Stack.Screen name="Add" component={Add} />
+              <Stack.Screen name="Transactions" component={Transactions} />
+              <Stack.Screen name="Recurring" component={RecurringScreen} />
+              <Stack.Screen name="ManageBudgets" component={ManageBudgets} />
+            </>
+          ) : (
+            <>
+              <Stack.Screen name="Onboarding" component={Onboarding} />
+            </>
+          )}
         </>
       ) : (
         <>

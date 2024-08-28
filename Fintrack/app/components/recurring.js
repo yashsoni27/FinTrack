@@ -52,7 +52,7 @@ const Recurring = () => {
         });
 
       setRecurringTransactions(recurring);
-      // console.log("recurring: ", recurring[0]);
+      // console.log("recurring: ", recurring);
     } catch (error) {
       console.log("Error in fetching recurring DB: ", error);
     }

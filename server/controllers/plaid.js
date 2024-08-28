@@ -28,6 +28,7 @@ const plaidClient = new PlaidApi(configuration);
 // Creating a temporary link token for bank connect
 export const createLinkToken = async (request, response) => {
   const { userId } = request.body;
+  console.log(userId);
   const user = await User.findOne({ userId });
   const plaidRequest = {
     user: {
@@ -83,6 +84,7 @@ export const exchangePublicToken = async (request, response) => {
       }
 
       user.institutions.push(institution);
+      user.onBoarded=true;
       user.save();
 
       accessToken = plaidResponse.data.access_token;
@@ -111,15 +113,18 @@ export const exchangePublicToken = async (request, response) => {
 export const getBalance = async (request, response) => {
   try {
     const { userId } = request.body;
+    console.log(userId);
     const user = await User.findOne({ userId });
     if (!user || !user.institutions || user.institutions.length == 0) {
-      throw new error("User not found or access token not set");
+      throw new Error("User not found or access token not set");
     }
 
     // Grabbing account info and saving to DB
     const res = await plaidClient.accountsBalanceGet({
       access_token: user.institutions[0].accessToken,
     });
+
+    console.log("len: ", res.data.accounts.length());
 
     for (const accountData of res.data.accounts) {
       try {
@@ -227,8 +232,8 @@ export const syncTransactions = async (request, response) => {
         cursor = syncResponse.data.next_cursor;
         hasMore = syncResponse.data.has_more;
       } catch (e) {
-        console.error("Error syncing transactions:", error);
-        throw error;
+        console.error("Error syncing transactions:", e);
+        throw e;
       }
     }
     // Update user's cursor

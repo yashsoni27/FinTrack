@@ -1,4 +1,8 @@
 import User from "../models/user.js";
+import Account from "../models/account.js";
+import Transaction from "../models/transaction.js";
+import Recurring from "../models/recurring.js";
+
 import { hashPassword, comparePassword } from "../helpers/auth.js";
 import jwt from "jsonwebtoken";
 import { nanoid } from "nanoid"; // for generating random code
@@ -168,7 +172,12 @@ export const deleteAccount = async (req, res) => {
     // }
 
     console.log("User deletion process from across every DB");
-    // await User.deleteOne({ userId });
+    await User.deleteOne({ userId });
+    await Account.deleteMany({ userId });
+    await Transaction.deleteMany({ userId });
+    await Recurring.deleteMany({ userId });
+    // await Budget.deleteMany({ userId });
+
 
     return res.json({ message: "Account deleted successfully" });
   } catch (err) {
