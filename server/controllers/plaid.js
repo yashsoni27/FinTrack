@@ -10,7 +10,6 @@ import Recurring from "../models/recurring.js";
 import { getBalanceDb, getRecurringDb } from "./db.js";
 import { callController } from "../helpers/callController.js";
 
-
 // Plaid common configuration
 const configuration = new Configuration({
   basePath: PlaidEnvironments[process.env.PLAID_ENV],
@@ -84,7 +83,7 @@ export const exchangePublicToken = async (request, response) => {
       }
 
       user.institutions.push(institution);
-      user.onBoarded=true;
+      user.onBoarded = true;
       user.save();
 
       accessToken = plaidResponse.data.access_token;
@@ -92,7 +91,7 @@ export const exchangePublicToken = async (request, response) => {
     } else {
       accessToken = user.institutions[0].accessToken;
     }
-    
+
     const authData = await plaidClient.accountsGet({
       access_token: accessToken,
     });
@@ -113,7 +112,6 @@ export const exchangePublicToken = async (request, response) => {
 export const getBalance = async (request, response) => {
   try {
     const { userId } = request.body;
-    console.log(userId);
     const user = await User.findOne({ userId });
     if (!user || !user.institutions || user.institutions.length == 0) {
       throw new Error("User not found or access token not set");
@@ -124,7 +122,6 @@ export const getBalance = async (request, response) => {
       access_token: user.institutions[0].accessToken,
     });
 
-    console.log("len: ", res.data.accounts.length());
 
     for (const accountData of res.data.accounts) {
       try {
@@ -164,8 +161,8 @@ export const getBalance = async (request, response) => {
       }
     }
 
-    const balanceResponse = await callController(getBalanceDb, {userId});
-    
+    const balanceResponse = await callController(getBalanceDb, { userId });
+
     response.json(balanceResponse);
     // response.json({ netBalance: netBalance });
   } catch (e) {
@@ -251,7 +248,8 @@ export const syncTransactions = async (request, response) => {
         name: transaction.name,
         merchantName: transaction.merchant_name,
         logoUrl: transaction.logo_url,
-        personalFinanceCategoryIconUrl: transaction.personal_finance_category_icon_url,
+        personalFinanceCategoryIconUrl:
+          transaction.personal_finance_category_icon_url,
         category: transaction.category,
         personalFinanceCategory: transaction.personal_finance_category,
         // description: transaction.description, -- Not for plaid response
@@ -350,10 +348,8 @@ export const recurringTransactions = async (request, response) => {
     // Fetch all recurring transactions from DB
     const recurringResponse = await callController(getRecurringDb, { userId });
     // console.log("recurringResponse: ", recurringResponse);
-    
+
     response.json(recurringResponse);
-
-
   } catch (e) {
     console.log("recurringTransactions error: ", e);
     response.status(500).send(e);

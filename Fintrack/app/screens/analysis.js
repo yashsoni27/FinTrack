@@ -150,7 +150,7 @@ const Analysis = () => {
 
     return (
       <>
-        <View>
+        <View style={{borderRightWidth: 0.2, borderLeftWidth: 0.2, borderColor: theme.text2}}>
           <LineChart
             areaChart
             curved
@@ -164,7 +164,7 @@ const Analysis = () => {
             startOpacity={0.5}
             endOpacity={0}
             width={Dimensions.get("window").width - 35}
-            height={150}
+            height={150}        
             thickness={2}
             // noOfSections={5}
             spacing={12}
@@ -541,6 +541,7 @@ const createStyles = (theme) => {
       width: 40,
     },
     pctContainer: {
+      width: "40%",
       padding: 20,
       paddingHorizontal: 30,
       margin: 10,

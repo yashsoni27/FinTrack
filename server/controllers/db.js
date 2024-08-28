@@ -29,7 +29,6 @@ export const getBalanceDb = async (request, response) => {
   try {
     const { userId } = request.body;
     const user = await User.findOne({ userId });
-    console.log("user: ", user);
     if (!user || !user.institutions || user.institutions.length == 0) {
       throw new Error("User not found");
     }
