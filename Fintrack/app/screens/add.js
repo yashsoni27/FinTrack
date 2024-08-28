@@ -138,7 +138,7 @@ const Add = () => {
     const date = findLine(dateRegex)?.match(dateRegex)[0] || "Not found";
 
     let merchantName = "Not found";
-    // Look for the first all-caps line that's not "TOTAL" or a date
+    // Looking for the first all-caps line that's not "TOTAL" or a date
     const merchantLine = structuredText.find(
       (line) =>
         line.text === line.text.toUpperCase() &&
@@ -160,6 +160,7 @@ const Add = () => {
     return new Date(year, month, day);
   };
 
+  // Mindee API (backup) for receipt scanning 
   const extractInfo = async (uri) => {
     try {
       const imageData = await RNFS.readFile(uri, "base64");
@@ -187,8 +188,10 @@ const Add = () => {
       };
       const response = await saveTransactionDb(transactionData);
       console.log("Transaction saved from DB", response);
+      navigation.navigate("Transactions");
     } catch (error) {
       console.log("Error in saving transactions:  ", error);
+      
     }
   };
 

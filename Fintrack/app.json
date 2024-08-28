@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Fintrack",
-    "slug": "Fintrack",
-    "scheme": "Fintrack",
+    "name": "Fintracker",
+    "slug": "Fintracker",
+    "scheme": "Fintracker",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
