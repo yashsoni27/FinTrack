@@ -158,7 +158,7 @@ const Home = () => {
             <DefaultText style={{ color: theme.text }}>Accounts</DefaultText>
             <AccountSlider
               accounts={accounts}
-              onAddAccountSuccess={fetchBalanceDB}
+              onAddAccountSuccess={fetchBalance}
             />
           </View>
 

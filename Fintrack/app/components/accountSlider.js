@@ -94,7 +94,7 @@ const AccountSlider = ({ accounts, onAddAccountSuccess }) => {
         // padding: 5,
       }}
     >
-      {accounts.length > 0 ? (
+      {accounts && accounts.length > 0 ? (
         accounts.map((account) => {
           return (
             <View

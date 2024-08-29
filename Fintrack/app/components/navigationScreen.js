@@ -34,7 +34,7 @@ const NavigationScreen = () => {
     >
       {authenticated ? (
         <>
-          {state.user.onBoarded == true ? (
+          {/* {state.user.onBoarded == false ? ( */}
             <>
               <Stack.Screen name="Home" component={Home} />
               <Stack.Screen name="Account" component={Account} />
@@ -44,11 +44,11 @@ const NavigationScreen = () => {
               <Stack.Screen name="Recurring" component={RecurringScreen} />
               <Stack.Screen name="ManageBudgets" component={ManageBudgets} />
             </>
-          ) : (
+          {/* ) : (
             <>
               <Stack.Screen name="Onboarding" component={Onboarding} />
             </>
-          )}
+          )} */}
         </>
       ) : (
         <>
