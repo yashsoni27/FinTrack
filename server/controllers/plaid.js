@@ -56,41 +56,41 @@ export const createLinkToken = async (request, response) => {
 // For exchanging public token with permanent access token
 export const exchangePublicToken = async (request, response) => {
   const { userId, public_token, metadata } = request.body;
-  // console.log(metadata);
+  console.log("exchange public link token hit...");
   const user = await User.findOne({ userId });
-  console.log(user);
+  // console.log(user);
   var accessToken;
   try {
     // Only exchange token if the user doesn't have access token
-    if (!user.institutions || user.institutions.length == 0) {
-      const plaidResponse = await plaidClient.itemPublicTokenExchange({
-        public_token: public_token,
-      });
+    // if (!user.institutions || user.institutions.length == 0) {
+    const plaidResponse = await plaidClient.itemPublicTokenExchange({
+      public_token: public_token,
+    });
 
-      // const itemID = plaidResponse.data.item_id;
-      // console.log("itemId: ", itemID);
+    // const itemID = plaidResponse.data.item_id;
+    // console.log("itemId: ", itemID);
 
-      const institution = {
-        institutionId: metadata.institution.id,
-        name: metadata.institution.name,
-        accessToken: plaidResponse.data.access_token,
-        plaidCursor: null,
-      };
+    const institution = {
+      institutionId: metadata.institution.id,
+      name: metadata.institution.name,
+      accessToken: plaidResponse.data.access_token,
+      plaidCursor: null,
+    };
 
-      // Initialize institutions if undefined
-      if (!user.institutions) {
-        user.institutions = [];
-      }
-
-      user.institutions.push(institution);
-      user.onBoarded = true;
-      user.save();
-
-      accessToken = plaidResponse.data.access_token;
-      console.log("user data saved");
-    } else {
-      accessToken = user.institutions[0].accessToken;
+    // Initialize institutions if undefined
+    if (!user.institutions) {
+      user.institutions = [];
     }
+
+    user.institutions.push(institution);
+    user.onBoarded = true;
+    user.save();
+
+    accessToken = plaidResponse.data.access_token;
+    console.log("user data saved");
+    // } else {
+    //   accessToken = user.institutions[0].accessToken;
+    // }
 
     const authData = await plaidClient.accountsGet({
       access_token: accessToken,
@@ -117,47 +117,51 @@ export const getBalance = async (request, response) => {
       throw new Error("User not found or access token not set");
     }
 
-    // Grabbing account info and saving to DB
-    const res = await plaidClient.accountsBalanceGet({
-      access_token: user.institutions[0].accessToken,
-    });
+    for (const institution of user.institutions) {
+      // Grabbing account info and saving to DB
+      const res = await plaidClient.accountsBalanceGet({
+        access_token: institution.accessToken,
+      });
 
-
-    for (const accountData of res.data.accounts) {
-      try {
-        const existingAccount = await Account.findOne({
-          account_id: accountData.account_id,
-        });
-
-        if (!existingAccount) {
-          const newAccount = new Account({
+      // console.log("res:  ", res.data.accounts);
+      for (const accountData of res.data.accounts) {
+        try {
+          const existingAccount = await Account.findOne({
             account_id: accountData.account_id,
-            balances: {
-              available: accountData.balances.available,
-              current: accountData.balances.current,
-              iso_currency_code: accountData.balances.iso_currency_code,
-              limit: accountData.balances.limit,
-              unofficial_currency_code:
-                accountData.balances.unofficial_currency_code,
-            },
-            mask: accountData.mask,
-            name: accountData.name,
-            type: accountData.type,
-            subType: accountData.subtype,
-            persistent_account_id: accountData.persistent_account_id,
-            userId: userId,
           });
-          await newAccount.save();
-          console.log("Bank account saved: ", accountData.account_id);
-        } else {
-          console.log("Bank account updated: ", accountData.account_id);
-          existingAccount.balances.available = accountData.balances.available;
-          existingAccount.balances.current = accountData.balances.current;
-          existingAccount.balances.limit = accountData.balances.limit;
-          existingAccount.save();
+
+          if (!existingAccount) {
+            const newAccount = new Account({
+              account_id: accountData.account_id,
+              balances: {
+                available: accountData.balances.available,
+                current: accountData.balances.current,
+                iso_currency_code: accountData.balances.iso_currency_code,
+                limit: accountData.balances.limit,
+                unofficial_currency_code:
+                  accountData.balances.unofficial_currency_code,
+              },
+              mask: accountData.mask,
+              name: accountData.name,
+              type: accountData.type,
+              subType: accountData.subtype,
+              persistent_account_id: accountData.persistent_account_id,
+              userId: userId,
+            });
+            await newAccount.save();
+            console.log("Bank account saved: ", accountData.account_id);
+            console.log("Name: ", accountData.name);
+          } else {
+            console.log("Bank account updated: ", accountData.account_id);
+            console.log("Name: ", accountData.name);
+            existingAccount.balances.available = accountData.balances.available;
+            existingAccount.balances.current = accountData.balances.current;
+            existingAccount.balances.limit = accountData.balances.limit;
+            existingAccount.save();
+          }
+        } catch (error) {
+          console.log(error);
         }
-      } catch (error) {
-        console.log(error);
       }
     }
 
@@ -170,7 +174,7 @@ export const getBalance = async (request, response) => {
   }
 };
 
-// Getting transactions data -- Could be removed as sync transactions is used
+// Getting transactions data -- Could be removed as syncTransactions is used
 export const getTransactions = async (request, response) => {
   try {
     const { userId } = request.body;
@@ -203,42 +207,63 @@ export const syncTransactions = async (request, response) => {
   }
 
   try {
-    let accessToken = user.institutions[0].accessToken;
-    let cursor = user.institutions[0].plaidCursor;
-    let hasMore = true;
-    let addedTransactions = [];
-    let modifiedTransactions = [];
-    let removedTransactions = [];
+    let allInstitutions = [];
+    user.institutions.forEach((institution) => {
+      allInstitutions.push({
+        accessToken: institution.accessToken,
+        plaidCursor: institution.plaidCursor,
+      });
+    });
 
-    while (hasMore) {
-      try {
-        const syncResponse = await plaidClient.transactionsSync({
-          access_token: accessToken,
-          cursor: cursor,
-          // count: 10,
-        });
+    let allAddedTransactions = [];
+    let allModifiedTransactions = [];
+    let allRemovedTransactions = [];
 
-        addedTransactions = addedTransactions.concat(syncResponse.data.added);
-        modifiedTransactions = modifiedTransactions.concat(
-          syncResponse.data.modified
-        );
-        removedTransactions = removedTransactions.concat(
-          syncResponse.data.removed
-        );
+    for (let i = 0; i < allInstitutions.length; i++) {
+      const institution = allInstitutions[i];
 
-        cursor = syncResponse.data.next_cursor;
-        hasMore = syncResponse.data.has_more;
-      } catch (e) {
-        console.error("Error syncing transactions:", e);
-        throw e;
+      // let accessToken = user.institutions[0].accessToken;
+      // let cursor = user.institutions[0].plaidCursor;
+      let hasMore = true;
+      let addedTransactions = [];
+      let modifiedTransactions = [];
+      let removedTransactions = [];
+
+      while (hasMore) {
+        try {
+          const syncResponse = await plaidClient.transactionsSync({
+            access_token: institution.accessToken,
+            cursor: institution.plaidCursor,
+            // count: 10,
+          });
+
+          addedTransactions = addedTransactions.concat(syncResponse.data.added);
+          modifiedTransactions = modifiedTransactions.concat(
+            syncResponse.data.modified
+          );
+          removedTransactions = removedTransactions.concat(
+            syncResponse.data.removed
+          );
+
+          institution.plaidCursor = syncResponse.data.next_cursor;
+          hasMore = syncResponse.data.has_more;
+        } catch (e) {
+          console.error("Error syncing transactions:", e);
+          throw e;
+        }
       }
+
+      allAddedTransactions = allAddedTransactions.concat(addedTransactions);
+      allModifiedTransactions = allModifiedTransactions.concat(modifiedTransactions);
+      allRemovedTransactions = allRemovedTransactions.concat(removedTransactions);
+
+      // Update user's cursor
+      user.institutions[i].plaidCursor = institution.plaidCursor;
+      await user.institutions[i].save();
     }
-    // Update user's cursor
-    user.institutions[0].plaidCursor = cursor;
-    user.save();
 
     // Processing the transactions
-    for (const transaction of addedTransactions) {
+    for (const transaction of allAddedTransactions) {
       await Transaction.create({
         userId: user.userId,
         transactionId: transaction.transaction_id,
@@ -256,7 +281,7 @@ export const syncTransactions = async (request, response) => {
       });
     }
 
-    for (const transaction of modifiedTransactions) {
+    for (const transaction of allModifiedTransactions) {
       await Transaction.findOneAndUpdate(
         { transactionId: transaction.transaction_id },
         {
@@ -270,16 +295,16 @@ export const syncTransactions = async (request, response) => {
       );
     }
 
-    for (const transaction of removedTransactions) {
+    for (const transaction of allRemovedTransactions) {
       await Transaction.deleteOne({
         transactionId: transaction.transaction_id,
       });
     }
 
     response.json({
-      added: addedTransactions.length,
-      modified: modifiedTransactions.length,
-      removed: removedTransactions.length,
+      added: allAddedTransactions.length,
+      modified: allModifiedTransactions.length,
+      removed: allRemovedTransactions.length,
     });
   } catch (e) {
     console.log("Sync transaction error: ", e);
