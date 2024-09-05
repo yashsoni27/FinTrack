@@ -18,10 +18,10 @@ const AccountSlider = ({ accounts, onAddAccountSuccess }) => {
   const [state, setState] = useContext(AuthContext);
   const [linkToken, setLinkToken] = useState(null);
   const [loading, setLoading] = useState(false);
-
   const { theme, mode } = useTheme();
-  const userId = state.user.userId;
+  
   let background = theme.background;
+  const userId = state.user.userId;
   let text = theme.text;
 
   if (mode == "light") {
@@ -31,6 +31,7 @@ const AccountSlider = ({ accounts, onAddAccountSuccess }) => {
     background = theme.primary;
     text = theme.background;
   }
+  const styles = createStyles(theme, background, text);
 
   const generateLinkToken = async () => {
     try {
@@ -97,19 +98,7 @@ const AccountSlider = ({ accounts, onAddAccountSuccess }) => {
       {accounts && accounts.length > 0 ? (
         accounts.map((account) => {
           return (
-            <View
-              key={account.accountId}
-              style={{
-                width: 150,
-                height: 100,
-                marginRight: 20,
-                borderWidth: 1,
-                padding: 10,
-                borderRadius: 10,
-                backgroundColor: background,
-                justifyContent: "space-between",
-              }}
-            >
+            <View key={account.accountId} style={styles.accountContainer}>
               <View
                 style={{
                   flexDirection: "row",
@@ -143,24 +132,14 @@ const AccountSlider = ({ accounts, onAddAccountSuccess }) => {
         <DefaultText>No Accounts linked yet</DefaultText>
       )}
       {linkToken && (
-        <TouchableOpacity
-          style={{
-            backgroundColor: theme.background,
-            borderStyle: "dashed",
-            borderWidth: 1,
-            borderColor: theme.text,
-            width: 120,
-            paddingHorizontal: 20,
-            paddingVertical: 10,
-            borderRadius: 10,
-            marginRight: 5,
-          }}
-        >
-          <PlaidLink
+        <TouchableOpacity style={styles.addAccountContainer}>
+          {/* Plaid Link component for linking bank account */}
+          <PlaidLink  
             tokenConfig={{
               token: linkToken,
             }}
-            onSuccess={onSuccess}
+            // Handling onSuccess function by fetching the details of the account
+            onSuccess={onSuccess} 
             onExit={(exit) => {
               console.log("Exit : ", exit);
             }}
@@ -185,4 +164,28 @@ const AccountSlider = ({ accounts, onAddAccountSuccess }) => {
 
 export default AccountSlider;
 
-const styles = StyleSheet.create({});
+const createStyles = (theme, background, text) => {
+  return StyleSheet.create({
+    accountContainer: {
+      width: 150,
+      height: 100,
+      marginRight: 20,
+      borderWidth: 1,
+      padding: 10,
+      borderRadius: 10,
+      backgroundColor: background,
+      justifyContent: "space-between",
+    },
+    addAccountContainer: {
+      backgroundColor: theme.background,
+      borderStyle: "dashed",
+      borderWidth: 1,
+      borderColor: theme.text,
+      width: 120,
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      borderRadius: 10,
+      marginRight: 5,
+    },
+  });
+};

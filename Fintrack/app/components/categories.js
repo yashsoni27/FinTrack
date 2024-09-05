@@ -31,6 +31,7 @@ const Categories = () => {
       setIsLoading(true);
       const response = await getBudget(userId, selectedMonth);
       console.log("Budget fetched");
+      console.log("budgets: ", response);
       if (response.length > 0) {
         setBudgets({
           Shopping: {
@@ -56,6 +57,35 @@ const Categories = () => {
           Home: {
             budget: response[0].category.home.budget,
             spent: response[0].category.home.spent,
+            emoji: "🏠",
+          },
+        });
+      }
+      else {
+        setBudgets({
+          Shopping: {
+            budget: 0,
+            spent: 0,
+            emoji: "🛍️",
+          },
+          Entertainment: {
+            budget: 0,
+            spent: 0,
+            emoji: "🎟️",
+          },
+          "Food & Drink": {
+            budget: 0,
+            spent: 0,
+            emoji: "🍕",
+          },
+          Transportation: {
+            budget: 0,
+            spent: 0,
+            emoji: "🚌",
+          },
+          Home: {
+            budget: 0,
+            spent: 0,
             emoji: "🏠",
           },
         });

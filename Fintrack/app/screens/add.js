@@ -121,9 +121,10 @@ const Add = () => {
   };
 
   const extractOCRInfo = (structuredText) => {
-    const findLine = (regex) =>
+    const findLine = (regex) => 
       structuredText.find((line) => regex.test(line.text))?.text;
 
+    // Regex for finding the total amount
     const totalRegex = /\b(total|total to pay|card)[ :]*?([£]?[\d,]+\.?\d*)/i;
     let total = "Not found";
     const totalLine = findLine(totalRegex);
@@ -134,14 +135,14 @@ const Add = () => {
       }
     }
 
+    // Regex for finding the date 
     const dateRegex = /\d{2}\/\d{2}\/\d{2}/;
     const date = findLine(dateRegex)?.match(dateRegex)[0] || "Not found";
 
     let merchantName = "Not found";
-    // Looking for the first all-caps line that's not "TOTAL" or a date
+    // Looking for the first line that's not TOTAL or a date
     const merchantLine = structuredText.find(
       (line) =>
-        line.text === line.text.toUpperCase() &&
         line.text.length > 3 &&
         !/TOTAL|RECEIPT|\d{1,2}[-/]\d{1,2}[-/]\d{2,4}/.test(line.text)
     );
@@ -188,6 +189,7 @@ const Add = () => {
       };
       const response = await saveTransactionDb(transactionData);
       console.log("Transaction saved from DB", response);
+      navigation.goBack()
       navigation.navigate("Transactions");
     } catch (error) {
       console.log("Error in saving transactions:  ", error);

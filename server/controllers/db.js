@@ -346,6 +346,7 @@ export const getBudget = async (request, response) => {
       month: currentMonth,
       year: currentYear,
     });
+    console.log("budget response: ",budgetResponse );
 
     if (budgetResponse.length > 0) {
       budgetResponse[0].spent = transactionResponse[0].total;
@@ -360,6 +361,29 @@ export const getBudget = async (request, response) => {
         { userId: userId, month: currentMonth, year: currentYear },
         { spent: transactionResponse[0].total }
       );
+    }
+    else {
+      const prevBudgetResponse = await Budget.find({
+        userId: userId,
+        month: currentMonth - 1,
+        year: currentYear,
+      });
+
+      const data = {
+        totalSpending: prevBudgetResponse[0].budget,
+        shopping: prevBudgetResponse[0].category.shopping.budget,
+        entertainment: prevBudgetResponse[0].category.entertainment.budget,
+        foodAndDrink: prevBudgetResponse[0].category.foodAndDrink.budget,
+        transportation: prevBudgetResponse[0].category.transportation.budget,
+        home: prevBudgetResponse[0].category.home.budget,
+        other: prevBudgetResponse[0].category.other.budget,
+      }      
+      
+      const currMonthResponse = await callController(setBudget, {
+        userId: userId,
+        data: data,
+      });      
+      console.log(currMonthResponse);
     }
 
     response.json(budgetResponse);
