@@ -348,23 +348,42 @@ export const getBudget = async (request, response) => {
     });
     console.log("budget response: ", budgetResponse);
 
-    if (budgetResponse.length > 0 && transactionResponse.length > 0) {
-      budgetResponse[0].spent = transactionResponse[0].total;
-      budgetResponse[0].category.shopping.spent =
-        transactionResponse[0].shopping;
-      budgetResponse[0].category.entertainment.spent =
-        transactionResponse[0].entertainment;
-      budgetResponse[0].category.foodAndDrink.spent =
-        transactionResponse[0].foodAndDrink;
-      budgetResponse[0].category.transportation.spent =
-        transactionResponse[0].transportation;
-      budgetResponse[0].category.home.spent = transactionResponse[0].home;
-      budgetResponse[0].category.other.spent = transactionResponse[0].other;
+    if (budgetResponse.length > 0) {
+      if (transactionResponse.length > 0) {
+        budgetResponse[0].spent = transactionResponse[0].total;
+        budgetResponse[0].category.shopping.spent =
+          transactionResponse[0].shopping;
+        budgetResponse[0].category.entertainment.spent =
+          transactionResponse[0].entertainment;
+        budgetResponse[0].category.foodAndDrink.spent =
+          transactionResponse[0].foodAndDrink;
+        budgetResponse[0].category.transportation.spent =
+          transactionResponse[0].transportation;
+        budgetResponse[0].category.home.spent = transactionResponse[0].home;
+        budgetResponse[0].category.other.spent = transactionResponse[0].other;
 
-      await Budget.findOneAndUpdate(
-        { userId: userId, month: currentMonth, year: currentYear },
-        { spent: transactionResponse[0].total }
-      );
+        await Budget.findOneAndUpdate(
+          { userId: userId, month: currentMonth, year: currentYear },
+          { spent: transactionResponse[0].total }
+        );
+      } else {
+        budgetResponse[0].spent = 0;
+        budgetResponse[0].category.shopping.spent =
+          0;
+        budgetResponse[0].category.entertainment.spent =
+          0;
+        budgetResponse[0].category.foodAndDrink.spent =
+          0;
+        budgetResponse[0].category.transportation.spent =
+          0;
+        budgetResponse[0].category.home.spent = 0;
+        budgetResponse[0].category.other.spent = 0;
+
+        await Budget.findOneAndUpdate(
+          { userId: userId, month: currentMonth, year: currentYear },
+          { spent: 0 }
+        );
+      }
     } else {
       const prevBudgetResponse = await Budget.find({
         userId: userId,
