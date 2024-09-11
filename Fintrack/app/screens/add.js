@@ -161,7 +161,7 @@ const Add = () => {
     return new Date(year, month, day);
   };
 
-  // Mindee API (backup) for receipt scanning 
+  // Mindee API (backup: third party API) for receipt scanning 
   const extractInfo = async (uri) => {
     try {
       const imageData = await RNFS.readFile(uri, "base64");

@@ -45,32 +45,32 @@ export const getBalanceDb = async (request, response) => {
 export const getTransactionsDb = async (request, response) => {
   try {
     const { userId, count, month } = request.body;
-    // console.log("count, month: ", count, month);
-    // console.log("userId: ", userId);
 
     const user = await User.findOne({ userId });
     if (!user || !user.institutions || user.institutions.length == 0) {
       throw new Error("User not found or access token not set");
     }
 
-    const currDate = new Date();
-    const currMonth = month || currDate.getMonth() + 1;
-    const currYear = currDate.getFullYear();
-
-    // Calculate the start and end dates for the query
-    const startDate = new Date(currYear, currMonth - 1, 1); // first day of the month
-    const endDate = new Date(currYear, currMonth, 0, 23, 59, 59);
-
     let query = Transaction.find({
       userId: userId,
-      date: { $gte: startDate, $lt: endDate },
-    }).sort({ date: -1 });
+    });
 
     if (count || count != 0) {
       query = query.limit(count);
     } else if (count == null) {
-      query = query.limit(10);
+      const currDate = new Date();
+      const currMonth = month || currDate.getMonth() + 1;
+      const currYear = currDate.getFullYear();
+
+      // Calculate the start and end dates for the query
+      const startDate = new Date(currYear, currMonth - 1, 1); // first day of the month
+      const endDate = new Date(currYear, currMonth, 0, 23, 59, 59);
+      query = query.find({
+        date: { $gte: startDate, $lt: endDate },
+      });
     }
+
+    query = query.sort({ date: -1 });
 
     const transactions = await query.exec();
 
@@ -346,14 +346,18 @@ export const getBudget = async (request, response) => {
       month: currentMonth,
       year: currentYear,
     });
-    console.log("budget response: ",budgetResponse );
+    console.log("budget response: ", budgetResponse);
 
     if (budgetResponse.length > 0) {
       budgetResponse[0].spent = transactionResponse[0].total;
-      budgetResponse[0].category.shopping.spent = transactionResponse[0].shopping;
-      budgetResponse[0].category.entertainment.spent = transactionResponse[0].entertainment;
-      budgetResponse[0].category.foodAndDrink.spent = transactionResponse[0].foodAndDrink;
-      budgetResponse[0].category.transportation.spent = transactionResponse[0].transportation;
+      budgetResponse[0].category.shopping.spent =
+        transactionResponse[0].shopping;
+      budgetResponse[0].category.entertainment.spent =
+        transactionResponse[0].entertainment;
+      budgetResponse[0].category.foodAndDrink.spent =
+        transactionResponse[0].foodAndDrink;
+      budgetResponse[0].category.transportation.spent =
+        transactionResponse[0].transportation;
       budgetResponse[0].category.home.spent = transactionResponse[0].home;
       budgetResponse[0].category.other.spent = transactionResponse[0].other;
 
@@ -361,8 +365,7 @@ export const getBudget = async (request, response) => {
         { userId: userId, month: currentMonth, year: currentYear },
         { spent: transactionResponse[0].total }
       );
-    }
-    else {
+    } else {
       const prevBudgetResponse = await Budget.find({
         userId: userId,
         month: currentMonth - 1,
@@ -377,12 +380,12 @@ export const getBudget = async (request, response) => {
         transportation: prevBudgetResponse[0].category.transportation.budget,
         home: prevBudgetResponse[0].category.home.budget,
         other: prevBudgetResponse[0].category.other.budget,
-      }      
-      
+      };
+
       const currMonthResponse = await callController(setBudget, {
         userId: userId,
         data: data,
-      });      
+      });
       console.log(currMonthResponse);
     }
 

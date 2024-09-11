@@ -259,8 +259,9 @@ export const syncTransactions = async (request, response) => {
 
       // Update user's cursor
       user.institutions[i].plaidCursor = institution.plaidCursor;
-      await user.institutions[i].save();
+      // await user.institutions[i].save();
     }
+    await user.save();
 
     // Processing the transactions
     for (const transaction of allAddedTransactions) {
