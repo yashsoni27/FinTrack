@@ -45,6 +45,7 @@ export const getBalanceDb = async (request, response) => {
 export const getTransactionsDb = async (request, response) => {
   try {
     const { userId, count, month } = request.body;
+    console.log(userId, count, month);
 
     const user = await User.findOne({ userId });
     if (!user || !user.institutions || user.institutions.length == 0) {
@@ -55,9 +56,9 @@ export const getTransactionsDb = async (request, response) => {
       userId: userId,
     });
 
-    if (count || count != 0) {
+    if (count > 0) {      
       query = query.limit(count);
-    } else if (count == null) {
+    } else if (count == null || count == 0) {      
       const currDate = new Date();
       const currMonth = month || currDate.getMonth() + 1;
       const currYear = currDate.getFullYear();
