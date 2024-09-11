@@ -339,7 +339,7 @@ export const getBudget = async (request, response) => {
     ];
 
     const transactionResponse = await Transaction.aggregate(pipeline);
-    // console.log("response: ", transactionResponse);
+    console.log("response: ", transactionResponse);
 
     const budgetResponse = await Budget.find({
       userId: userId,
@@ -348,7 +348,7 @@ export const getBudget = async (request, response) => {
     });
     console.log("budget response: ", budgetResponse);
 
-    if (budgetResponse.length > 0) {
+    if (budgetResponse.length > 0 && transactionResponse.length > 0) {
       budgetResponse[0].spent = transactionResponse[0].total;
       budgetResponse[0].category.shopping.spent =
         transactionResponse[0].shopping;
