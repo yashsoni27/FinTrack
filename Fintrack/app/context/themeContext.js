@@ -33,21 +33,16 @@ export const themes = {
 };
 
 export const ThemeProvider = ({ children }) => {
-  const initialColorScheme = Appearance.getColorScheme();
+  const initialColorScheme = Appearance.getColorScheme(); // Getting the system theme
   const [theme, setTheme] = useState(initialColorScheme == 'light' ? "dark" : 'light');
-  // const [theme, setTheme] = useState(initialColorScheme == 'light' ? "light" : 'dark');
 
   useEffect(() => {
-    console.log(theme);
     const handleAppearanceChange = (pref) => {
         const newScheme = pref.colorScheme;
         setTheme(newScheme == 'light' ? "dark" : 'light');        
-        // setTheme(newScheme == 'light' ? "light" : 'dark');        
-    };
-    
+    };    
     const listener = Appearance.addChangeListener(handleAppearanceChange);
 
-    // Cleanup listener on unmount
     return () => {
       listener.remove();
     };
@@ -56,7 +51,6 @@ export const ThemeProvider = ({ children }) => {
 
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
-    // Appearance.setColorScheme(prevTheme === "light" ? "dark" : "light");
   };
 
   return (

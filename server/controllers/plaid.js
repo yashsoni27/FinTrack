@@ -31,16 +31,12 @@ export const createLinkToken = async (request, response) => {
   const user = await User.findOne({ userId });
   const plaidRequest = {
     user: {
-      // client_user_id: "user",
       client_user_id: user.userId,
     },
     client_name: "Fintracker",
-    // products: process.env.PLAID_PRODUCTS.split(","),
     products: ["auth"],
     required_if_supported_products: ["transactions"],
     language: "en",
-    // webhook: 'https://webhook.example.com',
-    // redirect_uri: 'http://localhost:8081/',
     android_package_name: "com.yashso.fintrack",
     country_codes: process.env.PLAID_COUNTRY_CODES.split(","),
   };
@@ -48,7 +44,6 @@ export const createLinkToken = async (request, response) => {
     const createTokenResponse = await plaidClient.linkTokenCreate(plaidRequest);
     response.json(createTokenResponse.data);
   } catch (error) {
-    // console.log(response.json);
     response.status(500).json({ error: error.message });
   }
 };
@@ -56,7 +51,6 @@ export const createLinkToken = async (request, response) => {
 // For exchanging public token with permanent access token
 export const exchangePublicToken = async (request, response) => {
   const { userId, public_token, metadata } = request.body;
-  console.log("exchange public link token hit...");
   const user = await User.findOne({ userId });
   // console.log(user);
   var accessToken;
@@ -66,9 +60,6 @@ export const exchangePublicToken = async (request, response) => {
     const plaidResponse = await plaidClient.itemPublicTokenExchange({
       public_token: public_token,
     });
-
-    // const itemID = plaidResponse.data.item_id;
-    // console.log("itemId: ", itemID);
 
     const institution = {
       institutionId: metadata.institution.id,
@@ -95,14 +86,11 @@ export const exchangePublicToken = async (request, response) => {
     const authData = await plaidClient.accountsGet({
       access_token: accessToken,
     });
-    // console.log("authResponse: ", authData.data);
 
     response.json({
-      // balance: balanceResponse.data,
       auth: authData.data,
     });
   } catch (error) {
-    // handle error
     console.log("ERROR: ", error);
     response.send(error);
   }

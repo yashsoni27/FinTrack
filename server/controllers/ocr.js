@@ -1,9 +1,9 @@
 import mindee from "mindee";
-import Tesseract from "tesseract.js";
+// import Tesseract from "tesseract.js";
 // import Tesseract from "node-tesseract-ocr";
-import { Buffer } from "buffer";
-import multer from "multer";
-import fs from "fs";
+// import { Buffer } from "buffer";
+// import multer from "multer";
+// import fs from "fs";
 import path from "path";
 import { fileURLToPath } from 'url';
 
