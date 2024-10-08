@@ -21,6 +21,7 @@ const accountSchema = mongoose.Schema({
   subType: String,
   persistent_account_id: String,
   userId: String,
+  consent_expiration_time: String,
 });
 
 export default mongoose.model("Account", accountSchema);

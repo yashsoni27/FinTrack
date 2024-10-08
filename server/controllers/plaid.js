@@ -26,8 +26,8 @@ const plaidClient = new PlaidApi(configuration);
 // Plaid API starts
 // Creating a temporary link token for bank connect
 export const createLinkToken = async (request, response) => {
-  const { userId } = request.body;
-  console.log(userId);
+  const { userId, isUpdate, accountNo } = request.body;
+  console.log(userId, isUpdate, accountNo);
   const user = await User.findOne({ userId });
   const plaidRequest = {
     user: {
@@ -40,6 +40,11 @@ export const createLinkToken = async (request, response) => {
     android_package_name: "com.yashso.fintrack",
     country_codes: process.env.PLAID_COUNTRY_CODES.split(","),
   };
+
+  if (isUpdate) {
+    plaidRequest.access_token = user.institutions[accountNo].accessToken;
+  }
+
   try {
     const createTokenResponse = await plaidClient.linkTokenCreate(plaidRequest);
     response.json(createTokenResponse.data);
@@ -154,6 +159,7 @@ export const getBalance = async (request, response) => {
     }
 
     const balanceResponse = await callController(getBalanceDb, { userId });
+    const authResponse = await callController(auth, { userId });
 
     response.json(balanceResponse);
     // response.json({ netBalance: netBalance });
@@ -242,8 +248,10 @@ export const syncTransactions = async (request, response) => {
       }
 
       allAddedTransactions = allAddedTransactions.concat(addedTransactions);
-      allModifiedTransactions = allModifiedTransactions.concat(modifiedTransactions);
-      allRemovedTransactions = allRemovedTransactions.concat(removedTransactions);
+      allModifiedTransactions =
+        allModifiedTransactions.concat(modifiedTransactions);
+      allRemovedTransactions =
+        allRemovedTransactions.concat(removedTransactions);
 
       // Update user's cursor
       user.institutions[i].plaidCursor = institution.plaidCursor;
@@ -378,14 +386,44 @@ export const auth = async (request, response) => {
     if (!user || !user.institutions || user.institutions.length == 0) {
       throw new error("User not found or access token not set");
     }
-    // const accessToken = user.institutions[0].accessToken;
-    const plaidRequest = {
-      access_token: user.institutions[0].accessToken,
-    };
-    const plaidResponse = await plaidClient.authGet(plaidRequest);
-    console.log("plaidResponse: ", plaidResponse.data);
-    response.json(plaidResponse.data);
+
+    let allAuthData = [];
+
+    for (const institution of user.institutions) {
+      try {
+        const plaidResponse = await plaidClient.authGet({
+          access_token: institution.accessToken,
+        });
+
+        await Account.findOneAndUpdate(
+          { userId: userId, account_id: plaidResponse.data.accounts[0].account_id },
+          {
+            consent_expiration_time: plaidResponse.data.item.consent_expiration_time,
+          }
+        );
+
+        // console.log("plaidResponse for institution: ", institution.name, plaidResponse.data);
+        allAuthData.push({
+          institution: institution.name,
+          authData: plaidResponse.data,
+        });
+      } catch (error) {
+        console.log(
+          `Error fetching auth data for institution ${institution.name}:`,
+          error
+        );
+        allAuthData.push({
+          institution: institution.name,
+          error: error.message,
+        });
+      }
+    }
+
+    console.log("auth called: ");
+    // response.json(allAuthData);
+    response.json({message: "Bank successfully authorised"});
   } catch (e) {
+    console.log("auth error: ", e);
     response.status(500).send(e);
   }
 };

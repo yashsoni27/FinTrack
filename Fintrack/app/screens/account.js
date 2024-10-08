@@ -11,36 +11,47 @@ import FooterList from "../components/footer/footerList";
 import DefaultText from "../components/defaultText";
 import { AuthContext } from "../context/auth";
 import { useTheme } from "../context/themeContext";
+import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { deleteAccount } from "../../api/auth";
 import { Switch } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import PlaidLink from "react-native-plaid-link-sdk";
+import { createLinkToken } from "../../api/plaidAPI";
+import { getAccountsDb } from "../../api/db";
 
 const Account = () => {
   const [state, setState] = useContext(AuthContext);
   const { theme, toggleTheme, mode } = useTheme();
   const styles = createStyles(theme, mode);
 
+  const [linkToken, setLinkToken] = useState(null);
   const [isFingerprintEnabled, setIsFingerprintEnabled] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
+  const [accountModal, setAccountModal] = useState(false);
+  const [accData, setAccData] = useState([]);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
   const userId = state.user.userId;
+  const todayDate = new Date();
 
-  const toggleSwitch = async () => {    
+  const toggleSwitch = async () => {
     setIsFingerprintEnabled(!isFingerprintEnabled);
     try {
       const authData = await AsyncStorage.getItem("auth");
       if (authData) {
         const { token, user } = JSON.parse(authData);
-        const updatedUser = { ...user, fingerprintEnabled: !isFingerprintEnabled };
+        const updatedUser = {
+          ...user,
+          fingerprintEnabled: !isFingerprintEnabled,
+        };
         const updatedAuthData = JSON.stringify({ token, user: updatedUser });
         await AsyncStorage.setItem("auth", updatedAuthData);
         console.log("isfingerprintEnabled: ", !isFingerprintEnabled);
       }
     } catch (error) {
       console.error("Error updating fingerprint in AsyncStorage:", error);
-    }    
+    }
   };
 
   const signOut = async () => {
@@ -74,25 +85,107 @@ const Account = () => {
           <DefaultText style={styles.detailLabel}>{detail.label}</DefaultText>
           <DefaultText style={styles.detailValue}>{detail.value}</DefaultText>
         </View>
-        {/* <MaterialIcons name="chevron-right" size={24} color={theme.text2} /> */}
       </TouchableOpacity>
     ));
   };
-  
+
+  const renderAccountDetails = () => {
+    if (!Array.isArray(accData.accounts) || accData.accounts.length === 0) {
+      return <DefaultText>No account data available</DefaultText>;
+    }
+
+    return accData.accounts.map((account, index) => {
+      const expiryDate = new Date(account.consent_expiration_time);
+      const diffInMs = expiryDate.getTime() - todayDate.getTime();
+      const daysLeft = Math.ceil(diffInMs / (1000 * 60 * 60 * 24));
+
+      return (
+        <View style={styles.detailItem} key={index}>
+          <View
+            style={[
+              styles.detailContent,
+              { flexDirection: "row", justifyContent: "space-between" },
+            ]}
+          >
+            <View>
+              <DefaultText style={styles.detailLabel}>
+                {account.name}
+              </DefaultText>
+              <DefaultText style={styles.detailLabel}>
+                Expiring in {daysLeft} days
+              </DefaultText>
+            </View>
+            {linkToken ? (
+              <PlaidLink
+                tokenConfig={{
+                  token: linkToken,
+                  noLoadingState: false,
+                }}
+                onSuccess={onSuccess}
+                onExit={() => setLinkToken(null)}
+              >
+                <MaterialIcons name="refresh" size={20} color={theme.text} />
+                <DefaultText style={styles.detailLabel}>Linked</DefaultText>
+              </PlaidLink>
+            ) : daysLeft < 10 ? (
+              <TouchableOpacity onPress={() => generateLinkToken(index)}>
+                <MaterialIcons name="refresh" size={20} color={theme.text} />
+              </TouchableOpacity>
+            ) : (
+              <></>
+            )}
+          </View>
+        </View>
+      );
+    });
+  };
+
+  const generateLinkToken = async (accountNo) => {
+    try {
+      // setLoading(true);
+      const response = await createLinkToken(userId, true, accountNo);
+      console.log("create_link_token account response", response);
+      setLinkToken(response.link_token);
+    } catch (error) {
+      console.log("Error generating link token: ", error);
+    } finally {
+      // setLoading(false);
+    }
+  };
+
+  const onSuccess = async (success) => {
+    console.log("Plaid Link update successful: ", success);
+    // Refresh the account details
+    fetchAccountDetails();
+    setLinkToken(null);
+  };
+
+  const fetchAccountDetails = async () => {
+    try {
+      const response = await getAccountsDb(userId);
+      console.log("accResponse: ", response);
+      setAccData(response);
+    } catch (error) {
+      console.error("Error fetching account details:", error);
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const authData = await AsyncStorage.getItem('auth');
+        const authData = await AsyncStorage.getItem("auth");
         if (authData) {
-          const {token, user} = JSON.parse(authData)
+          const { token, user } = JSON.parse(authData);
           console.log("user.fingerprint:", user.fingerprintEnabled);
           setIsFingerprintEnabled(user.fingerprintEnabled);
         }
       } catch (error) {
-        console.error('Error retrieving data:', error);
+        console.error("Error retrieving data:", error);
       }
     };
+
     fetchData();
+    fetchAccountDetails();
   }, []);
 
   return (
@@ -172,6 +265,18 @@ const Account = () => {
               />
             </View>
 
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => setAccountModal(true)}
+            >
+              <FontAwesome5Icon
+                name="university"
+                size={25}
+                color={theme.text}
+              />
+              <DefaultText style={{ marginLeft: 15 }}>Accounts</DefaultText>
+            </TouchableOpacity>
+
             <TouchableOpacity style={styles.button} onPress={signOut}>
               <MaterialIcons name="logout" size={25} color={theme.danger} />
               <DefaultText style={{ color: theme.danger, marginLeft: 15 }}>
@@ -215,6 +320,32 @@ const Account = () => {
               <View></View>
             </View>
             <View style={styles.modalContent}>{renderPersonalDetails()}</View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Account Details Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={accountModal}
+        onRequestClose={() => {
+          console.log("Modal has been closed.");
+          setAccountModal(!accountModal);
+        }}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalView}>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity onPress={() => setAccountModal(false)}>
+                <MaterialIcons name="close" size={22} color={theme.text} />
+              </TouchableOpacity>
+              <DefaultText style={styles.modalTitle}>
+                Account Details
+              </DefaultText>
+              <View></View>
+            </View>
+            <View style={styles.modalContent}>{renderAccountDetails()}</View>
           </View>
         </View>
       </Modal>

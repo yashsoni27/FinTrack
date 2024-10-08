@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  getAccountsDb,
   getBalanceDb,
   getBudget,
   getChartData,
@@ -18,6 +19,7 @@ router.get("/", (req, res) => {
 });
 
 router.post("/balance/get", getBalanceDb);
+router.post("/accounts/get", getAccountsDb);
 router.post("/transactions/get", getTransactionsDb);
 router.post("/transactions/recurring/get", getRecurringDb);
 

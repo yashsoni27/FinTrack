@@ -2,10 +2,12 @@ import axios from "axios";
 
 const BASE_URL = process.env.EXPO_PUBLIC_SERVER_URL;
 
-export const createLinkToken = async (userId) => {
+export const createLinkToken = async (userId, isUpdate = false, accountNo = null) => {
   try {
     const response = await axios.post(`${BASE_URL}/api/create_link_token`, {
       userId,
+      isUpdate,
+      accountNo,
     });
     return response.data;
   } catch (error) {
@@ -27,6 +29,18 @@ export const exchangePublicToken = async (userId, public_token, metadata) => {
     throw error;
   }
 };
+
+export const getAccounts = async (userId) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/api/auth`, {
+      userId,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching accounts: ", error);
+    throw error;
+  }
+}
 
 export const getBalance = async (userId) => {
   try {
