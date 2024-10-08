@@ -54,14 +54,10 @@ const RecurringScreen = () => {
         (stream) => stream.category[0] === "Service"
         // && stream.category[1] === "Subscription"
       );
-      // console.log("subs: ", subscriptions);
+      console.log("subs: ", subscriptions);
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-
-      // const upcomingTransactions = [];
-      // const paidTransactions = [];
-      // const overdueTransactions = [];
 
       subscriptions.forEach((transaction) => {
         const lastTransactionDate = new Date(transaction.lastDate);
