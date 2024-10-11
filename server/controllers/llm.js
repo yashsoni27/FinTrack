@@ -32,32 +32,3 @@ export const generateResponse = async (request, response) => {
     throw error;
   }
 };
-
-export const generate = async (request, response) => {
-  const { prompt } = request.body;
-  console.log("Received prompt: ", prompt);
-
-  // const generate = spawn('python', ['./generate.py', prompt]);
-  const generate = spawn("python", ["./generateLangchain.py", prompt]);
-
-  let output = "";
-  let errorOutput = "";
-
-  generate.stdout.on("data", (data) => {
-    output += data.toString();
-  });
-
-  generate.stderr.on("data", (data) => {
-    errorOutput += data.toString();
-  });
-
-  generate.on("close", (code) => {
-    if (code === 0) {
-      console.log("Generated output: ", output);
-      response.send({ output: output.trim() });
-    } else {
-      console.error(`Error: ${errorOutput}`);
-      response.status(500).send(`Error generating text: ${errorOutput}`);
-    }
-  });
-};
