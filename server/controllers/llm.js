@@ -2,32 +2,47 @@ import { spawn } from "child_process";
 import dotenv from "dotenv";
 dotenv.config();
 import { getLlama, LlamaChatSession } from "node-llama-cpp";
+// import { GenerativeLanguageClient } from "@google-ai/generativelanguage";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import Session from "../models/session.js";
+import session from "../models/session.js";
 
-const llama = await getLlama();
-const model = await llama.loadModel({
-  modelPath: "C:/Users/ybond/Downloads/llama-2-7b.Q5_K_M.gguf",
-});
-const context = await model.createContext();
-const session = new LlamaChatSession({
-  contextSequence: context.getSequence(),
-});
+// const apiKey = process.env.GEMINI_API; // Get your API key from environment variables
+// const client = new GenerativeLanguageClient({
+//   apiKey: apiKey,
+// });
 
-// Store sessions in memory (you can replace this with a persistent store)
-const sessions = {};
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-const createNewSession = async () => {
-  const context = await model.createContext();
-  const session = new LlamaChatSession({
-    contextSequence: context.getSequence(),
-  });
-  return session;
-};
+// const llama = await getLlama();
+// const model = await llama.loadModel({
+//   modelPath: "C:/Users/ybond/Downloads/llama-2-7b.Q5_K_M.gguf",
+// });
+
+// const createNewSession = async () => {
+//   const context = await model.createContext();
+//   const session = new LlamaChatSession({
+//     contextSequence: context.getSequence(),
+//   });
+//   return session;
+// };
 
 export const startNewSession = async (request, response) => {
   try {
+    const { userId } = request.body;
     const sessionId = Date.now().toString(); // Simple session ID generation
-    const session = await createNewSession();
-    sessions[sessionId] = session;
+    // const session = await createNewSession();
+    // sessions[sessionId] = session;
+    const newSession = new Session({
+      userId: userId,
+      sessionId: sessionId,
+      // contextSequence: session.contextSequence,
+    });
+
+    await newSession.save();
+    console.log("start new session hit: ", sessionId);
+
     return response.json({ sessionId });
   } catch (error) {
     console.error("Error starting new session:", error);
@@ -38,13 +53,42 @@ export const startNewSession = async (request, response) => {
 
 export const generateResponse = async (request, response) => {
   try {
-    const { prompt } = request.body;
-    console.log("User: " + prompt);
+    const { prompt, sessionId } = request.body;
+    console.log("sessionID: ", sessionId);
+    const sessionData = await Session.findOne({ sessionId: sessionId.toString() });
 
-    const res = await session.prompt(prompt);
-    console.log("AI: " + res);
+    if (!sessionData) {
+      return response.status(404).json({ error: 'Session not found' });
+    }
 
-    return response.json({ output: res });
+    // const session = new LlamaChatSession({
+    //   contextSequence: sessionData.contextSequence,
+    // });
+    const formattedPrompt = `You are a helpful and friendly AI assistant. ${prompt}`; // You might need to adjust this based on your application's needs
+    // const model = "models/gemini-pro"; // Or another Gemini model you prefer
+    // const parameters = {
+    //   temperature: 0.7, // Adjust as needed
+    //   // You can add other parameters like topP, topK, etc.
+    // };
+    console.log("User: " + formattedPrompt);
+
+    // const apiResponse = await client.generateText({
+    //   model: model,
+    //   prompt: formattedPrompt,
+    //   parameters: parameters,
+    // });
+    // const generatedText = apiResponse[0].result; 
+
+    // console.log("Gemini: " + generatedText);
+
+    const result = await model.generateContent(formattedPrompt);
+    console.log("API: " + result);
+
+    // Update the session context sequence and save it back to the database
+    // sessionData.contextSequence = session.contextSequence;
+    // await sessionData.save();
+
+    return response.json(result);
   } catch (error) {
     console.error("Error generating response:", error);
     throw error;

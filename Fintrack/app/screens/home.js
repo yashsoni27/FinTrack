@@ -71,7 +71,7 @@ const Home = () => {
       setLoading(false);
     }
   };
-  
+
   const fetchBalanceDB = async () => {
     try {
       const response = await getBalanceDb(userId);
@@ -95,7 +95,7 @@ const Home = () => {
       setAccounts(null);
     }
   };
-  
+
   const fetchTransactionsDB = async () => {
     try {
       setLoading(true);
@@ -200,8 +200,8 @@ const Home = () => {
                         }}
                         resizeMode="contain"
                       />
-                      <View style={{ marginLeft: 10 }}>
-                        <DefaultText>
+                      <View style={{ marginLeft: 10, maxWidth: "90%" }}>
+                        <DefaultText numberOfLines={1} ellipsizeMode="tail">
                           {item.merchantName ? item.merchantName : item.name}
                         </DefaultText>
                         <DefaultText>

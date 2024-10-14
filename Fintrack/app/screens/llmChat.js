@@ -1,8 +1,6 @@
-import {
-  Button,
+import {  
   FlatList,
-  StyleSheet,
-  Text,
+  StyleSheet,  
   TextInput,
   TouchableOpacity,
   View,
@@ -13,38 +11,35 @@ import DefaultText from "../components/defaultText";
 import FooterList from "../components/footer/footerList";
 import { AuthContext } from "../context/auth";
 import { useTheme } from "../context/themeContext";
+import { startNewSession, generateResponse } from "../../api/llm";
 
 const LLMChat = () => {
   const [state, setState] = useContext(AuthContext);
   const { theme } = useTheme();
   const styles = createStyles(theme);
+  const userId = state.user.userId;
 
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState("");
 
   const [prompt, setPrompt] = useState("");
-  const [response, setResponse] = useState("");
+  // const [response, setResponse] = useState("");
   const [sessionId, setSessionId] = useState("");
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (inputText.trim()) {
-      setMessages([
-        ...messages,
-        { id: Date.now(), text: inputText, sender: "user" },
-      ]);
+      const userMessage = { id: Date.now(), text: inputText, sender: "user" };
+      setMessages((prevMessages) => [...prevMessages, userMessage]);
       setInputText("");
-      // Here you would typically call your LLM API and add the response
-      // For demonstration, we'll just add a mock response
-      setTimeout(() => {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          {
-            id: Date.now(),
-            text: "This is a mock LLM response.",
-            sender: "ai",
-          },
-        ]);
-      }, 1000);
+
+      try {
+        const aiResponse = await handleGenerateResponse(inputText);
+        const aiMessage = { id: Date.now(), text: aiResponse, sender: "ai" };
+        setMessages((prevMessages) => [...prevMessages, aiMessage]);
+      }
+      catch (error) {
+        console.error("Error handling AI response:", error);
+      }
     }
   };
 
@@ -67,19 +62,28 @@ const LLMChat = () => {
     </View>
   );
 
-  // useEffect(() => {
-  //   const initializeSession = async () => {
-  //     const newSessionId = await startNewSession();
-  //     setSessionId(newSessionId);
-  //   };
+  useEffect(() => {
+    const initializeSession = async () => {
+      const response = await startNewSession(userId);
+      console.log("session: ", response);
+      setSessionId(response.sessionId);
+    };
 
-  //   initializeSession();
-  // }, []);
+    initializeSession();
+  }, []);
 
-  // const handleGenerateResponse = async () => {
-  //   const res = await generateResponseFromAI(prompt, sessionId);
-  //   setResponse(res);
-  // };
+  const handleGenerateResponse = async (prompt) => {
+    try {
+      console.log("session#:   ", sessionId);
+      const res = await generateResponse(prompt, sessionId);
+      console.log("Response: ", res);
+      const reply = res.candidates[0].content.parts[0].text;
+      return reply;
+    }
+    catch (e) {
+      console.log("Error from generateResponse: ", e);
+    }
+  };
 
   return (
     <>
@@ -140,20 +144,15 @@ const createStyles = (theme) => {
     userMessage: {
       alignSelf: "flex-end",
       backgroundColor: theme.text,
-      // color: theme.background,
     },
     aiMessage: {
       alignSelf: "flex-start",
       backgroundColor: theme.secondary,
-      // color: theme.text,
-    },
-    messageText: {
-      // fontSize: 16,
-      // color: theme.background,
     },
     inputContainer: {
       flexDirection: "row",
       padding: 10,
+      marginHorizontal: 15,
       backgroundColor: theme.background,
     },
     input: {

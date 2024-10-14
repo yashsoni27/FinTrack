@@ -86,7 +86,9 @@ const Transactions = () => {
         }}
       >
         <ActivityIndicator size="large" color={theme.text} />
-        <DefaultText style={{ marginTop: 10, fontSize: 16, color: theme.text2 }}>
+        <DefaultText
+          style={{ marginTop: 10, fontSize: 16, color: theme.text2 }}
+        >
           Loading...
         </DefaultText>
       </View>
@@ -235,7 +237,11 @@ const Transactions = () => {
                       }}
                       resizeMode="contain"
                     />
-                    <DefaultText style={{ marginLeft: 10 }}>
+                    <DefaultText
+                      style={{ marginLeft: 10, maxWidth: "90%" }}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
                       {transaction.merchantName
                         ? transaction.merchantName
                         : transaction.name}
@@ -267,9 +273,9 @@ const Transactions = () => {
         >
           <MaterialIcons name="add" size={24} color={theme.text} />
         </TouchableOpacity>
-      </View>      
+      </View>
       <FooterList />
-      
+
       {/* Loading Overlay */}
       {loading && (
         <View
@@ -286,8 +292,10 @@ const Transactions = () => {
             zIndex: 1000,
           }}
         >
-          <ActivityIndicator size="large" color={theme.text}/>
-          <DefaultText style={{ marginTop: 10, fontSize: 16, color: theme.text2 }}>
+          <ActivityIndicator size="large" color={theme.text} />
+          <DefaultText
+            style={{ marginTop: 10, fontSize: 16, color: theme.text2 }}
+          >
             Loading...
           </DefaultText>
         </View>
