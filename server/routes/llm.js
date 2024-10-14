@@ -1,5 +1,5 @@
 import express from "express";
-import { generate, generateResponse } from "../controllers/llm.js";
+import { generateResponse, startNewSession } from "../controllers/llm.js";
 
 const router = express.Router();
 
@@ -9,7 +9,7 @@ router.get("/", (req, res) => {
   });
 });
 
-router.post("/generate", generate);
 router.post("/generateResponse", generateResponse);
+router.post("/start-session", startNewSession);
 
 export default router;

@@ -15,6 +15,7 @@ const FooterList = () => {
       <View style={styles.container}>
         <FooterItem name="home-filled" text="Home" screenName="Home" handlePress={() => navigation.navigate("Home")} routeName={route.name} />
         <FooterItem name="list" text="Transactions" screenName="Transactions" handlePress={() => navigation.navigate("Transactions")} routeName={route.name} />
+        <FooterItem name="app-shortcut" text="AI" screenName="LLMChat" handlePress={() => navigation.navigate("LLMChat")} routeName={route.name} />
         <FooterItem name="analytics" text="Spending" screenName="Analysis" handlePress={() => navigation.navigate("Analysis")} routeName={route.name} />
         <FooterItem name="person" text="Account" screenName="Account" handlePress={() => navigation.navigate("Account")} routeName={route.name} />
       </View>

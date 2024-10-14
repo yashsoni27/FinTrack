@@ -12,20 +12,38 @@ const session = new LlamaChatSession({
   contextSequence: context.getSequence(),
 });
 
+// Store sessions in memory (you can replace this with a persistent store)
+const sessions = {};
+
+const createNewSession = async () => {
+  const context = await model.createContext();
+  const session = new LlamaChatSession({
+    contextSequence: context.getSequence(),
+  });
+  return session;
+};
+
+export const startNewSession = async (request, response) => {
+  try {
+    const sessionId = Date.now().toString(); // Simple session ID generation
+    const session = await createNewSession();
+    sessions[sessionId] = session;
+    return response.json({ sessionId });
+  } catch (error) {
+    console.error("Error starting new session:", error);
+    return response.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
 export const generateResponse = async (request, response) => {
   try {
-    // Ensure the correct method is used to generate the response
     const { prompt } = request.body;
     console.log("User: " + prompt);
 
     const res = await session.prompt(prompt);
     console.log("AI: " + res);
 
-    // const q2 = "Summarize what you said";
-    // console.log("User: " + q2);
-
-    // const a2 = await session.prompt(q2);
-    // console.log("AI: " + a2);
     return response.json({ output: res });
   } catch (error) {
     console.error("Error generating response:", error);

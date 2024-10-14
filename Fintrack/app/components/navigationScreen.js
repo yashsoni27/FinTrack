@@ -14,6 +14,7 @@ import { useTheme } from "../context/themeContext";
 import RecurringScreen from "../screens/recurringScreen";
 import ManageBudgets from "../screens/manageBudgets";
 import Onboarding from "../screens/onboarding";
+import LLMChat from "../screens/llmChat";
 
 const Stack = createNativeStackNavigator();
 
@@ -41,6 +42,7 @@ const NavigationScreen = () => {
               <Stack.Screen name="Analysis" component={Analysis} />
               <Stack.Screen name="Add" component={Add} />
               <Stack.Screen name="Transactions" component={Transactions} />
+              <Stack.Screen name="LLMChat" component={LLMChat} />
               <Stack.Screen name="Recurring" component={RecurringScreen} />
               <Stack.Screen name="ManageBudgets" component={ManageBudgets} />
             </>
