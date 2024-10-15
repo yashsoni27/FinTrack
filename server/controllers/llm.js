@@ -46,49 +46,45 @@ export const startNewSession = async (request, response) => {
     return response.json({ sessionId });
   } catch (error) {
     console.error("Error starting new session:", error);
-    return response.status(500).json({ error: 'Internal Server Error' });
+    return response.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 
 export const generateResponse = async (request, response) => {
   try {
     const { prompt, sessionId } = request.body;
     console.log("sessionID: ", sessionId);
-    const sessionData = await Session.findOne({ sessionId: sessionId.toString() });
 
+    const sessionData = await Session.findOne({
+      sessionId: sessionId.toString(),
+    });
     if (!sessionData) {
-      return response.status(404).json({ error: 'Session not found' });
+      return response.status(404).json({ error: "Session not found" });
     }
 
-    // const session = new LlamaChatSession({
-    //   contextSequence: sessionData.contextSequence,
-    // });
-    const formattedPrompt = `You are a helpful and friendly AI assistant. ${prompt}`; // You might need to adjust this based on your application's needs
-    // const model = "models/gemini-pro"; // Or another Gemini model you prefer
-    // const parameters = {
-    //   temperature: 0.7, // Adjust as needed
-    //   // You can add other parameters like topP, topK, etc.
-    // };
-    console.log("User: " + formattedPrompt);
+    let formattedPrompt = `You are a helpful and financial AI assistant. ${prompt}`;
 
-    // const apiResponse = await client.generateText({
-    //   model: model,
-    //   prompt: formattedPrompt,
-    //   parameters: parameters,
-    // });
-    // const generatedText = apiResponse[0].result; 
+    if (sessionData.contextSequence.length > 0) {
+      let context = sessionData.contextSequence.join("@#");
+      formattedPrompt = `Context:\n${context}\n\nUser Prompt:\n${prompt}`;
+    }
 
-    // console.log("Gemini: " + generatedText);
+    console.log("Prompt\n\n" + formattedPrompt);
 
+    // Calling the Gemini API
     const result = await model.generateContent(formattedPrompt);
-    console.log("API: " + result);
 
-    // Update the session context sequence and save it back to the database
-    // sessionData.contextSequence = session.contextSequence;
-    // await sessionData.save();
+    if (result && result.response && result.response.candidates && result.response.candidates.length > 0) {
+      const aiResponse = result.response.candidates[0].content.parts[0].text;
 
-    return response.json(result);
+      // Update the session context sequence and save it back to the database
+      sessionData.contextSequence.push(prompt + "@#", aiResponse + "@#");
+      await sessionData.save();
+
+      return response.json(result);
+    } else {
+      return response.status(500).json({ error: "Failed to generate response" });
+    }
   } catch (error) {
     console.error("Error generating response:", error);
     throw error;
