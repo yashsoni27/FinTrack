@@ -24,7 +24,6 @@ export const initializeSession = async (request, response) => {
     if (existingSession) {
       const sessionId = existingSession.sessionId;
       console.log("existing session hit: ", sessionId);
-      // console.log(existingSession);
       return response.json(existingSession);
     } else {
       const sessionId = Date.now().toString();

@@ -23,8 +23,6 @@ const LLMChat = () => {
 
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState("");
-
-  const [prompt, setPrompt] = useState("");
   const [sessionId, setSessionId] = useState("");
 
   const newChat = async () => {
@@ -95,9 +93,7 @@ const LLMChat = () => {
 
   const handleGenerateResponse = async (prompt) => {
     try {
-      console.log("session#:   ", sessionId);
       const res = await generateResponse(prompt, sessionId);
-      console.log("Response: ", res);
       return res;
     } catch (e) {
       console.log("Error from generateResponse: ", e);
