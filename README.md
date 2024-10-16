@@ -6,6 +6,7 @@ FinTrack is a personal finance tracker mobile application that allows users to m
 
 - **Expense Tracking:** Track all your expenses in one place, categorized and summarized for easy review.
 - **Bank Account Integration:** Link your bank accounts using Plaid API to automatically import transactions.
+- **LLM Integration:** Access the power of LLM in order to get personalised insights, summaries and more by simply asking the question to your data.
 - **Receipt Scanning:** Use OCR technology to scan and digitize receipts.
 - **Analytics:** View detailed spending analytics and insights.
 - **User Authentication:** Secure login and registration with biometric authentication support.
@@ -94,6 +95,7 @@ FinTrack is a personal finance tracker mobile application that allows users to m
   - MongoDB
   - Mongoose
   - Plaid API
+  - Gemini API
 
 ## Contributing
 
