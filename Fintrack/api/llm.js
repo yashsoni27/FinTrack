@@ -15,9 +15,19 @@ export const generateResponse = async (prompt, sessionId) => {
   }
 };
 
+export const initializeSession = async (userId) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/llm/initializeSession`, { userId });
+    return response.data;
+  } catch (error) {
+    console.error("Error initializing the session: ", error);
+    throw error;
+  }
+};
+
 export const startNewSession = async (userId) => {
   try {
-    const response = await axios.post(`${BASE_URL}/llm/start-session`, { userId });
+    const response = await axios.post(`${BASE_URL}/llm/newSession`, { userId });
     return response.data;
   } catch (error) {
     console.error("Error starting AI session: ", error);

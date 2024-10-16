@@ -1,5 +1,9 @@
 import express from "express";
-import { generateResponse, startNewSession } from "../controllers/llm.js";
+import {
+  generateResponse,
+  startNewSession,
+  initializeSession,
+} from "../controllers/llm.js";
 
 const router = express.Router();
 
@@ -10,6 +14,7 @@ router.get("/", (req, res) => {
 });
 
 router.post("/generateResponse", generateResponse);
-router.post("/start-session", startNewSession);
+router.post("/initializeSession", initializeSession);
+router.post("/newSession", startNewSession);
 
 export default router;

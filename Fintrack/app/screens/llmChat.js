@@ -1,17 +1,19 @@
-import {  
+import {
   FlatList,
-  StyleSheet,  
+  StyleSheet,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import Markdown from "react-native-markdown-display";
 import DefaultText from "../components/defaultText";
 import FooterList from "../components/footer/footerList";
 import { AuthContext } from "../context/auth";
 import { useTheme } from "../context/themeContext";
-import { startNewSession, generateResponse } from "../../api/llm";
+import { initializeSession, startNewSession, generateResponse } from "../../api/llm";
 
 const LLMChat = () => {
   const [state, setState] = useContext(AuthContext);
@@ -23,8 +25,14 @@ const LLMChat = () => {
   const [inputText, setInputText] = useState("");
 
   const [prompt, setPrompt] = useState("");
-  // const [response, setResponse] = useState("");
   const [sessionId, setSessionId] = useState("");
+
+  const newChat = async () => {
+    const response = await startNewSession(userId);
+    console.log("session: ", response);
+    setSessionId(response.sessionId);
+    setMessages([]);
+  };
 
   const sendMessage = async () => {
     if (inputText.trim()) {
@@ -36,8 +44,7 @@ const LLMChat = () => {
         const aiResponse = await handleGenerateResponse(inputText);
         const aiMessage = { id: Date.now(), text: aiResponse, sender: "ai" };
         setMessages((prevMessages) => [...prevMessages, aiMessage]);
-      }
-      catch (error) {
+      } catch (error) {
         console.error("Error handling AI response:", error);
       }
     }
@@ -50,26 +57,40 @@ const LLMChat = () => {
         item.sender === "user" ? styles.userMessage : styles.aiMessage,
       ]}
     >
-      <DefaultText
-        style={[
-          item.sender == "user"
-            ? { color: theme.background }
-            : { color: theme.text2 },
-        ]}
+      <Markdown
+        style={StyleSheet.create({
+          body: {
+            flexShrink: 1,
+            color: item.sender === "user" ? theme.background : theme.text2,
+          },
+        })}
       >
         {item.text}
-      </DefaultText>
+      </Markdown>
     </View>
   );
 
   useEffect(() => {
-    const initializeSession = async () => {
-      const response = await startNewSession(userId);
-      console.log("session: ", response);
+    const sessionInitiate = async () => {
+      const response = await initializeSession(userId);
+      console.log("session: ", response.sessionId);
       setSessionId(response.sessionId);
+      setMessages([]);
+      response.contextSequence.forEach((msg, index) => {
+        let message = {};
+        if (index % 2 == 0) {
+          message.text = msg.replace("@#","");
+          message.sender = "user";
+        }
+        else {
+          message.text = msg.replace("@#","");;
+          message.sender = "ai";
+        }
+        setMessages((prevMessages) => [...prevMessages, message]);
+      })
     };
 
-    initializeSession();
+    sessionInitiate();
   }, []);
 
   const handleGenerateResponse = async (prompt) => {
@@ -77,10 +98,8 @@ const LLMChat = () => {
       console.log("session#:   ", sessionId);
       const res = await generateResponse(prompt, sessionId);
       console.log("Response: ", res);
-      const reply = res.candidates[0].content.parts[0].text;
-      return reply;
-    }
-    catch (e) {
+      return res;
+    } catch (e) {
       console.log("Error from generateResponse: ", e);
     }
   };
@@ -92,16 +111,31 @@ const LLMChat = () => {
           height: "92%",
         }}
       >
-        <View style={{ marginBottom: 10 }}>
+        <View
+          style={{
+            marginTop: 5,
+            marginBottom: 10,
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <TouchableOpacity style={styles.newChat} onPress={newChat}>
+            <MaterialCommunityIcons
+              name="chat-plus"
+              size={28}
+              color={theme.text}
+            />
+          </TouchableOpacity>
           <DefaultText style={{ fontSize: 30, textAlign: "center" }}>
             LLM Chat
           </DefaultText>
+          <View style={{ marginHorizontal: 15 }} />
         </View>
         <View style={styles.container}>
           <FlatList
             data={messages}
             renderItem={renderMessage}
-            keyExtractor={(item) => item.id.toString()}
+            // keyExtractor={(item) => item.id.toString()}
             contentContainerStyle={styles.messageList}
           />
           <View style={styles.inputContainer}>
@@ -136,10 +170,12 @@ const createStyles = (theme) => {
       paddingBottom: 10,
     },
     messageBubble: {
-      maxWidth: "80%",
-      padding: 12,
+      maxWidth: "85%",
+      paddingVertical: 5,
+      paddingHorizontal: 10,
       borderRadius: 20,
       marginVertical: 5,
+      flexShrink: 1,
     },
     userMessage: {
       alignSelf: "flex-end",
@@ -168,5 +204,55 @@ const createStyles = (theme) => {
       justifyContent: "center",
       alignItems: "center",
     },
+    newChat: {
+      justifyContent: "center",
+      alignItems: "center",
+      marginLeft: 10,
+    },
   });
 };
+
+// const markdownStyles = {
+//   body: {
+//     fontSize: 16,
+//   },
+//   paragraph: {
+//     // marginVertical: 5,
+//   },
+//   heading1: {
+//     fontSize: 20,
+//     fontWeight: 'bold',
+//     marginVertical: 8,
+//   },
+//   heading2: {
+//     fontSize: 18,
+//     fontWeight: 'bold',
+//     marginVertical: 6,
+//   },
+//   link: {
+//     textDecorationLine: 'underline',
+//   },
+//   listItem: {
+//     flexDirection: 'row',
+//     alignItems: 'flex-start',
+//   },
+//   listItemNumber: {
+//     marginRight: 5,
+//   },
+//   listItemBullet: {
+//     marginRight: 5,
+//   },
+//   listItemContent: {
+//     flex: 1,
+//   },
+//   code_inline: {
+//     backgroundColor: 'rgba(128, 128, 128, 0.1)',
+//     borderRadius: 3,
+//     paddingHorizontal: 4,
+//   },
+//   code_block: {
+//     backgroundColor: 'rgba(128, 128, 128, 0.1)',
+//     borderRadius: 5,
+//     padding: 10,
+//   },
+// };
