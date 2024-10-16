@@ -18,7 +18,7 @@ export const initializeSession = async (request, response) => {
   try {
     const { userId } = request.body;
     const existingSession = await Session.findOne({ userId: userId }).sort({
-      date: -1,
+      dateTime: -1,
     });
 
     if (existingSession) {
