@@ -8,6 +8,7 @@ import {
   getTransactionsDb,
   saveTransactionDb,
   setBudget,
+  updateTransactionDb,
 } from "../controllers/db.js";
 
 const router = express.Router();
@@ -27,5 +28,5 @@ router.post("/transactions/save", saveTransactionDb);
 router.post("/chartData/get", getChartData);
 router.post("/budget/get", getBudget);
 router.post("/budget/set", setBudget);
-
+router.post("/transactions/update", updateTransactionDb);
 export default router;

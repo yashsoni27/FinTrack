@@ -22,6 +22,10 @@ const accountSchema = mongoose.Schema({
   persistent_account_id: String,
   userId: String,
   consent_expiration_time: String,
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 export default mongoose.model("Account", accountSchema);

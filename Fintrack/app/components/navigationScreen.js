@@ -15,6 +15,7 @@ import RecurringScreen from "../screens/recurringScreen";
 import ManageBudgets from "../screens/manageBudgets";
 import Onboarding from "../screens/onboarding";
 import LLMChat from "../screens/llmChat";
+import TransactionDetail from "./transactionDetail";
 
 const Stack = createNativeStackNavigator();
 
@@ -45,6 +46,7 @@ const NavigationScreen = () => {
               <Stack.Screen name="LLMChat" component={LLMChat} />
               <Stack.Screen name="Recurring" component={RecurringScreen} />
               <Stack.Screen name="ManageBudgets" component={ManageBudgets} />
+              <Stack.Screen name="TransactionDetail" component={TransactionDetail} />
             </>
           {/* ) : (
             <>

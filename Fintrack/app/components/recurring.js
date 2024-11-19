@@ -27,6 +27,7 @@ const Recurring = () => {
         (stream) => stream.category[0] === "Service"
         // && stream.category[1] === "Subscription"
       );
+      // console.log("subscriptions: ", subscriptions);
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -52,7 +53,7 @@ const Recurring = () => {
         });
 
       setRecurringTransactions(recurring);
-      // console.log("recurring: ", recurring);
+      // console.log("recurring: ", recurring.length);
     } catch (error) {
       console.log("Error in fetching recurring DB: ", error);
     }
@@ -66,7 +67,7 @@ const Recurring = () => {
     <View>
       <TouchableOpacity onPress={() => navigation.navigate("Recurring")}>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <DefaultText style={{color: theme.text2}}>UPCOMING</DefaultText>
+          <DefaultText style={{ color: theme.text2 }}>UPCOMING</DefaultText>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <DefaultText>recurrings </DefaultText>
             <MaterialIcons
@@ -78,46 +79,73 @@ const Recurring = () => {
           </View>
         </View>
       </TouchableOpacity>
-      <View style={{marginTop: 10}}>
+      <View style={{ marginTop: 10 }}>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-            {recurringTransactions.slice(0, 3).map((item, index) => {
-              const date = new Date(item.lastDate);
-              date.setMonth(date.getMonth() + 1);
-              return (
-                <View key={index} style={{ marginHorizontal: 5, width: 150 }}>
-                  <View>
-                    <DefaultText>
-                      {new Intl.DateTimeFormat("en-US", options).format(date)}
-                    </DefaultText>
-                  </View>
-                  <View
-                    style={{
-                      backgroundColor: theme.surface,
-                      padding: 15,
-                      borderRadius: 10,
-                      marginTop: 5,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <DefaultText
+          {recurringTransactions.length > 0 ? (
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+            >
+              {recurringTransactions.slice(0, 3).map((item, index) => {
+                const date = new Date(item.lastDate);
+                date.setMonth(date.getMonth() + 1);
+                return (
+                  <View key={index} style={{ marginHorizontal: 5, width: 150 }}>
+                    <View>
+                      <DefaultText>
+                        {new Intl.DateTimeFormat("en-US", options).format(date)}
+                      </DefaultText>
+                    </View>
+                    <View
                       style={{
-                        textTransform: "capitalize",
-                        width: 80,
+                        backgroundColor: theme.surface,
+                        padding: 15,
+                        borderRadius: 10,
+                        marginTop: 5,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
                       }}
-                      numberOfLines={1}
-                      ellipsizeMode="tail"
                     >
-                      {item.merchantName ? item.merchantName : item.description}
-                    </DefaultText>
-                    <DefaultText style={{fontWeight: "bold"}}>   £ {item.averageAmount.amount}</DefaultText>
+                      <DefaultText
+                        style={{
+                          textTransform: "capitalize",
+                          width: 80,
+                        }}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {item.merchantName
+                          ? item.merchantName
+                          : item.description}
+                      </DefaultText>
+                      <DefaultText style={{ fontWeight: "bold" }}>
+                        {" "}
+                        £ {item.averageAmount.amount}
+                      </DefaultText>
+                    </View>
                   </View>
-                </View>
-              );
-            })}
-          </ScrollView>
+                );
+              })}
+            </ScrollView>
+          ) : (
+            <View
+              style={{
+                backgroundColor: theme.surface,
+                padding: 15,
+                borderRadius: 10,
+                marginTop: 5,
+                flex: 1,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <DefaultText style={{ textAlign: "center" }}>
+                No upcoming recurring transactions
+              </DefaultText>
+            </View>
+          )}
         </View>
       </View>
     </View>

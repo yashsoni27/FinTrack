@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect, useCallback } from "react";
-import { View, ScrollView, RefreshControl, Image } from "react-native";
+import { View, ScrollView, RefreshControl, Image, TouchableOpacity } from "react-native";
 import FooterList from "../components/footer/footerList";
 import { AuthContext } from "../context/auth";
 import { ActivityIndicator } from "react-native";
@@ -10,6 +10,7 @@ import { useTheme } from "../context/themeContext";
 import AccountSlider from "../components/accountSlider";
 import Recurring from "../components/recurring";
 import Categories from "../components/categories";
+import { useNavigation } from "@react-navigation/native";
 
 const Home = () => {
   const [state, setState] = useContext(AuthContext);
@@ -21,6 +22,7 @@ const Home = () => {
   const [balance, setBalance] = useState(null);
   const [accounts, setAccounts] = useState([]);
   const [transactions, setTransactions] = useState([]);
+  const navigation = useNavigation();
 
   const options = {
     month: "short",
@@ -169,55 +171,64 @@ const Home = () => {
             <View style={{ marginTop: 10 }}>
               {transactions.map((item, index) => {
                 return (
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      padding: 10,
-                      backgroundColor: theme.surface,
-                      borderWidth: 1,
-                      borderColor: theme.text2,
-                      borderRadius: 10,
-                      marginVertical: 2,
-                    }}
+                  <TouchableOpacity
+                    onPress={() =>
+                      navigation.navigate("TransactionDetail", {
+                        transaction: item,
+                      })
+                    }
                     key={index}
                   >
                     <View
-                      style={{ flexDirection: "row", alignItems: "center" }}
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        padding: 10,
+                        backgroundColor: theme.surface,
+                        borderWidth: 1,
+                        borderColor: theme.text2,
+                        borderRadius: 10,
+                        marginVertical: 2,
+                      }}
+                      // key={index}
                     >
-                      <Image
-                        source={{
-                          uri: item.logoUrl
-                            ? item.logoUrl
-                            : item.personalFinanceCategoryIconUrl,
-                        }}
-                        style={{
-                          width: 30,
-                          height: 30,
-                          borderRadius: 30,
-                          borderWidth: 1,
-                          borderColor: theme.text,
-                        }}
-                        resizeMode="contain"
-                      />
-                      <View style={{ marginLeft: 10, maxWidth: "90%" }}>
-                        <DefaultText numberOfLines={1} ellipsizeMode="tail">
-                          {item.merchantName ? item.merchantName : item.name}
-                        </DefaultText>
-                        <DefaultText>
-                          {new Intl.DateTimeFormat("en-US", options).format(
-                            new Date(item.date)
-                          )}
+                      <View
+                        style={{ flexDirection: "row", alignItems: "center" }}
+                      >
+                        <Image
+                          source={{
+                            uri: item.logoUrl
+                              ? item.logoUrl
+                              : item.personalFinanceCategoryIconUrl,
+                          }}
+                          style={{
+                            width: 30,
+                            height: 30,
+                            borderRadius: 30,
+                            borderWidth: 1,
+                            borderColor: theme.text,
+                          }}
+                          resizeMode="contain"
+                        />
+                        <View style={{ marginLeft: 10, maxWidth: "90%" }}>
+                          <DefaultText numberOfLines={1} ellipsizeMode="tail">
+                            {item.merchantName ? item.merchantName : item.name}
+                          </DefaultText>
+                          <DefaultText>
+                            {new Intl.DateTimeFormat("en-US", options).format(
+                              new Date(item.date)
+                            )}
+                          </DefaultText>
+                        </View>
+                      </View>
+                      <View style={{ alignSelf: "center" }}>
+                        <DefaultText style={{ fontSize: 18 }}>
+                          {item.amount > 0 ? "-" : "+"}£
+                          {Math.abs(Math.round(item.amount * 100) / 100)}
                         </DefaultText>
                       </View>
                     </View>
-                    <View style={{ alignSelf: "center" }}>
-                      <DefaultText style={{ fontSize: 18 }}>
-                        {item.amount > 0 ? "-" : "+"}£
-                        {Math.abs(Math.round(item.amount * 100) / 100)}
-                      </DefaultText>
-                    </View>
-                  </View>
+                  </TouchableOpacity>
                 );
               })}
             </View>

@@ -120,7 +120,7 @@ export const getBalance = async (request, response) => {
       for (const accountData of res.data.accounts) {
         try {
           const existingAccount = await Account.findOne({
-            account_id: accountData.account_id,
+            persistent_account_id: accountData.persistent_account_id,
           });
 
           if (!existingAccount) {
@@ -142,10 +142,10 @@ export const getBalance = async (request, response) => {
               userId: userId,
             });
             await newAccount.save();
-            console.log("Bank account saved: ", accountData.account_id);
+            console.log("Bank account saved: ", accountData.persistent_account_id);
             console.log("Name: ", accountData.name);
           } else {
-            console.log("Bank account updated: ", accountData.account_id);
+            console.log("Bank account updated: ", accountData.persistent_account_id);
             console.log("Name: ", accountData.name);
             existingAccount.balances.available = accountData.balances.available;
             existingAccount.balances.current = accountData.balances.current;
@@ -159,7 +159,7 @@ export const getBalance = async (request, response) => {
     }
 
     const balanceResponse = await callController(getBalanceDb, { userId });
-    const authResponse = await callController(auth, { userId });
+    // const authResponse = await callController(auth, { userId });
 
     response.json(balanceResponse);
     // response.json({ netBalance: netBalance });
@@ -317,23 +317,23 @@ export const recurringTransactions = async (request, response) => {
     if (!user || !user.institutions || user.institutions.length == 0) {
       throw new error("User not found or access token not set");
     }
-    const accessToken = user.institutions[0].accessToken;
 
-    const accountIds = await Account.find(
-      { userId: userId },
-      { account_id: 1 }
-    );
-    const accountIdArray = accountIds.map((account) => account.account_id);
+    // Initialize arrays to store all streams
+    let allInflowStreams = [];
+    let allOutflowStreams = [];
 
-    const plaidRequest = {
-      access_token: accessToken,
-      account_ids: accountIdArray,
-    };
-    const plaidResponse = await plaidClient.transactionsRecurringGet(
-      plaidRequest
-    );
-    let inflowStreams = plaidResponse.data.inflow_streams;
-    let outflowStreams = plaidResponse.data.outflow_streams;
+    // Iterate through all institutions
+    for (const institution of user.institutions) {
+      const plaidRequest = {
+        access_token: institution.accessToken,
+      };
+      
+      const plaidResponse = await plaidClient.transactionsRecurringGet(plaidRequest);
+      
+      // Combine streams from each institution
+      allInflowStreams = allInflowStreams.concat(plaidResponse.data.inflow_streams);
+      allOutflowStreams = allOutflowStreams.concat(plaidResponse.data.outflow_streams);
+    }
 
     const saveOrUpdateStream = async (stream, streamType) => {
       for (const streamItem of stream) {
@@ -364,12 +364,13 @@ export const recurringTransactions = async (request, response) => {
       }
     };
 
-    await saveOrUpdateStream(inflowStreams, "Inflow");
-    await saveOrUpdateStream(outflowStreams, "Outflow");
+    // Save all combined streams
+    await saveOrUpdateStream(allInflowStreams, "Inflow");
+    await saveOrUpdateStream(allOutflowStreams, "Outflow");
 
     // Fetch all recurring transactions from DB
     const recurringResponse = await callController(getRecurringDb, { userId });
-    // console.log("recurringResponse: ", recurringResponse);
+    console.log("recurringResponse: ", recurringResponse);
 
     response.json(recurringResponse);
   } catch (e) {

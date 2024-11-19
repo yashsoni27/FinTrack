@@ -17,7 +17,7 @@ export const getAccountsDb = async (request, response) => {
       throw new Error("User not found");
     }
 
-    const accounts = await Account.find({ userId: userId });
+    const accounts = await Account.find({ userId: userId, isDeleted: false });
 
     response.json({ accounts: accounts });
   } catch (e) {
@@ -33,7 +33,7 @@ export const getBalanceDb = async (request, response) => {
       throw new Error("User not found");
     }
 
-    const netBalance = await Account.find({ userId: userId });
+    const netBalance = await Account.find({ userId: userId, isDeleted: false });
 
     response.json({ netBalance: netBalance });
   } catch (e) {
@@ -132,6 +132,27 @@ export const saveTransactionDb = async (request, response) => {
     });
   } catch (e) {
     console.log("saveTransaction error: ", e);
+    response.status(500).send(e);
+  }
+};
+
+export const updateTransactionDb = async (request, response) => {
+  try {
+    const { data } = request.body;
+    console.log("data: ", data);
+
+    await Transaction.findOneAndUpdate(
+      { transactionId: data.transactionId },
+      {
+        excludeFromAnalytics: data.excludeFromAnalytics
+      }
+    );
+
+    response.json({
+      message: "Transaction updated successfully"
+    });
+  } catch (e) {
+    console.log("updateTransaction error: ", e);
     response.status(500).send(e);
   }
 };
@@ -235,6 +256,7 @@ export const getBudget = async (request, response) => {
           userId,
           date: { $gte: startDate, $lt: endDate },
           excludeFromAnalytics: { $ne: true },
+          amount: {$gte: 0}
         },
       },
       {
