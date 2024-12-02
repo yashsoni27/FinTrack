@@ -1,7 +1,6 @@
 import { useState } from "react";
 import {
   View,
-  Text,
   Image,
   TextInput,
   TouchableOpacity,
@@ -10,6 +9,7 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { forgotPassword, resetPassword } from "../../../api/auth";
 import { useTheme } from "../../context/themeContext";
+import DefaultText from "../../components/defaultText";
 
 const ForgotPassword = ({ navigation }) => {
   const { theme } = useTheme();
@@ -54,9 +54,9 @@ const ForgotPassword = ({ navigation }) => {
   return (
     <KeyboardAwareScrollView contentCotainerStyle={styles.container}>
       <View style={{ marginVertical: 100 }}>
-        <Text style={styles.signupText}>Forgot Password</Text>
+        <DefaultText style={styles.signupText}>Forgot Password</DefaultText>
         <View style={{ marginHorizontal: 24 }}>
-          <Text style={{ fontSize: 16, color: "#8e93a1" }}>EMAIL</Text>
+          <DefaultText style={{ fontSize: 16, color: theme.text2 }}>EMAIL</DefaultText>
           <TextInput
             style={styles.signupInput}
             value={email}
@@ -68,9 +68,9 @@ const ForgotPassword = ({ navigation }) => {
         {visible && (
           <>
             <View style={{ marginHorizontal: 24 }}>
-              <Text style={{ fontSize: 16, color: "#8e93a1" }}>
+              <DefaultText style={{ fontSize: 16, color: theme.text2 }}>
                 NEW PASSWORD
-              </Text>
+              </DefaultText>
               <TextInput
                 style={styles.signupInput}
                 value={password}
@@ -80,9 +80,9 @@ const ForgotPassword = ({ navigation }) => {
               />
             </View>
             <View style={{ marginHorizontal: 24 }}>
-              <Text style={{ fontSize: 16, color: "#8e93a1" }}>
+              <DefaultText style={{ fontSize: 16, color: theme.text2 }}>
                 Password Reset Code
-              </Text>
+              </DefaultText>
               <TextInput
                 style={styles.signupInput}
                 value={resetCode}
@@ -96,16 +96,16 @@ const ForgotPassword = ({ navigation }) => {
           onPress={visible ? handlePasswordReset : handleSubmit}
           style={styles.buttonStyle}
         >
-          <Text style={styles.buttonText}>
+          <DefaultText style={styles.buttonText}>
             {visible ? "Reset Password" : "Request Reset Code"}
-          </Text>
+          </DefaultText>
         </TouchableOpacity>
-        <Text
+        <DefaultText
           onPress={() => navigation.navigate("SignIn")}
           style={styles.forgotText}
         >
           Sign In
-        </Text>
+        </DefaultText>
       </View>
     </KeyboardAwareScrollView>
   );
@@ -118,14 +118,15 @@ const createStyles = (theme) => {
       fontSize: 12,
       textAlign: "center",
       marginTop: 10,
-      color: "darkgreen",
+      color: theme.text2,
       fontWeight: "bold",
     },
-    signupText: { fontSize: 30, textAlign: "center" },
+    signupText: { fontSize: 30, textAlign: "center", color: theme.text, marginBottom: 50 },
     signupInput: {
       borderBottomWidth: 0.5,
       height: 48,
-      borderBottomColor: "#8e93a1",
+      color: theme.text,
+      borderBottomColor: theme.text2,
       marginBottom: 30,
     },
     buttonStyle: {
