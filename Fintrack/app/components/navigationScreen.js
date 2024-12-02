@@ -20,9 +20,10 @@ import TransactionDetail from "./transactionDetail";
 const Stack = createNativeStackNavigator();
 
 const NavigationScreen = () => {
-  const [state, setState] = useContext(AuthContext);
+  const [state] = useContext(AuthContext);
   console.log("state:::", state);
   const authenticated = state && state.token !== "" && state.user !== null;
+  let isOnboarded = state?.user?.onBoarded;
 
   const { theme } = useTheme();
 
@@ -32,28 +33,28 @@ const NavigationScreen = () => {
         headerShown: false,
         contentStyle: { backgroundColor: theme.background },
       }}
-      initialRouteName="Home"
+      // initialRouteName="Home"
     >
       {authenticated ? (
-        <>
-          {/* {state.user.onBoarded == false ? ( */}
-            <>
-              <Stack.Screen name="Home" component={Home} />
-              <Stack.Screen name="Account" component={Account} />
-              <Stack.Screen name="Analysis" component={Analysis} />
-              <Stack.Screen name="Add" component={Add} />
-              <Stack.Screen name="Transactions" component={Transactions} />
-              <Stack.Screen name="LLMChat" component={LLMChat} />
-              <Stack.Screen name="Recurring" component={RecurringScreen} />
-              <Stack.Screen name="ManageBudgets" component={ManageBudgets} />
-              <Stack.Screen name="TransactionDetail" component={TransactionDetail} />
-            </>
-          {/* ) : (
-            <>
-              <Stack.Screen name="Onboarding" component={Onboarding} />
-            </>
-          )} */}
-        </>
+        !isOnboarded ? (
+          <Stack.Screen 
+            name="Onboarding" 
+            component={Onboarding}
+            options={{ gestureEnabled: false }}
+          />
+        ) : (
+          <>
+            <Stack.Screen name="Home" component={Home} />
+            <Stack.Screen name="Account" component={Account} />
+            <Stack.Screen name="Analysis" component={Analysis} />
+            <Stack.Screen name="Add" component={Add} />
+            <Stack.Screen name="Transactions" component={Transactions} />
+            <Stack.Screen name="LLMChat" component={LLMChat} />
+            <Stack.Screen name="Recurring" component={RecurringScreen} />
+            <Stack.Screen name="ManageBudgets" component={ManageBudgets} />
+            <Stack.Screen name="TransactionDetail" component={TransactionDetail} />
+          </>
+        )
       ) : (
         <>
           <Stack.Screen name="Landing" component={Landing} />

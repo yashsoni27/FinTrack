@@ -15,10 +15,9 @@ import { useNavigation } from "@react-navigation/native";
 const Home = () => {
   const [state, setState] = useContext(AuthContext);
   const { theme, toggleTheme, mode } = useTheme();
-
+  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-
   const [balance, setBalance] = useState(null);
   const [accounts, setAccounts] = useState([]);
   const [transactions, setTransactions] = useState([]);
@@ -30,6 +29,7 @@ const Home = () => {
     // weekday: "short",
   };
   const userId = state.user.userId;
+
 
   const onRefresh = useCallback(() => {
     try {
@@ -46,9 +46,16 @@ const Home = () => {
 
   const fetchBalance = async () => {
     try {
+      setLoading(true);
       const response = await getBalance(userId);
-      // console.log("Balance Plaid: ", response);
-      console.log("Balance Plaid");
+      
+      if (!response || !response.netBalance) {
+        // Handle case where bank data isn't ready
+        setBalance(0);
+        setAccounts([]);
+        return;
+      }
+
       const netBalance = response.netBalance.reduce(
         (sum, account) => sum + (account.balances.current || 0),
         0
@@ -57,7 +64,10 @@ const Home = () => {
       fetchBalanceDB();
     } catch (error) {
       console.log("Error fetching balance: ", error);
-      setBalance(null);
+      setBalance(0);
+      setAccounts([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -79,6 +89,7 @@ const Home = () => {
       const response = await getBalanceDb(userId);
       // console.log("Balance DB: ", response.netBalance);
       console.log("Balance DB");
+      
       const netBalance = response.netBalance.reduce(
         (sum, account) => sum + (account.balances.current || 0),
         0

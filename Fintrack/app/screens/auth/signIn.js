@@ -31,10 +31,22 @@ const SignIn = ({ navigation }) => {
     if (response.error) {
       alert(response.error);
     } else {
-      setState(response);
-      await AsyncStorage.setItem("auth", JSON.stringify(response));
+      const authData = {
+        ...response,
+        user: {
+          ...response.user,
+          isOnboarded: response.user.isOnboarded || response.user.onBoarded || false
+        }
+      };
+      setState(authData);
+      await AsyncStorage.setItem("auth", JSON.stringify(authData));
+      console.log("onboarding status::: ", response.user);
       // alert("Sign In Successful");
-      navigation.navigate("Home");
+      if (!response.user.onBoarded) {
+        navigation.navigate("Onboarding");
+      } else {
+        navigation.navigate("Home");
+      }
     }
   };
 

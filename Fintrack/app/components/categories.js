@@ -35,28 +35,28 @@ const Categories = () => {
       if (response.length > 0) {
         setBudgets({
           Shopping: {
-            budget: response[0].category.shopping.budget,
-            spent: response[0].category.shopping.spent,
+            budget: response[0].category.shopping?.budget ?? 0,
+            spent: response[0].category.shopping?.spent ?? 0,
             emoji: "🛍️",
           },
           Entertainment: {
-            budget: response[0].category.entertainment.budget,
-            spent: response[0].category.entertainment.spent,
+            budget: response[0].category.entertainment?.budget ?? 0,
+            spent: response[0].category.entertainment?.spent?? 0,
             emoji: "🎟️",
           },
           "Food & Drink": {
-            budget: response[0].category.foodAndDrink.budget,
-            spent: response[0].category.foodAndDrink.spent,
+            budget: response[0].category.foodAndDrink?.budget ?? 0,
+            spent: response[0].category.foodAndDrink?.spent ?? 0,
             emoji: "🍕",
           },
           Transportation: {
-            budget: response[0].category.transportation.budget,
-            spent: response[0].category.transportation.spent,
+            budget: response[0].category.transportation?.budget ?? 0,
+            spent: response[0].category.transportation?.spent ?? 0,
             emoji: "🚌",
           },
           Home: {
-            budget: response[0].category.home.budget,
-            spent: response[0].category.home.spent,
+            budget: response[0].category.home?.budget ?? 0,
+            spent: response[0].category.home?.spent ?? 0,
             emoji: "🏠",
           },
         });
@@ -90,7 +90,7 @@ const Categories = () => {
           },
         });
       }
-      // console.log("budgets: ", budgets);
+      console.log("budgets state: ", budgets);
     } catch (error) {
       console.log("Error in fetching budget:  ", error);
     } finally {
@@ -133,7 +133,7 @@ const Categories = () => {
                 ([category, { spent, budget, emoji }]) => (
                   <View key={category} style={styles.categoryContainer}>
                     <Progress.Circle
-                      progress={spent / budget > 1 ? 1 : spent / budget}
+                      progress={budget === 0 ? 0 : (spent / budget > 1 ? 1 : spent / budget)}
                       color={spent / budget > 1 ? theme.danger : theme.success}
                       size={55}
                       strokeCap="round"

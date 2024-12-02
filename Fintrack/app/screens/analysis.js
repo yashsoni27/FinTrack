@@ -48,34 +48,45 @@ const Analysis = () => {
     try {
       setIsLoading(true);
       const response = await getChartData(userId, 0, selectedMonth);
-      const currMonthData = response.currMonthData;
-      const prevMonthData = response.prevMonthData;
+      const currMonthData = response.currMonthData ?? {
+        income: [],
+        expense: [],
+      };
+      const prevMonthData = response.prevMonthData ?? {
+        income: [],
+        expense: [],
+      };
 
       setIncomeData(currMonthData.income);
       setExpenseData(currMonthData.expense);
 
-      let currMonthIncom = currMonthData.income;
-      let currMonthExpense = currMonthData.expense;
-      // console.log("currMonthIncome: ", currMonthIncom.slice(-1)[0].value);
+      let currMonthIncome = currMonthData.income ?? 0;
+      let currMonthExpense = currMonthData.expense ?? 0;
+      // console.log("currMonthIncome: ", currMonthIncome.slice(-1)[0].value);
       // console.log("currMonthExpense: ", currMonthExpense.slice(-1)[0].value);
 
-      let prevMonthIncome = prevMonthData.income;
-      let prevMonthExpense = prevMonthData.expense;
+      let prevMonthIncome = prevMonthData.income ?? 0;
+      let prevMonthExpense = prevMonthData.expense ?? 0;
       // console.log("prevMonthIncome: ", prevMonthIncome.slice(-1)[0].value);
       // console.log("prevMonthExpense: ", prevMonthExpense.slice(-1)[0].value);
 
-      const currMonthIncomeValue = currMonthIncom.slice(-1)[0].value;
+      const currMonthIncomeValue = currMonthIncome.slice(-1)[0].value;
       const currMonthExpenseValue = currMonthExpense.slice(-1)[0].value;
       const prevMonthIncomeValue = prevMonthIncome.slice(-1)[0].value;
       const prevMonthExpenseValue = prevMonthExpense.slice(-1)[0].value;
 
       const incomeChange =
-        ((currMonthIncomeValue - prevMonthIncomeValue) / prevMonthIncomeValue) *
-        100;
+        prevMonthIncomeValue === 0
+          ? 0
+          : ((currMonthIncomeValue - prevMonthIncomeValue) /
+              prevMonthIncomeValue) *
+            100;
       const expenseChange =
-        ((currMonthExpenseValue - prevMonthExpenseValue) /
-          prevMonthExpenseValue) *
-        100;
+        prevMonthExpenseValue === 0
+          ? 0
+          : ((currMonthExpenseValue - prevMonthExpenseValue) /
+              prevMonthExpenseValue) *
+            100;
 
       setPctChange({
         incomepct: incomeChange.toFixed(2),
@@ -100,35 +111,61 @@ const Analysis = () => {
           budget: response[0].budget || 0,
           category: {
             Shopping: {
-              budget: response[0].category.shopping.budget,
+              budget: response[0].category.shopping.budget || 0,
               spent: response[0].category.shopping.spent,
             },
             Entertainment: {
-              budget: response[0].category.entertainment.budget,
+              budget: response[0].category.entertainment.budget || 0,
               spent: response[0].category.entertainment.spent,
             },
             "Food & Drink": {
-              budget: response[0].category.foodAndDrink.budget,
+              budget: response[0].category.foodAndDrink.budget || 0,
               spent: response[0].category.foodAndDrink.spent,
             },
             Transportation: {
-              budget: response[0].category.transportation.budget,
+              budget: response[0].category.transportation.budget || 0,
               spent: response[0].category.transportation.spent,
             },
             Home: {
-              budget: response[0].category.home.budget,
+              budget: response[0].category.home.budget || 0,
               spent: response[0].category.home.spent,
             },
             Other: {
-              budget: response[0].category.other.budget,
+              budget: response[0].category.other.budget || 0,
               spent: response[0].category.other.spent,
             },
+          },
+        });
+      } else {
+        // Set default values when no data is available
+        setBudgets({
+          spent: 0,
+          budget: 0,
+          category: {
+            Shopping: { budget: 0, spent: 0 },
+            Entertainment: { budget: 0, spent: 0 },
+            "Food & Drink": { budget: 0, spent: 0 },
+            Transportation: { budget: 0, spent: 0 },
+            Home: { budget: 0, spent: 0 },
+            Other: { budget: 0, spent: 0 },
           },
         });
       }
       // console.log("budgets: ", budgets);
     } catch (error) {
       console.log("Error in fetching budget:  ", error);
+      setBudgets({
+        spent: 0,
+        budget: 0,
+        category: {
+          Shopping: { budget: 0, spent: 0 },
+          Entertainment: { budget: 0, spent: 0 },
+          "Food & Drink": { budget: 0, spent: 0 },
+          Transportation: { budget: 0, spent: 0 },
+          Home: { budget: 0, spent: 0 },
+          Other: { budget: 0, spent: 0 }
+        }
+      });
     } finally {
       setIsLoading(false);
     }
@@ -150,7 +187,13 @@ const Analysis = () => {
 
     return (
       <>
-        <View style={{borderRightWidth: 0.2, borderLeftWidth: 0.2, borderColor: theme.text2}}>
+        <View
+          style={{
+            borderRightWidth: 0.2,
+            borderLeftWidth: 0.2,
+            borderColor: theme.text2,
+          }}
+        >
           <LineChart
             areaChart
             curved
@@ -164,7 +207,7 @@ const Analysis = () => {
             startOpacity={0.5}
             endOpacity={0}
             width={Dimensions.get("window").width - 35}
-            height={150}        
+            height={150}
             thickness={2}
             // noOfSections={5}
             spacing={12}
@@ -362,16 +405,17 @@ const Analysis = () => {
                   <DefaultText>{category}</DefaultText>
                   <View style={styles.progressContainer}>
                     <DefaultText style={styles.budgetAmount}>
-                      £ {Math.round(spent)}
+                      £ {Math.round(spent || 0)}
                     </DefaultText>
                     <Progress.Bar
-                      progress={spent / budget > 1 ? 1 : spent / budget}
-                      color={spent / budget > 1 ? theme.danger : theme.success}
+                      // progress={spent / budget > 1 ? 1 : spent / budget}
+                      progress={budget > 0 ? Math.min(1, (spent || 0) / budget) : 0}
+                      color={spent > budget ? theme.danger : theme.success}
                       width={120}
                       style={{ marginHorizontal: 10 }}
                     />
                     <DefaultText style={styles.budgetAmount}>
-                      £ {budget}
+                      £ {budget || 0}
                     </DefaultText>
                   </View>
                 </View>

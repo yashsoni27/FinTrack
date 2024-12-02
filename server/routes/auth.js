@@ -5,6 +5,7 @@ import {
   forgotPassword,
   resetPassword,
   deleteAccount,
+  updateOnboarding
 } from "../controllers/auth.js";
 
 const router = express.Router();
@@ -20,5 +21,6 @@ router.post("/signin", signIn);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
 router.post("/delete-account", deleteAccount);
+router.post("/update-onboarding", updateOnboarding);
 
 export default router;
