@@ -362,7 +362,7 @@ export const getBudget = async (request, response) => {
     ];
 
     const transactionResponse = await Transaction.aggregate(pipeline);
-    console.log("response: ", transactionResponse);
+    console.log("transaction response: ", transactionResponse);
 
     const budgetResponse = await Budget.find({
       userId: userId,
@@ -371,9 +371,13 @@ export const getBudget = async (request, response) => {
     });
     console.log("budget response: ", budgetResponse);
 
+
     if (budgetResponse.length > 0) {
+      console.log("1");
       if (transactionResponse.length > 0) {
+        console.log("2");
         budgetResponse[0].spent = transactionResponse[0].total;
+
         budgetResponse[0].category.shopping.spent =
           transactionResponse[0].shopping;
         budgetResponse[0].category.entertainment.spent =
@@ -390,6 +394,7 @@ export const getBudget = async (request, response) => {
           { spent: transactionResponse[0].total }
         );
       } else {
+        console.log("3");
         budgetResponse[0].spent = 0;
         budgetResponse[0].category.shopping.spent =
           0;
@@ -408,13 +413,16 @@ export const getBudget = async (request, response) => {
         );
       }
     } else {
+      console.log("4");
       const prevBudgetResponse = await Budget.find({
         userId: userId,
         month: currentMonth - 1,
         year: currentYear,
       });
 
-      const data = {
+      let data = {};
+      if (prevBudgetResponse.length > 0) {
+      data = {
         totalSpending: prevBudgetResponse[0].budget,
         shopping: prevBudgetResponse[0].category.shopping.budget,
         entertainment: prevBudgetResponse[0].category.entertainment.budget,
@@ -422,7 +430,8 @@ export const getBudget = async (request, response) => {
         transportation: prevBudgetResponse[0].category.transportation.budget,
         home: prevBudgetResponse[0].category.home.budget,
         other: prevBudgetResponse[0].category.other.budget,
-      };
+        };
+      }
 
       const currMonthResponse = await callController(setBudget, {
         userId: userId,

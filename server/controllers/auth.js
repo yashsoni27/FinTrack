@@ -2,6 +2,7 @@ import User from "../models/user.js";
 import Account from "../models/account.js";
 import Transaction from "../models/transaction.js";
 import Recurring from "../models/recurring.js";
+import Budget from "../models/budget.js";
 
 import { hashPassword, comparePassword } from "../helpers/auth.js";
 import jwt from "jsonwebtoken";
@@ -176,7 +177,7 @@ export const deleteAccount = async (req, res) => {
     await Account.deleteMany({ userId });
     await Transaction.deleteMany({ userId });
     await Recurring.deleteMany({ userId });
-    // await Budget.deleteMany({ userId });
+    await Budget.deleteMany({ userId });
 
 
     return res.json({ message: "Account deleted successfully" });
@@ -184,4 +185,10 @@ export const deleteAccount = async (req, res) => {
     console.log(err);
     return res.status(400).send("Error. Try again.");
   }
+};
+
+export const updateOnboarding = async (req, res) => {
+  const { userId, isOnboarded } = req.body;
+  await User.updateOne({ userId }, { isOnboarded });
+  return res.json({ message: "Onboarding status updated" });
 };

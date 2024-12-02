@@ -18,6 +18,7 @@ const AccountSlider = ({ accounts, onAddAccountSuccess }) => {
   const [state, setState] = useContext(AuthContext);
   const [linkToken, setLinkToken] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [initializing, setInitializing] = useState(true);
   const { theme, mode } = useTheme();
   
   let background = theme.background;
@@ -65,23 +66,24 @@ const AccountSlider = ({ accounts, onAddAccountSuccess }) => {
   };
 
   useEffect(() => {
-    generateLinkToken();
+    const initializeAccounts = async () => {
+      try {
+        await generateLinkToken();
+      } catch (error) {
+        console.error("Error initializing accounts:", error);
+      } finally {
+        setInitializing(false);
+      }
+    };
+
+    initializeAccounts();
   }, [state.user.userId]);
 
-  if (loading) {
+  if (initializing || loading) {
     return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          padding: 20,
-        }}
-      >
-        <ActivityIndicator size="large" color="#4285F4" />
-        <DefaultText style={{ marginTop: 10, fontSize: 16, color: theme.text }}>
-          Loading...
-        </DefaultText>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={theme.primary} />
+        <DefaultText>Loading accounts...</DefaultText>
       </View>
     );
   }
@@ -186,6 +188,12 @@ const createStyles = (theme, background, text) => {
       paddingVertical: 10,
       borderRadius: 10,
       marginRight: 5,
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 20,
     },
   });
 };

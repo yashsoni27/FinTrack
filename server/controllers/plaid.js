@@ -121,6 +121,7 @@ export const getBalance = async (request, response) => {
         try {
           const existingAccount = await Account.findOne({
             persistent_account_id: accountData.persistent_account_id,
+            userId: userId,
           });
 
           if (!existingAccount) {
@@ -370,7 +371,7 @@ export const recurringTransactions = async (request, response) => {
 
     // Fetch all recurring transactions from DB
     const recurringResponse = await callController(getRecurringDb, { userId });
-    console.log("recurringResponse: ", recurringResponse);
+    // console.log("recurringResponse: ", recurringResponse);
 
     response.json(recurringResponse);
   } catch (e) {

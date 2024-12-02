@@ -33,10 +33,16 @@ const SignUp = ({ navigation }) => {
     if (response.error) {
       alert(response.error);
     } else {
-      setState(response);
-      await AsyncStorage.setItem("auth", JSON.stringify(response));
-      // alert("User created successfully");
-      navigation.navigate("Home");
+      const authData = {
+        ...response,
+        user: {
+          ...response.user,
+          isOnboarded: false
+        }
+      };
+      setState(authData);
+      await AsyncStorage.setItem("auth", JSON.stringify(authData));
+      navigation.navigate("Onboarding");
     }
   };
 

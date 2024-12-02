@@ -1,8 +1,8 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import React from "react";
-import DefaultText from "../../components/defaultText";
 import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "../../context/themeContext";
+import DefaultText from "../../components/defaultText";
 
 const Landing = () => {
   const navigation = useNavigation();
@@ -25,7 +25,7 @@ const Landing = () => {
             style={styles.buttonStyle}
           >
             <DefaultText style={styles.buttonText}>Log In</DefaultText>
-          </TouchableOpacity>          
+          </TouchableOpacity>
           <TouchableOpacity
             onPress={() => navigation.navigate("SignUp")}
             style={[styles.buttonStyle, { backgroundColor: theme.text2 }]}
