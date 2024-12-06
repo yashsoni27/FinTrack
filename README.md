@@ -1,6 +1,21 @@
 # FinTrack - LLM based finance tracker
 
-FinTrack is a LLM integrated personal finance tracker mobile application that allows users to monitor their online and offline expenses from various connected accounts in one place. This repository contains both the frontend mobile application built with React Native and the backend server built with Node.js.
+FinTrack is a LLM integrated personal finance tracker mobile application that allows users to monitor their online and offline expenses from various connected accounts in one place. This repository contains both the frontend mobile application built with React Native and the backend server built with Node.js. 
+
+<!-- <img alt="recurring" src="https://github.com/user-attachments/assets/8d6030e3-dd87-4543-a7f5-58fea2b086ef" width=300 > -->
+<p>
+	<img alt="lightMode" src="https://github.com/user-attachments/assets/05273f49-9227-40f1-b208-0b05c8e04f6e" width=300 style="float:left">
+	<img alt="darkMode" src="https://github.com/user-attachments/assets/63b92624-33b7-41fc-9213-e8e8523a2dc2" width=300 style="float:right">
+</p>
+<p>
+	<img alt="llmChat" src="https://github.com/user-attachments/assets/3985ffd3-7e7d-490b-bb02-3f63edbff187" width=300>
+	<img alt="budget" src="https://github.com/user-attachments/assets/fec2ba28-a671-48f0-9d50-bd6d0892463f" width=300>
+</p>
+
+
+https://github.com/user-attachments/assets/fc1eb1ba-4d5e-403a-aeb9-d8b5fd279250
+
+
 
 ## Features
 
