@@ -108,7 +108,6 @@ https://github.com/user-attachments/assets/fc1eb1ba-4d5e-403a-aeb9-d8b5fd279250
   - Node.js
   - Express.js
   - MongoDB
-  - Mongoose
   - Plaid API
   - Gemini API
 
