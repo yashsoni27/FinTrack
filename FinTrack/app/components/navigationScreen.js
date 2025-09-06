@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useEffect, useRef, useState, useContext } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { AuthContext } from "../context/auth";
 import SignUp from "../screens/auth/signUp";
@@ -16,10 +16,47 @@ import ManageBudgets from "../screens/manageBudgets";
 import Onboarding from "../screens/onboarding";
 import LLMChat from "../screens/llmChat";
 import TransactionDetail from "./transactionDetail";
+import { registerForPushNotificationsAsync } from "../utils/notificationConfig";
+import { websocketService } from "../utils/websocketService";
+import * as Notifications from "expo-notifications";
 
 const Stack = createNativeStackNavigator();
 
 const NavigationScreen = () => {
+  const [expoPushToken, setExpoPushToken] = useState("");
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
+
+  // useEffect(() => {
+  //   // Push Notifications Setup
+  //   registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+
+  //   notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+  //     setNotification(notification);
+  //   });
+
+  //   responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+  //     console.log(response);
+  //   });
+
+  //   // WebSocket Setup
+  //   websocketService.connect('wss://your-websocket-server.com');
+
+  //   // Subscribe to WebSocket messages
+  //   const unsubscribe = websocketService.subscribe(data => {
+  //     console.log('Received WebSocket data:', data);
+  //     // Handle WebSocket messages here
+  //   });
+
+  //   return () => {
+  //     Notifications.removeNotificationSubscription(notificationListener.current);
+  //     Notifications.removeNotificationSubscription(responseListener.current);
+  //     websocketService.disconnect();
+  //     unsubscribe();
+  //   };
+  // }, []);
+
   const [state] = useContext(AuthContext);
   console.log("state:::", state);
   const authenticated = state && state.token !== "" && state.user !== null;
@@ -37,13 +74,14 @@ const NavigationScreen = () => {
     >
       {authenticated ? (
         !isOnboarded ? (
-          <Stack.Screen 
-            name="Onboarding" 
+          <Stack.Screen
+            name="Onboarding"
             component={Onboarding}
             options={{ gestureEnabled: false }}
           />
         ) : (
           <>
+            {/* Inside App */}
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen name="Account" component={Account} />
             <Stack.Screen name="Analysis" component={Analysis} />
@@ -52,11 +90,15 @@ const NavigationScreen = () => {
             <Stack.Screen name="LLMChat" component={LLMChat} />
             <Stack.Screen name="Recurring" component={RecurringScreen} />
             <Stack.Screen name="ManageBudgets" component={ManageBudgets} />
-            <Stack.Screen name="TransactionDetail" component={TransactionDetail} />
+            <Stack.Screen
+              name="TransactionDetail"
+              component={TransactionDetail}
+            />
           </>
         )
       ) : (
         <>
+          {/* Authentication pages */}
           <Stack.Screen name="Landing" component={Landing} />
           <Stack.Screen name="SignIn" component={SignIn} />
           <Stack.Screen name="SignUp" component={SignUp} />

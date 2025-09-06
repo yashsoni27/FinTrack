@@ -50,6 +50,7 @@ const RecurringScreen = () => {
   const getRecurringDb = async () => {
     try {
       const response = await getRecurringTransactionsDb(userId);
+      console.log("recurring: ", response.outflowStreams);
       const subscriptions = response.outflowStreams.filter(
         (stream) => stream.category[0] === "Service"
         // && stream.category[1] === "Subscription"

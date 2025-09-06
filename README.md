@@ -66,12 +66,20 @@ https://github.com/user-attachments/assets/fc1eb1ba-4d5e-403a-aeb9-d8b5fd279250
 	```
 
 ### Running the app
-1. **Start the backend server:**
+1. Setup
+   - Make sure you all the necessary android SDK installed
+   - Also if developing on local device then alongside Expo Go, your device should be in Developer mode and _USB debugging_ should be **enabled**
+   - Then after connecting the device via cable, run this command beforehand
+   	```sh
+	adb reverse tcp:8000 tcp:8000
+	```
+   
+3. **Start the backend server:**
 	```sh
 	cd server
 	npm start
 	```
-2. **Run the mobile app:**
+4. **Run the mobile app:**
 	```sh
 	cd..
 	npx expo run:android

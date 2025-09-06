@@ -44,7 +44,7 @@ if (getRNMinorVersion() >= 75) {
   }
 }
 
-rootProject.name = 'Fintrack'
+rootProject.name = 'Fintracker'
 
 dependencyResolutionManagement {
   versionCatalogs {
