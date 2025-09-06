@@ -23,41 +23,39 @@ import * as Notifications from "expo-notifications";
 const Stack = createNativeStackNavigator();
 
 const NavigationScreen = () => {
-
-  const [expoPushToken, setExpoPushToken] = useState('');
+  const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
 
-  useEffect(() => {
-    // Push Notifications Setup
-    registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+  // useEffect(() => {
+  //   // Push Notifications Setup
+  //   registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
 
-    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-      setNotification(notification);
-    });
+  //   notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+  //     setNotification(notification);
+  //   });
 
-    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log(response);
-    });
+  //   responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+  //     console.log(response);
+  //   });
 
-    // WebSocket Setup
-    websocketService.connect('wss://your-websocket-server.com');
+  //   // WebSocket Setup
+  //   websocketService.connect('wss://your-websocket-server.com');
 
-    // Subscribe to WebSocket messages
-    const unsubscribe = websocketService.subscribe(data => {
-      console.log('Received WebSocket data:', data);
-      // Handle WebSocket messages here
-    });
+  //   // Subscribe to WebSocket messages
+  //   const unsubscribe = websocketService.subscribe(data => {
+  //     console.log('Received WebSocket data:', data);
+  //     // Handle WebSocket messages here
+  //   });
 
-    return () => {
-      Notifications.removeNotificationSubscription(notificationListener.current);
-      Notifications.removeNotificationSubscription(responseListener.current);
-      websocketService.disconnect();
-      unsubscribe();
-    };
-  }, []);
-
+  //   return () => {
+  //     Notifications.removeNotificationSubscription(notificationListener.current);
+  //     Notifications.removeNotificationSubscription(responseListener.current);
+  //     websocketService.disconnect();
+  //     unsubscribe();
+  //   };
+  // }, []);
 
   const [state] = useContext(AuthContext);
   console.log("state:::", state);

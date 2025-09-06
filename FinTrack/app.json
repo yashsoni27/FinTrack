@@ -27,19 +27,23 @@
     },
     "plugins": [
       "expo-router",
-      "expo-build-properties",
-      {
-        "android": {
-          "enableProguardInReleaseBuilds": true,
-          "enableShrinkResourcesInReleaseBuilds": true
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableProguardInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true
+          }
         }
-      },
-      "expo-notifications",
-      {
-        "icon": "./assets/images/icon.png",
-        "color": "#ffffff",
-        "sounds": ["./assets/sounds/sound.wav"]
-      }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#ffffff",
+          "sounds": ["./assets/sounds/sound.wav"]
+        }
+      ]
     ],
     "extra": {
       "router": {

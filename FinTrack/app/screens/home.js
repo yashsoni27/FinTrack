@@ -118,7 +118,7 @@ const Home = () => {
       setTransactions(response.transactions);
       setLoading(false);
     } catch (error) {
-      console.log("Error in fetching transactions: ", error);
+      console.log("Error in fetching transactionsDB: ", error);
       setLoading(false);
     }
   };
